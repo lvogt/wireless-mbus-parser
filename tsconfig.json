@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "target": "ESNext",
+    "moduleResolution": "Bundler",
+    "module": "ESNext",
+    "declaration": true,
+    "noEmit": true,
+    "stripInternal": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src", "test", "vitest.config.ts"],
+  "exclude": ["node_modules", "dist"]
+}

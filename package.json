@@ -1,0 +1,76 @@
+{
+  "name": "wireless-mbus-parser",
+  "description": "Parse telegram data received via wireless mbus",
+  "version": "0.1.0",
+  "license": "MIT",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "README.md",
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      },
+      "default": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "homepage": "https://github.com/lvogt/wireless-mbus-parser",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lvogt/wireless-mbus-parser.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lvogt/wireless-mbus-parser/issues"
+  },
+  "keywords": [
+    "wireless",
+    "mbus",
+    "m-bus",
+    "parser",
+    "wmbus"
+  ],
+  "scripts": {
+    "build": "$npm_execpath run test && $npm_execpath format && $npm_execpath run lint && $npm_execpath run build:code",
+    "build:code": "tsup-node",
+    "compile": "tsc",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage",
+    "clean": "rimraf dist",
+    "lint": "eslint --cache --cache-strategy content .",
+    "lint:fix": "eslint --cache --cache-strategy content . --fix",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write ."
+  },
+  "type": "module",
+  "devDependencies": {
+    "@eslint/js": "9.10.0",
+    "@trivago/prettier-plugin-sort-imports": "4.3.0",
+    "@types/node": "22.5.5",
+    "@vitest/coverage-istanbul": "2.1.1",
+    "eslint": "9.10.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-prettier": "5.2.1",
+    "globals": "15.9.0",
+    "prettier": "3.3.3",
+    "rimraf": "6.0.1",
+    "tsup": "8.2.4",
+    "typescript": "5.5.4",
+    "typescript-eslint": "8.6.0",
+    "vite-tsconfig-paths": "5.0.1",
+    "vitest": "2.1.1"
+  },
+  "packageManager": "pnpm@9.6.0",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
