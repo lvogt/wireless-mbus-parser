@@ -1,1 +1,1 @@
-export function createParser() {}
+export { stripAnyCrc } from "@/crc/crcHandler";
