@@ -1,0 +1,85 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Link Layer > Check fields - Wired M-Bus 1`] = `
+{
+  "aField": 5,
+  "cField": 8,
+  "lField": 88,
+}
+`;
+
+exports[`Link Layer > Check fields 1`] = `
+{
+  "aField": 3430008,
+  "aFieldRaw": {
+    "data": [
+      120,
+      86,
+      52,
+      0,
+      51,
+      3,
+    ],
+    "type": "Buffer",
+  },
+  "addressRaw": {
+    "data": [
+      147,
+      21,
+      120,
+      86,
+      52,
+      0,
+      51,
+      3,
+    ],
+    "type": "Buffer",
+  },
+  "cField": 68,
+  "lField": 46,
+  "mField": 5523,
+  "manufacturer": "ELS",
+  "meterId": "00345678",
+  "type": 3,
+  "typeString": "Gas",
+  "version": 51,
+}
+`;
+
+exports[`Link Layer > Check fields with offset 1`] = `
+{
+  "aField": 3430008,
+  "aFieldRaw": {
+    "data": [
+      120,
+      86,
+      52,
+      0,
+      51,
+      119,
+    ],
+    "type": "Buffer",
+  },
+  "addressRaw": {
+    "data": [
+      147,
+      21,
+      120,
+      86,
+      52,
+      0,
+      51,
+      119,
+    ],
+    "type": "Buffer",
+  },
+  "cField": 68,
+  "lField": 46,
+  "mField": 5523,
+  "manufacturer": "ELS",
+  "meterId": "00345678",
+  "type": 119,
+  "typeString": "unknown",
+  "version": 51,
+}
+`;

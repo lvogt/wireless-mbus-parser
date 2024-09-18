@@ -43,6 +43,8 @@
     "build:code": "tsup-node",
     "compile": "tsc",
     "test": "vitest run",
+    "test:watch": "vitest",
+    "test:update": "vitest run --update",
     "coverage": "vitest run --coverage",
     "clean": "rimraf dist",
     "lint": "eslint --cache --cache-strategy content .",

@@ -4,6 +4,7 @@ import {
   FRAME_A_BLOCK_SIZE,
   FRAME_B_BLOCK_SIZE,
 } from "@/helper/constants";
+import { isWiredMbusFrame } from "@/helper/helper";
 
 function checkFrameTypeACrc(data: Buffer) {
   if (!checkCrc(data, 0, DATA_LINK_LAYER_SIZE)) {
@@ -171,10 +172,6 @@ function handleWiredMbusFrame(data: Buffer) {
   }
 
   return Buffer.from(data.subarray(0, data.length - 2));
-}
-
-function isWiredMbusFrame(data: Buffer) {
-  return data[0] == 0x68 && data[3] == 0x68 && data[data.length - 1] == 0x16;
 }
 
 export function stripAnyCrc(data: Buffer, containsCrc?: boolean) {
