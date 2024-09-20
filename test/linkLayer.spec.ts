@@ -11,7 +11,19 @@ describe("Link Layer", () => {
 
     expect(result.state.pos).toBe(10);
     expect(result.isWired).toBe(false);
-    expect(result.linkLayer).matchSnapshot();
+    expect(result.linkLayer).toEqual({
+      lField: 0x2e,
+      cField: 0x44,
+      mField: 0x1593,
+      aField: 0x345678,
+      version: 0x33,
+      type: 0x03,
+      addressRaw: Buffer.from("9315785634003303", "hex"),
+      aFieldRaw: Buffer.from("785634003303", "hex"),
+      manufacturer: "ELS",
+      typeString: "Gas",
+      meterId: "00345678",
+    });
   });
 
   it("Check fields with offset", () => {
@@ -22,7 +34,19 @@ describe("Link Layer", () => {
 
     expect(result.state.pos).toBe(15);
     expect(result.isWired).toBe(false);
-    expect(result.linkLayer).matchSnapshot();
+    expect(result.linkLayer).toEqual({
+      lField: 0x2e,
+      cField: 0x44,
+      mField: 0x1593,
+      aField: 0x345678,
+      version: 0x33,
+      type: 0x77,
+      addressRaw: Buffer.from("9315785634003377", "hex"),
+      aFieldRaw: Buffer.from("785634003377", "hex"),
+      manufacturer: "ELS",
+      typeString: "unknown",
+      meterId: "00345678",
+    });
   });
 
   it("Check fields - Wired M-Bus", () => {
@@ -33,7 +57,11 @@ describe("Link Layer", () => {
 
     expect(result.state.pos).toBe(6);
     expect(result.isWired).toBe(true);
-    expect(result.linkLayer).matchSnapshot();
+    expect(result.linkLayer).toEqual({
+      lField: 0x58,
+      cField: 0x08,
+      aField: 0x05,
+    });
   });
 
   /*it("Check fields - Wired M-Bus - after Application Layer", () => {
