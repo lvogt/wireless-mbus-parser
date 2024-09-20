@@ -6,7 +6,11 @@ import {
 } from "@/helper/helper";
 import type { LinkLayer, ParserState, WiredLinkLayer } from "@/types";
 
-export function decodeLinkLayer(state: ParserState) {
+export function decodeLinkLayer(state: ParserState): {
+  state: ParserState;
+  isWired: boolean;
+  linkLayer: LinkLayer | WiredLinkLayer;
+} {
   const { data, pos } = state;
   const isWired = isWiredMbusFrame(data);
 

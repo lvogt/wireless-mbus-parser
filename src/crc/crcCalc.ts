@@ -45,3 +45,9 @@ export function checkCrc(data: Buffer, start: number, end: number) {
   const expected = data.readUInt16BE(end);
   return checksum === expected;
 }
+
+export function checkCrcEll(data: Buffer, start: number, end: number) {
+  const expected = data.readUInt16LE(start);
+  const checksum = calcCrc(data, start + 2, end);
+  return checksum === expected;
+}
