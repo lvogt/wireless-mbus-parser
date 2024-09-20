@@ -9,6 +9,7 @@ export const CI_ELL_10 = 0x8e; // Extended Link Layer, 10 Bytes - OMS
 export const CI_ELL_16 = 0x8f; // Extended Link Layer, 16 Bytes
 
 export const CI_ELL = [CI_ELL_2, CI_ELL_8, CI_ELL_10, CI_ELL_16];
+export const CI_AFL = 0x90;
 
 export const VALID_DEVICES_TYPES = {
   0x00: "Other",
