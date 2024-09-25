@@ -7,6 +7,7 @@ import {
   CI_ELL_16,
 } from "@/helper/constants";
 import { decryptInPlace } from "@/helper/crypto";
+import { isLinkLayer } from "@/helper/helper";
 import { log } from "@/helper/logger";
 import type {
   ExtendedLinkLayer,
@@ -14,6 +15,7 @@ import type {
   ExtendedLinkLayer16,
   LinkLayer,
   ParserState,
+  WiredLinkLayer,
 } from "@/types";
 
 export function hasExtendedLinkLayer(state: ParserState) {
@@ -22,7 +24,7 @@ export function hasExtendedLinkLayer(state: ParserState) {
 
 export function decodeExtendedLinkLayer(
   state: ParserState,
-  linkLayer: LinkLayer
+  linkLayer: LinkLayer | WiredLinkLayer
 ): { state: ParserState; extendedLinkLayer: ExtendedLinkLayer } {
   const { state: newState, ell } = parseHeader(state);
   const data = newState.data;
@@ -49,6 +51,10 @@ export function decodeExtendedLinkLayer(
 
   if (state.key === undefined) {
     throw new Error("Encrytped ELL, but no key provided!");
+  }
+
+  if (!isLinkLayer(linkLayer)) {
+    throw new Error("Unexpected state: wired M-bus frame and ELL!");
   }
 
   const iv = createIv(ell, linkLayer);

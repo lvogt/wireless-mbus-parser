@@ -17,6 +17,7 @@ export function decodeAuthenticationAndFragmentationLayer(state: ParserState): {
   if (ci !== CI_AFL) {
     throw new Error(`Wrong AFL CI: ${ci}`);
   }
+  log.debug("Authentification and Fragmentation Layer");
 
   const afll = data[pos++];
 

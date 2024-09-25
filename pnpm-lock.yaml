@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      aes-cmac:
+        specifier: 3.0.2
+        version: 3.0.2
     devDependencies:
       '@eslint/js':
         specifier: 9.10.0
@@ -722,6 +726,9 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
+  aes-cmac@3.0.2:
+    resolution: {integrity: sha512-BYaGJ+pPhdt4cLHvQ1nOl4kAS1QxZM9CJkybLgoIfqoGVA1JMc6bOUTuzEO+XQf6jKp9ubll4iYTGP3ccNaMLQ==}
+
   ajv@6.12.6:
     resolution: {integrity: sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==}
 
@@ -1303,6 +1310,9 @@ packages:
   object-assign@4.1.1:
     resolution: {integrity: sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==}
     engines: {node: '>=0.10.0'}
+
+  one-webcrypto@1.0.3:
+    resolution: {integrity: sha512-fu9ywBVBPx0gS9K0etIROTiCkvI5S1TDjFsYFb3rC1ewFxeOqsbzq7aIMBHsYfrTHBcGXJaONXXjTl8B01cW1Q==}
 
   onetime@5.1.2:
     resolution: {integrity: sha512-kbpaSSGJTWdAY5KPVeMOKXSrPtr8C8C7wodJbcsd51jRnmD+GZu8Y0VoU6Dm5Z4vWr0Ig/1NKuWRKf7j5aaYSg==}
@@ -2346,6 +2356,10 @@ snapshots:
 
   acorn@8.12.1: {}
 
+  aes-cmac@3.0.2:
+    dependencies:
+      one-webcrypto: 1.0.3
+
   ajv@6.12.6:
     dependencies:
       fast-deep-equal: 3.1.3
@@ -2944,6 +2958,8 @@ snapshots:
       path-key: 3.1.1
 
   object-assign@4.1.1: {}
+
+  one-webcrypto@1.0.3: {}
 
   onetime@5.1.2:
     dependencies:

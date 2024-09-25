@@ -1,7 +1,12 @@
 import { VALID_DEVICES_TYPES } from "@/helper/constants";
+import type { LinkLayer, WiredLinkLayer } from "@/types";
 
 export function isWiredMbusFrame(data: Buffer) {
   return data[0] == 0x68 && data[3] == 0x68 && data[data.length - 1] == 0x16;
+}
+
+export function isLinkLayer(ll: LinkLayer | WiredLinkLayer): ll is LinkLayer {
+  return (ll as LinkLayer).mField !== undefined;
 }
 
 export function decodeBCD(digits: number, data: Buffer, offset = 0) {
@@ -24,9 +29,9 @@ export function decodeBCD(digits: number, data: Buffer, offset = 0) {
   return Math.trunc(sign * val);
 }
 
-export function getMeterId(data: Buffer, offset: number) {
-  const bcd = decodeBCD(8, data, offset);
-  return bcd.toString().padStart(8, "0");
+export function getMeterId(data: Buffer | number, offset = 0) {
+  const num = Buffer.isBuffer(data) ? data.readUint32LE(offset) : data;
+  return num.toString(16).padStart(8, "0");
 }
 
 export function decodeManufacturer(data: number) {
@@ -40,4 +45,19 @@ export function decodeManufacturer(data: number) {
 export function getDeviceType(type: number) {
   const idx = type as keyof typeof VALID_DEVICES_TYPES;
   return VALID_DEVICES_TYPES[idx] || "unknown";
+}
+
+export function getDeviceState(statusCode: number) {
+  switch (statusCode) {
+    case 0x00:
+      return "No error";
+    case 0x01:
+      return "Application busy";
+    case 0x02:
+      return "Any application error";
+    case 0x03:
+      return "Abnormal condition / Alarm";
+    default:
+      return `Error state 0x${statusCode.toString(16)}`;
+  }
 }

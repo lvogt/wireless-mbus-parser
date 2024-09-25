@@ -3,6 +3,8 @@ export const DATA_LINK_LAYER_SIZE = 10;
 export const FRAME_A_BLOCK_SIZE = 16;
 export const FRAME_B_BLOCK_SIZE = 128;
 
+export const AES_BLOCK_SIZE = 16;
+
 export const CI_ELL_2 = 0x8c; // Extended Link Layer, 2 Bytes - OMS
 export const CI_ELL_8 = 0x8d; // Extended Link Layer, 8 Bytes
 export const CI_ELL_10 = 0x8e; // Extended Link Layer, 10 Bytes - OMS
@@ -10,6 +12,15 @@ export const CI_ELL_16 = 0x8f; // Extended Link Layer, 16 Bytes
 
 export const CI_ELL = [CI_ELL_2, CI_ELL_8, CI_ELL_10, CI_ELL_16];
 export const CI_AFL = 0x90;
+
+export const CI_RESP_0 = 0x78; // Response from device, 0 Byte header, variable length
+export const CI_RESP_4 = 0x7a; // Response from device, 4 Bytes
+export const CI_RESP_12 = 0x72; // Response from device, 12 Bytes
+export const CI_RESP_SML_4 = 0x7e; // Response from device, 4 Bytes, application layer SML encoded
+export const CI_RESP_SML_12 = 0x7f; // Response from device, 12 Bytes, application layer SML encoded
+export const CI_RESP_COMPACT = 0x79; // Response from device, no header, Kamstrup(?) compact frame without data record header
+
+export const CI_APL = [CI_RESP_0, CI_RESP_4, CI_RESP_12];
 
 export const VALID_DEVICES_TYPES = {
   0x00: "Other",
