@@ -17,6 +17,58 @@ export interface LinkLayer extends WiredLinkLayer {
   meterId: string;
 }
 
+export interface DataRecord {
+  header: DataRecordHeader;
+  value: null | string | number | bigint | Buffer;
+}
+
+export interface DataRecordHeader {
+  dib: DataInformationBlock;
+  vib: ValueInformationBlock;
+  offset: number;
+  length: number;
+}
+
+export enum VifTable {
+  Default,
+  FD,
+  FB,
+  Plain,
+  Manufacturer,
+}
+
+export interface DataInformationBlock {
+  tariff: number;
+  deviceUnit: number;
+  storageNo: number;
+  functionField: number;
+  dataField: number;
+}
+
+export type PrimaryVif = PrimaryVifNumber | PrimaryVifString;
+
+export interface PrimaryVifNumber {
+  vif: number;
+  table: Exclude<VifTable, VifTable.Plain>;
+  extensionBitSet: boolean;
+}
+
+export interface PrimaryVifString {
+  vif: number;
+  table: VifTable.Plain;
+  plainText: string;
+  extensionBitSet: boolean;
+}
+
+export interface VifExtension {
+  vif: number;
+}
+
+export interface ValueInformationBlock {
+  primary: PrimaryVif;
+  extensions: number[];
+}
+
 export type Config = ConfigMode5 | ConfigMode7 | ConfigMode13;
 
 export interface ConfigMode5 {

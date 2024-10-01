@@ -22,6 +22,26 @@ export const CI_RESP_COMPACT = 0x79; // Response from device, no header, Kamstru
 
 export const CI_APL = [CI_RESP_0, CI_RESP_4, CI_RESP_12];
 
+export const DIF_VIF_EXTENSION_BIT = 0x80;
+export const DIF_VIF_EXTENSION_MASK = 0x7f;
+export const DIF_FILL_BYTE = 0x2f;
+export const DIF_DATATYPE_NONE = 0x00;
+export const DIF_DATATYPE_INT8 = 0x01;
+export const DIF_DATATYPE_INT16 = 0x02;
+export const DIF_DATATYPE_INT24 = 0x03;
+export const DIF_DATATYPE_INT32 = 0x04;
+export const DIF_DATATYPE_FLOAT32 = 0x05;
+export const DIF_DATATYPE_INT48 = 0x06;
+export const DIF_DATATYPE_INT64 = 0x07;
+export const DIF_DATATYPE_READOUT = 0x08;
+export const DIF_DATATYPE_BCD2 = 0x09;
+export const DIF_DATATYPE_BCD4 = 0x0a;
+export const DIF_DATATYPE_BCD6 = 0x0b;
+export const DIF_DATATYPE_BCD8 = 0x0c;
+export const DIF_DATATYPE_VARLEN = 0x0d;
+export const DIF_DATATYPE_BCD12 = 0x0e;
+export const DIF_SPECIAL_FUNCTIONS = 0x0f;
+
 export const VALID_DEVICES_TYPES = {
   0x00: "Other",
   0x01: "Oil",
