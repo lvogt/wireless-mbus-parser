@@ -19,6 +19,7 @@ import type {
   ApplicationLayer,
   ApplicationLayer4,
   ApplicationLayer12,
+  ApplicationLayerCompact,
   AuthenticationAndFragmentationLayer,
   Config,
   ConfigMode5,
@@ -28,6 +29,30 @@ import type {
   ParserState,
   WiredLinkLayer,
 } from "@/types";
+
+function getApplicationLayerCompact(
+  data: Buffer,
+  pos: number,
+  aplOffset: number
+): {
+  newPos: number;
+  apl: ApplicationLayerCompact;
+} {
+  const headerCrc = data.readUInt16LE(pos);
+  pos += 2;
+  const frameCrc = data.readUInt16LE(pos);
+  pos += 2;
+
+  return {
+    newPos: pos,
+    apl: {
+      ci: CI_RESP_COMPACT,
+      offset: aplOffset,
+      headerCrc: headerCrc,
+      frameCrc: frameCrc,
+    },
+  };
+}
 
 function getApplicationLayer4(
   data: Buffer,
@@ -240,10 +265,17 @@ export async function decodeApplicationLayer(
     throw new Error("Payload is SML encoded. SML decoding is not implemented");
   }
 
-  if (ci == CI_RESP_0) {
+  if (ci === CI_RESP_0) {
     return {
       state: { data: data, pos: pos },
       applicationLayer: { ci, offset },
+      linkLayer: getDummyLinkLayer(linkLayer),
+    };
+  } else if (ci === CI_RESP_COMPACT) {
+    const { newPos, apl } = getApplicationLayerCompact(data, pos, offset);
+    return {
+      state: { data: data, pos: newPos },
+      applicationLayer: apl,
       linkLayer: getDummyLinkLayer(linkLayer),
     };
   }
@@ -259,8 +291,6 @@ export async function decodeApplicationLayer(
     pos = res.newPos;
     apl = res.apl;
     ll = mockLinkLayerFromApplicationLayer(apl, linkLayer);
-  } else if (ci == CI_RESP_COMPACT) {
-    throw new Error("Compact frame handling is not implemented yet.");
   } else {
     throw new Error(
       `Unsupported CI Field 0x${ci.toString(16)}\nremaining payload is ${data.toString("hex", pos)}`

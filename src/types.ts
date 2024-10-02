@@ -60,10 +60,6 @@ export interface PrimaryVifString {
   extensionBitSet: boolean;
 }
 
-export interface VifExtension {
-  vif: number;
-}
-
 export interface ValueInformationBlock {
   primary: PrimaryVif;
   extensions: number[];
@@ -99,7 +95,8 @@ export interface ConfigMode13 {
 export type ApplicationLayer =
   | ApplicationLayer0
   | ApplicationLayer4
-  | ApplicationLayer12;
+  | ApplicationLayer12
+  | ApplicationLayerCompact;
 
 export interface ApplicationLayer0 {
   ci: 0x78;
@@ -123,6 +120,12 @@ export interface ApplicationLayer12 extends Omit<ApplicationLayer4, "ci"> {
   meterIdString: string;
   meterDeviceString: string;
   meterManufacturerString: string;
+}
+
+export interface ApplicationLayerCompact extends Omit<ApplicationLayer0, "ci"> {
+  ci: 0x79;
+  headerCrc: number;
+  frameCrc: number;
 }
 
 export interface AuthenticationAndFragmentationLayer {

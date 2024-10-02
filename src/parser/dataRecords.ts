@@ -1,3 +1,4 @@
+import { calcCrc } from "@/crc/crcCalc";
 import {
   DIF_DATATYPE_BCD2,
   DIF_DATATYPE_BCD4,
@@ -315,10 +316,73 @@ function decodeDataRecord(
   };
 }
 
-export function decodeDataRecords(state: ParserState): {
+function decodeDataRecordsFromCache(
+  state: ParserState,
+  cachedHeaders: DataRecordHeader[]
+): {
   state: ParserState;
   dataRecords: DataRecord[];
 } {
+  const dataRecords: DataRecord[] = [];
+
+  let pos = state.pos;
+  const data = state.data;
+  for (const header of cachedHeaders) {
+    const { newPos, value } = decodeDataRecordValue(data, pos, header);
+    pos = newPos;
+    dataRecords.push({ header, value });
+  }
+
+  return {
+    state: {
+      pos: pos,
+      data: data,
+    },
+    dataRecords: dataRecords,
+  };
+}
+
+export function calcHeaderCrc(dataRecords: DataRecord[], data: Buffer) {
+  let crcBuffer = Buffer.alloc(0);
+  for (const record of dataRecords) {
+    const offset = record.header.offset;
+    crcBuffer = Buffer.concat([
+      crcBuffer,
+      data.subarray(offset, offset + record.header.length),
+    ]);
+  }
+
+  return calcCrc(crcBuffer, 0, crcBuffer.length);
+}
+
+export function extractDataRecordHeaders(dataRecords: DataRecord[]) {
+  return dataRecords.map((record) => {
+    const header = record.header;
+    return {
+      dib: {
+        ...header.dib,
+      },
+      vib: {
+        primary: { ...header.vib.primary },
+        extensions: [...header.vib.extensions],
+      },
+      offset: header.offset,
+      length: header.length,
+    } as DataRecordHeader;
+  });
+}
+
+export function decodeDataRecords(
+  state: ParserState,
+  cachedHeaders?: DataRecordHeader[]
+): {
+  state: ParserState;
+  dataRecords: DataRecord[];
+} {
+  if (cachedHeaders !== undefined) {
+    return decodeDataRecordsFromCache(state, cachedHeaders);
+  }
+
   const data = state.data;
   let pos = state.pos;
 

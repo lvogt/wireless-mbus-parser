@@ -141,7 +141,7 @@ describe("Extended Link Layer", () => {
       "3F442D2C06357260190C8D207C71032F21255C79DD829283011117650000BFA80000D24F0000B1FB00000000E919FF18F7640000E8FA00000B000000DB111C0B"
     );
 
-    expect(result.extendedLinkLayer).to.eql({
+    expect(result.extendedLinkLayer).toEqual({
       ci: 0x8d,
       communicationControl: 32,
       accessNumber: 124,

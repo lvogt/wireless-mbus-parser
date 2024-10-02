@@ -221,3 +221,18 @@ describe("Application Layer", () => {
     );
   });
 });
+
+describe("Compact frames", () => {
+  it("Compact frame but no cached structure", async () => {
+    const result = await decodeLlAndApl(
+      "4644a205440000570c3779C4D788B0A60B00004E11000013070000C91A0000000000000000B10B6709"
+    );
+
+    expect(result.applicationLayer).toEqual({
+      ci: 0x79,
+      offset: 10,
+      headerCrc: 0xd7c4,
+      frameCrc: 0xb088,
+    });
+  });
+});
