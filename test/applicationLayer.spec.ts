@@ -113,7 +113,7 @@ describe("Application Layer", () => {
       offset: 0,
       accessNo: 136,
       statusCode: 0x04,
-      status: "Error state 0x4",
+      status: "No error; low power",
       meterId: 0x010115,
       meterManufacturer: 0x3033,
       meterVersion: 2,
