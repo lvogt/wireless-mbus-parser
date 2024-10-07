@@ -4,6 +4,7 @@ import {
   CI_RESP_4,
   CI_RESP_12,
   CI_RESP_COMPACT,
+  CI_RESP_PRIOS,
   CI_RESP_SML_4,
   CI_RESP_SML_12,
 } from "@/helper/constants";
@@ -15,6 +16,7 @@ import {
   getMeterId,
   isLinkLayer,
 } from "@/helper/helper";
+import { decodePriosApplicationLayer } from "@/parser/priosApplicationLayer";
 import type {
   ApplicationLayer,
   ApplicationLayer4,
@@ -291,6 +293,8 @@ export async function decodeApplicationLayer(
     pos = res.newPos;
     apl = res.apl;
     ll = mockLinkLayerFromApplicationLayer(apl, linkLayer);
+  } else if (CI_RESP_PRIOS.includes(ci)) {
+    return await decodePriosApplicationLayer(data, offset, linkLayer);
   } else {
     throw new Error(
       `Unsupported CI Field 0x${ci.toString(16)}\nremaining payload is ${data.toString("hex", pos)}`

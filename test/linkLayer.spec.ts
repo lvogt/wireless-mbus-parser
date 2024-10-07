@@ -93,4 +93,33 @@ describe("Link Layer", () => {
       meterId: "61260581",
     });
   });
+
+  it("Check fields - PRIOS - after Application Layer", async () => {
+    const result = decodeLinkLayer({
+      data: Buffer.from(
+        "1944a511780727324120a2211a00136d7417074c0dcb9661a3ab",
+        "hex"
+      ),
+      pos: 0,
+    });
+
+    const aplResult = await decodeApplicationLayer(
+      result.state,
+      result.linkLayer
+    );
+
+    expect(aplResult.linkLayer).toEqual({
+      lField: 0x19,
+      cField: 0x44,
+      mField: 0x11a5,
+      aField: 0x20413227,
+      version: 0x78,
+      type: 0x07,
+      addressRaw: Buffer.from("a511273241207807", "hex"),
+      aFieldRaw: Buffer.from("273241207807", "hex"),
+      manufacturer: "DME",
+      typeString: "Water",
+      meterId: "20413227",
+    });
+  });
 });

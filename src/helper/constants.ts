@@ -19,6 +19,7 @@ export const CI_RESP_12 = 0x72; // Response from device, 12 Bytes
 export const CI_RESP_SML_4 = 0x7e; // Response from device, 4 Bytes, application layer SML encoded
 export const CI_RESP_SML_12 = 0x7f; // Response from device, 12 Bytes, application layer SML encoded
 export const CI_RESP_COMPACT = 0x79; // Response from device, no header, Kamstrup(?) compact frame without data record header
+export const CI_RESP_PRIOS = [0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7];
 
 export const CI_APL = [CI_RESP_0, CI_RESP_4, CI_RESP_12, CI_RESP_COMPACT];
 

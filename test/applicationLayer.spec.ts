@@ -222,6 +222,19 @@ describe("Application Layer", () => {
   });
 });
 
+describe("PRIOS", () => {
+  it("Check link layer", async () => {
+    const result = await decodeLlAndApl(
+      "1944a511780727324120a2211a00136d7417074c0dcb9661a3ab"
+    );
+
+    expect(result.applicationLayer).toEqual({
+      ci: 0xa2,
+      offset: 10,
+    });
+  });
+});
+
 describe("Compact frames", () => {
   it("Compact frame but no cached structure", async () => {
     const result = await decodeLlAndApl(

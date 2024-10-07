@@ -96,7 +96,13 @@ export type ApplicationLayer =
   | ApplicationLayer0
   | ApplicationLayer4
   | ApplicationLayer12
-  | ApplicationLayerCompact;
+  | ApplicationLayerCompact
+  | ApplicationLayerPrios;
+
+export interface ApplicationLayerPrios {
+  ci: 0xa0 | 0xa1 | 0xa2 | 0xa3 | 0xa4 | 0xa5 | 0xa6 | 0xa7;
+  offset: number;
+}
 
 export interface ApplicationLayer0 {
   ci: 0x78;
