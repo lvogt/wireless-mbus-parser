@@ -123,6 +123,10 @@ export function decodeAuthenticationAndFragmentationLayer(state: ParserState): {
     pos += 2;
   }
 
+  if (fcl.mf) {
+    throw new Error("Fragmented messages are not supported yet.");
+  }
+
   return {
     state: {
       data,
