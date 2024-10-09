@@ -19,7 +19,7 @@ export interface LinkLayer extends WiredLinkLayer {
 
 export interface DataRecord {
   header: DataRecordHeader;
-  value: null | string | number | bigint | Buffer;
+  value: DataType;
 }
 
 export interface DataRecordHeader {
@@ -27,6 +27,47 @@ export interface DataRecordHeader {
   vib: ValueInformationBlock;
   offset: number;
   length: number;
+}
+
+export type DataType = string | number | bigint | Buffer | null;
+
+export interface VIFDescriptor {
+  vif: number;
+  legacyName: string;
+  calc: (value: DataType) => DataType;
+  unit: string;
+  description: string;
+  apply: (self: VIFDescriptor, dataRecord: DataRecord) => EvaluatedData;
+}
+
+export interface VIFEDescriptor {
+  vif: number;
+  legacyName: string;
+  calc?: (value: DataType | Date) => DataType | Date;
+  unit?: string;
+  description?: string;
+  apply: (
+    self: VIFEDescriptor,
+    dataRecord: DataRecord,
+    evaluatedData: EvaluatedData
+  ) => EvaluatedData;
+}
+
+export enum EvaluatedDataType {
+  Number,
+  BigInt,
+  String,
+  Date,
+  DateTime,
+  Buffer,
+  Null,
+}
+
+export interface EvaluatedData {
+  value: DataType | Date;
+  unit: string;
+  description: string;
+  type: EvaluatedDataType;
 }
 
 export enum VifTable {

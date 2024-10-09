@@ -1,6 +1,11 @@
 import { VALID_DEVICES_TYPES } from "@/helper/constants";
 import { log } from "@/helper/logger";
-import type { LinkLayer, WiredLinkLayer } from "@/types";
+import type {
+  LinkLayer,
+  PrimaryVif,
+  PrimaryVifString,
+  WiredLinkLayer,
+} from "@/types";
 
 export function isWiredMbusFrame(data: Buffer) {
   return data[0] == 0x68 && data[3] == 0x68 && data[data.length - 1] == 0x16;
@@ -8,6 +13,10 @@ export function isWiredMbusFrame(data: Buffer) {
 
 export function isLinkLayer(ll: LinkLayer | WiredLinkLayer): ll is LinkLayer {
   return (ll as LinkLayer).mField !== undefined;
+}
+
+export function isPrimaryVifString(vif: PrimaryVif): vif is PrimaryVifString {
+  return (vif as PrimaryVifString).plainText !== undefined;
 }
 
 export function decodeBCD(digits: number, data: Buffer, offset = 0) {
