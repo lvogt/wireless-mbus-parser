@@ -17,6 +17,12 @@ export interface LinkLayer extends WiredLinkLayer {
   meterId: string;
 }
 
+export interface MeterType {
+  manufacturer: string;
+  type: number;
+  version: number;
+}
+
 export interface DataRecord {
   header: DataRecordHeader;
   value: DataType;

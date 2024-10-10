@@ -2,11 +2,17 @@ import { describe, expect, it } from "vitest";
 
 import { decodeDataRecords } from "@/parser/dataRecords";
 import { evaluateDataRecords } from "@/parser/evaluatedData";
-import { EvaluatedDataType } from "@/types";
+import { EvaluatedDataType, type MeterType } from "@/types";
 
-function decode(data: string) {
+const dummyMeter: MeterType = {
+  manufacturer: "ABC",
+  version: 0x12,
+  type: 0x42,
+};
+
+function decode(data: string, meterType?: MeterType) {
   const result = decodeDataRecords({ data: Buffer.from(data, "hex"), pos: 0 });
-  return evaluateDataRecords(result.dataRecords);
+  return evaluateDataRecords(result.dataRecords, meterType ?? dummyMeter);
 }
 
 describe("Evaluate data records", () => {
@@ -283,6 +289,60 @@ describe("Raw Data Records - LVAR", () => {
         type: EvaluatedDataType.DateTime,
         unit: "",
         value: new Date("2026-04-22T18:52:22.000Z"),
+      },
+    ]);
+  });
+});
+
+describe("PRIOS", () => {
+  it("Water meter", () => {
+    const result = decode(
+      "0413eeae020044135da00200426cc12402ff6e9c0003ff2c0800000dff1709736d72616c61206f6e0dff973e09736d72616c61206f6e",
+      { ...dummyMeter, manufacturer: "DME" }
+    );
+    expect(result).toHaveLength(7);
+    expect(result).toEqual([
+      {
+        description: "Volume",
+        type: EvaluatedDataType.Number,
+        unit: "m³",
+        value: 175.854,
+      },
+      {
+        description: "Volume",
+        type: EvaluatedDataType.Number,
+        unit: "m³",
+        value: 172.125,
+      },
+      {
+        description: "Time point",
+        type: EvaluatedDataType.Date,
+        unit: "",
+        value: new Date("2022-04-01T00:00:00.000Z"),
+      },
+      {
+        description: "Remaining battery life",
+        type: EvaluatedDataType.Number,
+        unit: "month",
+        value: 156,
+      },
+      {
+        description: "Transmit period",
+        type: EvaluatedDataType.Number,
+        unit: "s",
+        value: 8,
+      },
+      {
+        description: "Alarm flags",
+        type: EvaluatedDataType.String,
+        unit: "",
+        value: "no alarms",
+      },
+      {
+        description: "Alarm flags; Previous value",
+        type: EvaluatedDataType.String,
+        unit: "",
+        value: "no alarms",
       },
     ]);
   });

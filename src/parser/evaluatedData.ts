@@ -8,6 +8,7 @@ import {
 import type {
   DataRecord,
   EvaluatedData,
+  MeterType,
   PrimaryVif,
   VIFDescriptor,
   VIFEDescriptor,
@@ -16,9 +17,13 @@ import { VifTable } from "@/types";
 import { defaultVIFs } from "@/vif/defaultVifs";
 import { fbVifs } from "@/vif/fbVifs";
 import { fdVifs } from "@/vif/fdVifs";
+import {
+  manufacturerSpecificsVifes,
+  manufacturerSpecificsVifs,
+} from "@/vif/manufacturerSpecificVifs";
 import { vifExtensions } from "@/vif/vifExtension";
 
-function getDescriptor(dataRecord: DataRecord) {
+function getDescriptor(dataRecord: DataRecord, meterType: MeterType) {
   switch (dataRecord.header.vib.primary.table) {
     case VifTable.Default:
       return defaultVIFs.find(
@@ -35,13 +40,51 @@ function getDescriptor(dataRecord: DataRecord) {
     case VifTable.Plain:
       return getPlainTextDescriptor(dataRecord.header.vib.primary);
     case VifTable.Manufacturer:
-      return getFallbackDescriptor(dataRecord, true);
+      return getManufacturerSpecificsVifDescriptor(dataRecord, meterType);
     default:
       throw new Error("Table not yet implemented");
   }
 }
 
-function getVifeDescriptor(extension: number) {
+function getManufacturerSpecificsVifDescriptor(
+  dataRecord: DataRecord,
+  meterType: MeterType
+) {
+  if (meterType.manufacturer in manufacturerSpecificsVifs) {
+    const descriptor = manufacturerSpecificsVifs[meterType.manufacturer].find(
+      (item) => item.vif === dataRecord.header.vib.primary.vif
+    );
+    if (descriptor != undefined) {
+      return descriptor;
+    }
+  }
+  return getFallbackDescriptor(dataRecord, true);
+}
+
+function getManufacturerSpecificsVifeDescriptor(
+  extension: number,
+  meterType: MeterType
+) {
+  if (meterType.manufacturer in manufacturerSpecificsVifes) {
+    const descriptor = manufacturerSpecificsVifes[meterType.manufacturer].find(
+      (item) => item.vif === extension
+    );
+    if (descriptor != undefined) {
+      return descriptor;
+    }
+  }
+  return getFallbackExtensiontDescriptor(extension);
+}
+
+function getVifeDescriptor(
+  extension: number,
+  meterType: MeterType,
+  manufacturerSpecific = false
+) {
+  if (manufacturerSpecific) {
+    return getManufacturerSpecificsVifeDescriptor(extension, meterType);
+  }
+
   const descriptor = vifExtensions.find((item) => item.vif === extension);
   if (descriptor === undefined) {
     return getFallbackExtensiontDescriptor(extension);
@@ -88,8 +131,8 @@ function getFallbackExtensiontDescriptor(extension: number): VIFEDescriptor {
   };
 }
 
-function evaluatePrimaryVif(dataRecord: DataRecord) {
-  let descriptor = getDescriptor(dataRecord);
+function evaluatePrimaryVif(dataRecord: DataRecord, meterType: MeterType) {
+  let descriptor = getDescriptor(dataRecord, meterType);
   if (descriptor === undefined) {
     descriptor = getFallbackDescriptor(dataRecord);
   }
@@ -104,9 +147,14 @@ function evaluatePrimaryVif(dataRecord: DataRecord) {
 function evaluateVifExtension(
   data: EvaluatedData,
   dataRecord: DataRecord,
+  meterType: MeterType,
   extension: number
 ) {
-  const descriptor = getVifeDescriptor(extension);
+  const descriptor = getVifeDescriptor(
+    extension,
+    meterType,
+    dataRecord.header.vib.primary.table === VifTable.Manufacturer
+  );
 
   try {
     return descriptor.apply(descriptor, dataRecord, data);
@@ -115,18 +163,22 @@ function evaluateVifExtension(
   }
 }
 
-function evaluateDataRecord(dataRecord: DataRecord): EvaluatedData {
-  const evaluatedData = evaluatePrimaryVif(dataRecord);
+function evaluateDataRecord(
+  dataRecord: DataRecord,
+  meterType: MeterType
+): EvaluatedData {
+  const evaluatedData = evaluatePrimaryVif(dataRecord, meterType);
 
   for (const ext of dataRecord.header.vib.extensions) {
-    evaluateVifExtension(evaluatedData, dataRecord, ext);
+    evaluateVifExtension(evaluatedData, dataRecord, meterType, ext);
   }
 
   return evaluatedData;
 }
 
 export function evaluateDataRecords(
-  dataRecords: DataRecord[]
+  dataRecords: DataRecord[],
+  meterType: MeterType
 ): EvaluatedData[] {
-  return dataRecords.map((record) => evaluateDataRecord(record));
+  return dataRecords.map((record) => evaluateDataRecord(record, meterType));
 }
