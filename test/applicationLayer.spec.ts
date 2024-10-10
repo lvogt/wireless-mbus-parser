@@ -235,6 +235,19 @@ describe("PRIOS", () => {
   });
 });
 
+describe("Techem", () => {
+  it("HCA", async () => {
+    const result = await decodeLlAndApl(
+      "33446850942905119480a20f9f257500902d0000018e0a760a000000000000000000000000000000000000000000000000000000"
+    );
+
+    expect(result.applicationLayer).toEqual({
+      ci: 0xa2,
+      offset: 10,
+    });
+  });
+});
+
 describe("Compact frames", () => {
   it("Compact frame but no cached structure", async () => {
     const result = await decodeLlAndApl(

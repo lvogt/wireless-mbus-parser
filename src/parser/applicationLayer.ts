@@ -7,6 +7,7 @@ import {
   CI_RESP_PRIOS,
   CI_RESP_SML_4,
   CI_RESP_SML_12,
+  CI_RESP_TECHEM,
 } from "@/helper/constants";
 import { calcKenc, checkAflMac, decryptInPlace } from "@/helper/crypto";
 import {
@@ -17,6 +18,7 @@ import {
   isLinkLayer,
 } from "@/helper/helper";
 import { decodePriosApplicationLayer } from "@/parser/priosApplicationLayer";
+import { decodeTechemApplicationLayer } from "@/parser/techemApplicationLayer";
 import type {
   ApplicationLayer,
   ApplicationLayer4,
@@ -248,6 +250,21 @@ function createIvMode5(
   return iv;
 }
 
+function isPrios(linkLayer: LinkLayer | WiredLinkLayer, ci: number) {
+  return (
+    isLinkLayer(linkLayer) &&
+    linkLayer.manufacturer === "DME" &&
+    CI_RESP_PRIOS.includes(ci)
+  );
+}
+
+function isTechem(linkLayer: LinkLayer | WiredLinkLayer, ci: number) {
+  return (
+    isLinkLayer(linkLayer) &&
+    linkLayer.manufacturer === "TCH" &&
+    CI_RESP_TECHEM.includes(ci)
+  );
+}
 export async function decodeApplicationLayer(
   state: ParserState,
   linkLayer: LinkLayer | WiredLinkLayer,
@@ -293,8 +310,14 @@ export async function decodeApplicationLayer(
     pos = res.newPos;
     apl = res.apl;
     ll = mockLinkLayerFromApplicationLayer(apl, linkLayer);
-  } else if (CI_RESP_PRIOS.includes(ci)) {
+  } else if (isPrios(linkLayer, ci)) {
     return await decodePriosApplicationLayer(data, offset, linkLayer);
+  } else if (isTechem(linkLayer, ci)) {
+    return await decodeTechemApplicationLayer(
+      data,
+      offset,
+      linkLayer as LinkLayer
+    );
   } else {
     throw new Error(
       `Unsupported CI Field 0x${ci.toString(16)}\nremaining payload is ${data.toString("hex", pos)}`

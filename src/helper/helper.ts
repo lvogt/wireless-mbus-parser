@@ -134,3 +134,41 @@ export function decodeDateTimeTypeI(value: number) {
   const year = ((buffer[3] & 0xe0) >> 5) | ((buffer[4] & 0xf0) >> 1);
   return new Date(year + 2000, month - 1, day, hours, minutes, seconds);
 }
+
+export function decodeDateTypeTechem(value: number) {
+  // value is a 16bit int
+
+  //   YYYY YYYM MMMD DDDD
+  // 0b0010 0101 1001 1111 = 31.12.2018
+
+  const day = value & 0x1f;
+  const month = (value & 0x1e0) >> 5;
+  const year = (value & 0x7e00) >> 9;
+  return new Date(year + 2000, month - 1, day);
+}
+
+export function decodeNoYearDateTypeTechem(value: number) {
+  // value is a 16bit int
+  //   rrrM MMMD DDDD rrrr
+  // 0b0000 1100 1111 0000 = 15.06.
+
+  const day = (value & 0x1f0) >> 4;
+  const month = (value & 0x1e00) >> 9;
+  const year = new Date().getFullYear();
+  return new Date(year, month - 1, day);
+}
+
+export function encodeDateTypeG(date: Date) {
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear() - 2000;
+
+  const yearLSB = year & 0b111;
+  const yearMSB = (year & 0b1111000) >> 3;
+
+  //   YYYY MMMM YYYD DDDD
+  // 0b0000 1100 1111 1111 = 31.12.2007
+  // 0b0000 0100 1111 1110 = 30.04.2007
+
+  return (yearMSB << 12) | (month << 8) | (yearLSB << 5) | day;
+}

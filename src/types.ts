@@ -144,9 +144,9 @@ export type ApplicationLayer =
   | ApplicationLayer4
   | ApplicationLayer12
   | ApplicationLayerCompact
-  | ApplicationLayerPrios;
+  | ApplicationLayerDummy;
 
-export interface ApplicationLayerPrios {
+export interface ApplicationLayerDummy {
   ci: 0xa0 | 0xa1 | 0xa2 | 0xa3 | 0xa4 | 0xa5 | 0xa6 | 0xa7;
   offset: number;
 }

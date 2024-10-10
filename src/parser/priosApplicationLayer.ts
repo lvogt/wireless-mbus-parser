@@ -7,7 +7,7 @@ import {
 import { getDeviceType, getMeterId, isLinkLayer } from "@/helper/helper";
 import type {
   ApplicationLayer,
-  ApplicationLayerPrios,
+  ApplicationLayerDummy,
   LinkLayer,
   ParserState,
   WiredLinkLayer,
@@ -235,8 +235,8 @@ export async function decodePriosApplicationLayer(
   const rawDataRecords = createValidDataRecords(decryptedData);
   const fixedData = Buffer.concat([data.subarray(0, pos), rawDataRecords]);
 
-  const apl: ApplicationLayerPrios = {
-    ci: data[pos] as ApplicationLayerPrios["ci"],
+  const apl: ApplicationLayerDummy = {
+    ci: data[pos] as ApplicationLayerDummy["ci"],
     offset: pos,
   };
 

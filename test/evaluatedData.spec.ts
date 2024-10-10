@@ -348,6 +348,61 @@ describe("PRIOS", () => {
   });
 });
 
+describe("Techem", () => {
+  it("HCA", () => {
+    const result = decode(
+      "426c5f2c426e7500026c1936026e000002658e0a0265760a02611800",
+      { manufacturer: "TCH", type: 0x80, version: 0x94 }
+    );
+
+    expect(result).toHaveLength(7);
+    expect(result).toEqual([
+      {
+        description: "Time point",
+        type: EvaluatedDataType.Date,
+        unit: "",
+        value: new Date("2018-12-31T00:00:00.000Z"),
+      },
+      {
+        description: "Units for H.C.A.",
+        type: EvaluatedDataType.Number,
+        unit: "",
+        value: 117,
+      },
+      {
+        description: "Time point",
+        type: EvaluatedDataType.Date,
+        unit: "",
+        value: new Date("2024-06-25T00:00:00.000Z"),
+      },
+      {
+        description: "Units for H.C.A.",
+        type: EvaluatedDataType.Number,
+        unit: "",
+        value: 0,
+      },
+      {
+        description: "External Temperature",
+        type: 0,
+        unit: "°C",
+        value: 27.02,
+      },
+      {
+        description: "External Temperature",
+        type: 0,
+        unit: "°C",
+        value: 26.78,
+      },
+      {
+        description: "Temperature Difference",
+        type: 0,
+        unit: "K",
+        value: 0.24,
+      },
+    ]);
+  });
+});
+
 describe("Special DIF values", () => {
   it("DIF_NONE", () => {
     const result = decode("0013ff");

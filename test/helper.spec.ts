@@ -5,7 +5,10 @@ import {
   decodeDateTimeTypeF,
   decodeDateTimeTypeI,
   decodeDateTypeG,
+  decodeDateTypeTechem,
   decodeManufacturer,
+  decodeNoYearDateTypeTechem,
+  encodeDateTypeG,
   getDeviceState,
 } from "@/helper/helper";
 
@@ -70,9 +73,12 @@ describe("decodeDateTypeG", () => {
     { data: 0x18b2, expected: "2013-08-18T00:00:00.000Z" },
     { data: 0x04fe, expected: "2007-04-30T00:00:00.000Z" },
     { data: 0x1c3f, expected: "2009-12-31T00:00:00.000Z" },
-  ])("Device state $expected", ({ data, expected }) => {
+  ])("Date $expected", ({ data, expected }) => {
     const result = decodeDateTypeG(data);
     expect(result.toISOString()).toBe(expected);
+
+    const roundTrip = encodeDateTypeG(result);
+    expect(roundTrip).toEqual(data);
   });
 });
 
@@ -83,7 +89,7 @@ describe("decodeDateTimeTypeF", () => {
     { data: 0x2a243216, expected: "2017-10-04T18:22:00.000Z" },
     { data: 0x18d90619, expected: "2014-08-25T06:25:00.000Z" },
     { data: 0x28443428, expected: "2018-08-04T20:40:00.000Z" },
-  ])("Device state $expected", ({ data, expected }) => {
+  ])("Date $expected", ({ data, expected }) => {
     const result = decodeDateTimeTypeF(data);
     expect(result.toISOString()).toBe(expected);
   });
@@ -95,8 +101,30 @@ describe("decodeDateTimeTypeI", () => {
     { data: 0x21ea4e1138, expected: "2023-01-10T14:17:56.000Z" },
     { data: 0x21e5893826, expected: "2023-01-05T09:56:38.000Z" },
     { data: 0x21e58a0026, expected: "2023-01-05T10:00:38.000Z" },
-  ])("Device state $expected", ({ data, expected }) => {
+  ])("Date time $expected", ({ data, expected }) => {
     const result = decodeDateTimeTypeI(data);
+    expect(result.toISOString()).toBe(expected);
+  });
+});
+
+describe("decodeDateTypeTechem", () => {
+  it.each([{ data: 0x259f, expected: "2018-12-31T00:00:00.000Z" }])(
+    "Date $expected",
+    ({ data, expected }) => {
+      const result = decodeDateTypeTechem(data);
+      expect(result.toISOString()).toBe(expected);
+    }
+  );
+});
+
+describe("decodeDateTypeTechem", () => {
+  it.each([
+    {
+      data: 0x2d90,
+      expected: `${new Date().getFullYear()}-06-25T00:00:00.000Z`,
+    },
+  ])("Date $expected", ({ data, expected }) => {
+    const result = decodeNoYearDateTypeTechem(data);
     expect(result.toISOString()).toBe(expected);
   });
 });
