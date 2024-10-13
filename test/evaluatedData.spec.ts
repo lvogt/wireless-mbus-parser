@@ -349,9 +349,9 @@ describe("PRIOS", () => {
 });
 
 describe("Techem", () => {
-  it("HCA", () => {
+  it("HCA #1 version 0x94", () => {
     const result = decode(
-      "426c5f2c426e7500026c1936026e000002658e0a0265760a02611800",
+      "426c5f2c426e7500026c1936026e000002658e0a0265760a0d61e21800",
       { manufacturer: "TCH", type: 0x80, version: 0x94 }
     );
 
@@ -398,6 +398,59 @@ describe("Techem", () => {
         type: 0,
         unit: "K",
         value: 0.24,
+      },
+    ]);
+  });
+
+  it("HCA #2 version 0x69", () => {
+    const result = decode(
+      "426c7f2c426e0204026c0832026e83000265c4080265f7090d61e2cdfe",
+      { manufacturer: "TCH", type: 0x80, version: 0x94 }
+    );
+
+    expect(result).toHaveLength(7);
+    expect(result).toEqual([
+      {
+        description: "Time point",
+        type: EvaluatedDataType.Date,
+        unit: "",
+        value: new Date("2019-12-31T00:00:00.000Z"),
+      },
+      {
+        description: "Units for H.C.A.",
+        type: EvaluatedDataType.Number,
+        unit: "",
+        value: 1026,
+      },
+      {
+        description: "Time point",
+        type: EvaluatedDataType.Date,
+        unit: "",
+        value: new Date("2024-02-08T00:00:00.000Z"),
+      },
+      {
+        description: "Units for H.C.A.",
+        type: EvaluatedDataType.Number,
+        unit: "",
+        value: 131,
+      },
+      {
+        description: "External Temperature",
+        type: 0,
+        unit: "°C",
+        value: 22.44,
+      },
+      {
+        description: "External Temperature",
+        type: 0,
+        unit: "°C",
+        value: 25.51,
+      },
+      {
+        description: "Temperature Difference",
+        type: 0,
+        unit: "K",
+        value: -3.07,
       },
     ]);
   });

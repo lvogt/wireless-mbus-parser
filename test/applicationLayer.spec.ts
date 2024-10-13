@@ -236,13 +236,24 @@ describe("PRIOS", () => {
 });
 
 describe("Techem", () => {
-  it("HCA", async () => {
+  it("HCA #1 version 0x94", async () => {
     const result = await decodeLlAndApl(
       "33446850942905119480a20f9f257500902d0000018e0a760a000000000000000000000000000000000000000000000000000000"
     );
 
     expect(result.applicationLayer).toEqual({
       ci: 0xa2,
+      offset: 10,
+    });
+  });
+
+  it("HCA #2 version 0x69", async () => {
+    const result = await decodeLlAndApl(
+      "31446850226677116980A0119F27020480048300C408F709143C003D341A2B0B2A0707000000000000062D114457563D71A1850000"
+    );
+
+    expect(result.applicationLayer).toEqual({
+      ci: 0xa0,
       offset: 10,
     });
   });

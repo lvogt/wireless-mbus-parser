@@ -1,4 +1,4 @@
-import { DIF_DATATYPE_INT16 } from "@/helper/constants";
+import { DIF_DATATYPE_INT16, DIF_DATATYPE_VARLEN } from "@/helper/constants";
 import {
   decodeDateTypeTechem,
   decodeNoYearDateTypeTechem,
@@ -52,7 +52,7 @@ function createValidDataRecordsHca(data: Buffer, pos: number, version: number) {
     throw new Error("Telegram to short for TCH HCA coding!");
   }
 
-  const result = Buffer.alloc(28);
+  const result = Buffer.alloc(29);
   let i = 0;
 
   //last period date
@@ -109,9 +109,10 @@ function createValidDataRecordsHca(data: Buffer, pos: number, version: number) {
 
   //difference
   const diff = temp1 - temp2;
-  result[i++] = DIF_DATATYPE_INT16;
+  result[i++] = DIF_DATATYPE_VARLEN;
   result[i++] = 0x61;
-  result.writeUInt16LE(diff, i);
+  result[i++] = 0xe2; //binary number; 2 bytes
+  result.writeInt16LE(diff, i);
   i += 2;
 
   return result;
