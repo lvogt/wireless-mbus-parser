@@ -285,7 +285,7 @@ function decodeLvarValue(
     // binary number (lvar - E0h) bytes
     const count = lvar - 0xe0;
     if (count <= 6) {
-      return { newPos: pos + count, value: data.readUIntLE(pos, count) };
+      return { newPos: pos + count, value: data.readIntLE(pos, count) };
     } else {
       const hexString = data.toString("hex", pos, pos + count);
       return { newPos: pos + count, value: hexString };
