@@ -1,6 +1,7 @@
 import { isPrimaryVifString } from "@/helper/helper";
 import { log } from "@/helper/logger";
 import {
+  applyFunctionFieldType,
   applyNumberOrStringifyDefault,
   applyStringifyDefault,
   extendDescription,
@@ -138,7 +139,8 @@ function evaluatePrimaryVif(dataRecord: DataRecord, meterType: MeterType) {
   }
 
   try {
-    return descriptor.apply(descriptor, dataRecord);
+    const evaluatedData = descriptor.apply(descriptor, dataRecord);
+    return applyFunctionFieldType(evaluatedData, dataRecord);
   } catch {
     return applyStringifyDefault(descriptor, dataRecord);
   }

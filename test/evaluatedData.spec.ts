@@ -95,7 +95,7 @@ describe("Evaluate data records", () => {
         info: info("VIF_VOLUME"),
       },
       {
-        description: "Volume Flow",
+        description: "Volume Flow (maximum value)",
         type: EvaluatedDataType.Number,
         unit: "m³/h",
         value: 0.113,
@@ -208,12 +208,12 @@ describe("Raw Data Records - LVAR", () => {
   });
 
   it("Single value - Volume - BCD", () => {
-    const result = decode("0d13c512345678902f");
+    const result = decode("3d13c512345678902f");
 
     expect(result).toHaveLength(1);
     expect(result).toEqual([
       {
-        description: "Volume",
+        description: "Volume (during error state)",
         type: EvaluatedDataType.Number,
         unit: "m³",
         value: 9078563.412,
@@ -223,12 +223,12 @@ describe("Raw Data Records - LVAR", () => {
   });
 
   it("Single value - Energy - negative BCD", () => {
-    const result = decode("0d13d51234567890");
+    const result = decode("2d13d51234567890");
 
     expect(result).toHaveLength(1);
     expect(result).toEqual([
       {
-        description: "Volume",
+        description: "Volume (minimum value)",
         type: EvaluatedDataType.Number,
         unit: "m³",
         value: -9078563.412,

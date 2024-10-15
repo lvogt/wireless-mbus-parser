@@ -1,4 +1,11 @@
-import { DIF_DATATYPE_INT16, DIF_DATATYPE_INT48 } from "@/helper/constants";
+import {
+  DIF_DATATYPE_INT16,
+  DIF_DATATYPE_INT48,
+  FIELD_TYPE_ERROR_STATE,
+  FIELD_TYPE_INSTANTANEOUS,
+  FIELD_TYPE_MAXIMUM,
+  FIELD_TYPE_MINIMUM,
+} from "@/helper/constants";
 import {
   decodeDateTimeTypeF,
   decodeDateTimeTypeI,
@@ -57,6 +64,27 @@ function dataTypeToString(value: DataType): string {
     return value.toString("hex");
   } else {
     return value.toString();
+  }
+}
+
+export function applyFunctionFieldType(
+  data: EvaluatedData,
+  dataRecord: DataRecord
+) {
+  switch (dataRecord.header.dib.functionField) {
+    case FIELD_TYPE_INSTANTANEOUS:
+      return data;
+    case FIELD_TYPE_MAXIMUM:
+      data.description += " (maximum value)";
+      return data;
+    case FIELD_TYPE_MINIMUM:
+      data.description += " (minimum value)";
+      return data;
+    case FIELD_TYPE_ERROR_STATE:
+      data.description += " (during error state)";
+      return data;
+    default:
+      return data;
   }
 }
 

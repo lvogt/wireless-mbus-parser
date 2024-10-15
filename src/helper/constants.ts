@@ -22,6 +22,11 @@ export const CI_RESP_COMPACT = 0x79; // Response from device, no header, Kamstru
 export const CI_RESP_PRIOS = [0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7];
 export const CI_RESP_TECHEM = [0xa0, 0xa1, 0xa2];
 
+export const FIELD_TYPE_INSTANTANEOUS = 0x00;
+export const FIELD_TYPE_MAXIMUM = 0x01;
+export const FIELD_TYPE_MINIMUM = 0x02;
+export const FIELD_TYPE_ERROR_STATE = 0x03;
+
 export const DIF_VIF_EXTENSION_BIT = 0x80;
 export const DIF_VIF_EXTENSION_MASK = 0x7f;
 export const DIF_FILL_BYTE = 0x2f;
