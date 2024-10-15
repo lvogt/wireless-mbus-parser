@@ -257,6 +257,39 @@ describe("Techem", () => {
       offset: 10,
     });
   });
+
+  it("Water meter type 0x62", async () => {
+    const result = await decodeLlAndApl(
+      "2F446850313233347462A2069F255900B029310000000306060906030609070606050509050505050407040605070500"
+    );
+
+    expect(result.applicationLayer).toEqual({
+      ci: 0xa2,
+      offset: 10,
+    });
+  });
+
+  it("Water meter type 0x72", async () => {
+    const result = await decodeLlAndApl(
+      "2f446850567325307472a2069f25f304902d750000000000000000010c1312120e1211100f0e0e0f1111121214171312"
+    );
+
+    expect(result.applicationLayer).toEqual({
+      ci: 0xa2,
+      offset: 10,
+    });
+  });
+
+  it("Heat meter type 0x43", async () => {
+    const result = await decodeLlAndApl(
+      "36446850626262624543A1009F2777010060780000000A000000000000000000000000000000000000000000000000A0400000B4010000"
+    );
+
+    expect(result.applicationLayer).toEqual({
+      ci: 0xa1,
+      offset: 10,
+    });
+  });
 });
 
 describe("Compact frames", () => {

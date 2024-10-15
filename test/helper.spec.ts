@@ -7,6 +7,7 @@ import {
   decodeDateTypeG,
   decodeDateTypeTechem,
   decodeManufacturer,
+  decodeNoYearDateType2Techem,
   decodeNoYearDateTypeTechem,
   encodeDateTypeG,
   getDeviceState,
@@ -125,6 +126,19 @@ describe("decodeDateTypeTechem", () => {
     },
   ])("Date $expected", ({ data, expected }) => {
     const result = decodeNoYearDateTypeTechem(data);
+    expect(result.toISOString()).toBe(expected);
+  });
+});
+
+describe("decodeDateType2Techem", () => {
+  it.each([
+    {
+      dataDay: 0x00,
+      dataMonth: 0x60,
+      expected: `${new Date().getFullYear()}-11-30T00:00:00.000Z`,
+    },
+  ])("Date $expected", ({ dataDay, dataMonth, expected }) => {
+    const result = decodeNoYearDateType2Techem(dataDay, dataMonth);
     expect(result.toISOString()).toBe(expected);
   });
 });

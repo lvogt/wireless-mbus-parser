@@ -1,6 +1,12 @@
-import { DIF_DATATYPE_INT16, DIF_DATATYPE_VARLEN } from "@/helper/constants";
+import {
+  DIF_DATATYPE_INT16,
+  DIF_DATATYPE_INT24,
+  DIF_DATATYPE_INT32,
+  DIF_DATATYPE_VARLEN,
+} from "@/helper/constants";
 import {
   decodeDateTypeTechem,
+  decodeNoYearDateType2Techem,
   decodeNoYearDateTypeTechem,
   encodeDateTypeG,
 } from "@/helper/helper";
@@ -81,7 +87,7 @@ function createValidDataRecordsHca(data: Buffer, pos: number, version: number) {
   result.writeUInt16LE(currentDate, i);
   i += 2;
 
-  //last period hca
+  //current hca
   result[i++] = DIF_DATATYPE_INT16;
   result[i++] = 0x6e;
   result[i++] = data[pos + 8];
@@ -118,6 +124,103 @@ function createValidDataRecordsHca(data: Buffer, pos: number, version: number) {
   return result;
 }
 
+function createValidDataRecordsWater(data: Buffer, pos: number) {
+  const result = Buffer.alloc(21);
+  let i = 0;
+
+  //last period date
+  const lastDate = encodeDateTypeG(
+    decodeDateTypeTechem(data.readUInt16LE(pos + 2))
+  );
+
+  result[i++] = DIF_DATATYPE_INT16 | 0x40; // storageNo = 1
+  result[i++] = 0x6c;
+  result.writeUInt16LE(lastDate, i);
+  i += 2;
+
+  //last period volume
+  result[i++] = DIF_DATATYPE_INT16 | 0x40; // storageNo = 1
+  result[i++] = 0x15; // 0.1 m³
+  result[i++] = data[pos + 4];
+  result[i++] = data[pos + 5];
+  const lastPeriod = data.readUint16LE(pos + 4);
+
+  //current date
+  const currentDate = encodeDateTypeG(
+    decodeNoYearDateTypeTechem(data.readUInt16LE(pos + 6))
+  );
+
+  result[i++] = DIF_DATATYPE_INT16;
+  result[i++] = 0x6c;
+  result.writeUInt16LE(currentDate, i);
+  i += 2;
+
+  //current volume
+  result[i++] = DIF_DATATYPE_INT16;
+  result[i++] = 0x15; // 0.1 m³
+  result[i++] = data[pos + 8];
+  result[i++] = data[pos + 9];
+  const currentPeriod = data.readUint16LE(pos + 8);
+
+  // total
+  result[i++] = DIF_DATATYPE_INT24;
+  result[i++] = 0x15; // 0.1 m³
+  result.writeUIntLE(currentPeriod + lastPeriod, i, 3);
+
+  return result;
+}
+
+function createValidDataRecordsHeat(data: Buffer, pos: number) {
+  const result = Buffer.alloc(24);
+  let i = 0;
+
+  //last period date
+  const lastDate = encodeDateTypeG(
+    decodeDateTypeTechem(data.readUInt16LE(pos + 2))
+  );
+
+  result[i++] = DIF_DATATYPE_INT16 | 0x40; // storageNo = 1
+  result[i++] = 0x6c;
+  result.writeUInt16LE(lastDate, i);
+  i += 2;
+
+  //last period energy
+  result[i++] = DIF_DATATYPE_INT24 | 0x40; // storageNo = 1
+  result[i++] = 0x06; // 1 kWh
+  result[i++] = data[pos + 4];
+  result[i++] = data[pos + 5];
+  result[i++] = data[pos + 6];
+  const lastPeriod = data.readUintLE(pos + 4, 3);
+
+  //current date
+  const currentDate = encodeDateTypeG(
+    decodeNoYearDateType2Techem(
+      data.readUInt8(pos + 11),
+      data.readInt8(pos + 7)
+    )
+  );
+
+  result[i++] = DIF_DATATYPE_INT16;
+  result[i++] = 0x6c;
+  result.writeUInt16LE(currentDate, i);
+  i += 2;
+
+  //current energy
+  result[i++] = DIF_DATATYPE_INT24;
+  result[i++] = 0x06; // 1 kWh
+  result[i++] = data[pos + 8];
+  result[i++] = data[pos + 9];
+  result[i++] = data[pos + 10];
+  const currentPeriod = data.readUint16LE(pos + 8);
+
+  // total
+  result[i++] = DIF_DATATYPE_INT32;
+  result[i++] = 0x06; // 1 kWh
+  result.writeUInt32LE(currentPeriod + lastPeriod, i);
+
+  return result;
+}
+
 function createValidDataRecords(
   type: TCHDeviceType,
   data: Buffer,
@@ -127,6 +230,10 @@ function createValidDataRecords(
   switch (type) {
     case TCHDeviceType.HCA:
       return createValidDataRecordsHca(data, pos, version);
+    case TCHDeviceType.Water:
+      return createValidDataRecordsWater(data, pos);
+    case TCHDeviceType.Heat:
+      return createValidDataRecordsHeat(data, pos);
     default:
       throw new Error("Not yet implemented!");
   }
@@ -149,7 +256,6 @@ export async function decodeTechemApplicationLayer(
     linkLayer.version
   );
   const fixedData = Buffer.concat([data.subarray(0, pos), rawDataRecords]);
-  console.log(`TCH: ${rawDataRecords.toString("hex")}`);
   const apl: ApplicationLayerDummy = {
     ci: data[pos] as ApplicationLayerDummy["ci"],
     offset: pos,

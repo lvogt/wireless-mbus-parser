@@ -158,6 +158,16 @@ export function decodeNoYearDateTypeTechem(value: number) {
   return new Date(year, month - 1, day);
 }
 
+export function decodeNoYearDateType2Techem(
+  valueDay: number,
+  valueMonth: number
+) {
+  const day = (valueDay & 0xf80) >> 7;
+  const month = (valueMonth & 0x78) >> 3;
+  const year = new Date().getFullYear();
+  return new Date(year, month - 1, day);
+}
+
 export function encodeDateTypeG(date: Date) {
   const day = date.getDate();
   const month = date.getMonth() + 1;

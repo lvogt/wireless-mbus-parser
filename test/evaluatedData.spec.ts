@@ -436,21 +436,147 @@ describe("Techem", () => {
       },
       {
         description: "External Temperature",
-        type: 0,
+        type: EvaluatedDataType.Number,
         unit: "°C",
         value: 22.44,
       },
       {
         description: "External Temperature",
-        type: 0,
+        type: EvaluatedDataType.Number,
         unit: "°C",
         value: 25.51,
       },
       {
         description: "Temperature Difference",
-        type: 0,
+        type: EvaluatedDataType.Number,
         unit: "K",
         value: -3.07,
+      },
+    ]);
+  });
+
+  it("Water meter 0x62", () => {
+    const result = decode("426c5f2c42155900026c1b340215310003158a0000", {
+      manufacturer: "TCH",
+      type: 0x62,
+      version: 0x94,
+    });
+
+    expect(result).toHaveLength(5);
+    expect(result).toEqual([
+      {
+        description: "Time point",
+        type: EvaluatedDataType.Date,
+        unit: "",
+        value: new Date("2018-12-31T00:00:00.000Z"),
+      },
+      {
+        description: "Volume",
+        type: EvaluatedDataType.Number,
+        unit: "m³",
+        value: 8.9,
+      },
+      {
+        description: "Time point",
+        type: EvaluatedDataType.Date,
+        unit: "",
+        value: new Date("2024-04-27T00:00:00.000Z"),
+      },
+      {
+        description: "Volume",
+        type: EvaluatedDataType.Number,
+        unit: "m³",
+        value: 4.9,
+      },
+      {
+        description: "Volume",
+        type: EvaluatedDataType.Number,
+        unit: "m³",
+        value: 13.8,
+      },
+    ]);
+  });
+
+  it("Water meter 0x72", () => {
+    const result = decode("426c5f2c4215f304026c1936021575000315680500", {
+      manufacturer: "TCH",
+      type: 0x72,
+      version: 0x94,
+    });
+
+    expect(result).toHaveLength(5);
+    expect(result).toEqual([
+      {
+        description: "Time point",
+        type: EvaluatedDataType.Date,
+        unit: "",
+        value: new Date("2018-12-31T00:00:00.000Z"),
+      },
+      {
+        description: "Volume",
+        type: EvaluatedDataType.Number,
+        unit: "m³",
+        value: 126.7,
+      },
+      {
+        description: "Time point",
+        type: EvaluatedDataType.Date,
+        unit: "",
+        value: new Date("2024-06-25T00:00:00.000Z"),
+      },
+      {
+        description: "Volume",
+        type: EvaluatedDataType.Number,
+        unit: "m³",
+        value: 11.7,
+      },
+      {
+        description: "Volume",
+        type: EvaluatedDataType.Number,
+        unit: "m³",
+        value: 138.4,
+      },
+    ]);
+  });
+
+  it("Heat meter 0x43", () => {
+    const result = decode("426c7f2c4306770100026c1e3b03067800000406ef010000 ", {
+      manufacturer: "TCH",
+      type: 0x43,
+      version: 0x94,
+    });
+
+    expect(result).toHaveLength(5);
+    expect(result).toEqual([
+      {
+        description: "Time point",
+        type: EvaluatedDataType.Date,
+        unit: "",
+        value: new Date("2019-12-31T00:00:00.000Z"),
+      },
+      {
+        description: "Energy",
+        type: EvaluatedDataType.Number,
+        unit: "Wh",
+        value: 375000,
+      },
+      {
+        description: "Time point",
+        type: EvaluatedDataType.Date,
+        unit: "",
+        value: new Date("2024-11-30T00:00:00.000Z"),
+      },
+      {
+        description: "Energy",
+        type: EvaluatedDataType.Number,
+        unit: "Wh",
+        value: 120000,
+      },
+      {
+        description: "Energy",
+        type: EvaluatedDataType.Number,
+        unit: "Wh",
+        value: 495000,
       },
     ]);
   });
