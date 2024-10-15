@@ -301,6 +301,21 @@ describe("Raw Data Records - LVAR", () => {
     ]);
   });
 
+  it("Single value - Temperature - with manufacturer specific VIFE", () => {
+    const result = decode("01E7FF0F03", { ...dummyMeter, manufacturer: "KAM" });
+
+    expect(result).toHaveLength(1);
+    expect(result).toEqual([
+      {
+        description: "External Temperature; (average)",
+        type: EvaluatedDataType.Number,
+        unit: "°C",
+        value: 3,
+        info: info("VIF_EXTERNAL_TEMP"),
+      },
+    ]);
+  });
+
   it("Three values - Date or time - date / time / time I", () => {
     const result = decode("02fd30811104fd3032371f1506fd30563412563412");
 

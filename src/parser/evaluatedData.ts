@@ -150,12 +150,13 @@ function evaluateVifExtension(
   data: EvaluatedData,
   dataRecord: DataRecord,
   meterType: MeterType,
-  extension: number
+  extension: number,
+  manufacturerSpecific: boolean
 ) {
   const descriptor = getVifeDescriptor(
     extension,
     meterType,
-    dataRecord.header.vib.primary.table === VifTable.Manufacturer
+    manufacturerSpecific
   );
 
   try {
@@ -170,9 +171,27 @@ function evaluateDataRecord(
   meterType: MeterType
 ): EvaluatedData {
   const evaluatedData = evaluatePrimaryVif(dataRecord, meterType);
+  const manufacturerSpecificPrimaryVif =
+    dataRecord.header.vib.primary.table === VifTable.Manufacturer;
 
+  let lastExtManufacturerSpecific = false;
   for (const ext of dataRecord.header.vib.extensions) {
-    evaluateVifExtension(evaluatedData, dataRecord, meterType, ext);
+    if (ext === 0x7f) {
+      lastExtManufacturerSpecific = true;
+      continue;
+    }
+
+    const manufacturerSpecificTable =
+      manufacturerSpecificPrimaryVif || lastExtManufacturerSpecific;
+    lastExtManufacturerSpecific = false;
+
+    evaluateVifExtension(
+      evaluatedData,
+      dataRecord,
+      meterType,
+      ext,
+      manufacturerSpecificTable
+    );
   }
 
   return evaluatedData;
