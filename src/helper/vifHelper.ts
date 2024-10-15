@@ -60,23 +60,33 @@ function dataTypeToString(value: DataType): string {
   }
 }
 
+function getInfo(vif: VIFDescriptor, dataRecord: DataRecord) {
+  return {
+    legacyVif: vif.legacyName,
+    tariff: dataRecord.header.dib.tariff,
+    deviceUnit: dataRecord.header.dib.deviceUnit,
+    storageNo: dataRecord.header.dib.storageNo,
+  };
+}
+
 export function applyStringifyDefault(
   vif: VIFDescriptor,
   dataRecord: DataRecord
-) {
+): EvaluatedData {
   const stringValue = dataTypeToString(dataRecord.value);
   return {
     value: stringValue,
     unit: vif.unit,
     description: vif.description,
     type: EvaluatedDataType.String,
+    info: getInfo(vif, dataRecord),
   };
 }
 
 export function applyNumberOrStringifyDefault(
   vif: VIFDescriptor,
   dataRecord: DataRecord
-) {
+): EvaluatedData {
   if (
     typeof dataRecord.value !== "number" &&
     typeof dataRecord.value !== "bigint"
@@ -87,6 +97,7 @@ export function applyNumberOrStringifyDefault(
       unit: vif.unit,
       description: vif.description,
       type: EvaluatedDataType.String,
+      info: getInfo(vif, dataRecord),
     };
   }
   const type =
@@ -98,6 +109,7 @@ export function applyNumberOrStringifyDefault(
     unit: vif.unit,
     description: vif.description,
     type: type,
+    info: getInfo(vif, dataRecord),
   };
 }
 
@@ -114,13 +126,14 @@ export function applyNumberDefault(
     unit: vif.unit,
     description: vif.description,
     type: type,
+    info: getInfo(vif, dataRecord),
   };
 }
 
 export function applyDateOrDateTimeDefault(
   vif: VIFDescriptor,
   dataRecord: DataRecord
-) {
+): EvaluatedData {
   if (typeof dataRecord.value !== "number") {
     throw new Error("Unexpected type!");
   }
@@ -146,6 +159,7 @@ export function applyDateDefault(
     unit: "",
     description: vif.description,
     type: EvaluatedDataType.Date,
+    info: getInfo(vif, dataRecord),
   };
 }
 
@@ -166,6 +180,7 @@ export function applyDateTimeDefault(
     unit: "",
     description: vif.description,
     type: EvaluatedDataType.DateTime,
+    info: getInfo(vif, dataRecord),
   };
 }
 
@@ -179,6 +194,7 @@ export function applyBufferOrNumberDefault(
       unit: vif.unit,
       description: vif.description,
       type: EvaluatedDataType.Buffer,
+      info: getInfo(vif, dataRecord),
     };
   }
 
@@ -198,6 +214,7 @@ export function applyBufferOrNumberDefault(
     unit: vif.unit,
     description: vif.description,
     type: type,
+    info: getInfo(vif, dataRecord),
   };
 }
 

@@ -74,6 +74,12 @@ export interface EvaluatedData {
   unit: string;
   description: string;
   type: EvaluatedDataType;
+  info: {
+    legacyVif: string;
+    tariff: number;
+    deviceUnit: number;
+    storageNo: number;
+  };
 }
 
 export enum VifTable {
