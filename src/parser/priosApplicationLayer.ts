@@ -216,18 +216,19 @@ function createValidDataRecords(data: Buffer) {
   return result;
 }
 
-export async function decodePriosApplicationLayer(
-  data: Buffer,
-  pos: number,
+export function decodePriosApplicationLayer(
+  state: ParserState,
   linkLayer: LinkLayer | WiredLinkLayer
-): Promise<{
+): {
   state: ParserState;
   applicationLayer: ApplicationLayer;
   linkLayer: LinkLayer;
-}> {
+} {
   if (!isLinkLayer(linkLayer)) {
     throw new Error("PRIOS telegram without full link layer!");
   }
+
+  const { pos, data } = state;
 
   const key = getKey(linkLayer.addressRaw, data, pos);
   const decryptedData = decrypt(key, data, pos);
@@ -242,6 +243,7 @@ export async function decodePriosApplicationLayer(
 
   return {
     state: {
+      ...state,
       data: fixedData,
       pos: pos + 1,
     },

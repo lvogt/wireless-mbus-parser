@@ -239,15 +239,15 @@ function createValidDataRecords(
   }
 }
 
-export async function decodeTechemApplicationLayer(
-  data: Buffer,
-  pos: number,
+export function decodeTechemApplicationLayer(
+  state: ParserState,
   linkLayer: LinkLayer
-): Promise<{
+): {
   state: ParserState;
   applicationLayer: ApplicationLayer;
   linkLayer: LinkLayer;
-}> {
+} {
+  const { pos, data } = state;
   const tchDevice = checkType(linkLayer.type);
   const rawDataRecords = createValidDataRecords(
     tchDevice,
@@ -263,6 +263,7 @@ export async function decodeTechemApplicationLayer(
 
   return {
     state: {
+      ...state,
       data: fixedData,
       pos: pos + 1,
     },

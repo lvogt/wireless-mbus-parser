@@ -286,14 +286,14 @@ export async function decodeApplicationLayer(
 
   if (ci === CI_RESP_0) {
     return {
-      state: { data: data, pos: pos },
+      state: { ...state, pos: pos },
       applicationLayer: { ci, offset },
       linkLayer: getDummyLinkLayer(linkLayer),
     };
   } else if (ci === CI_RESP_COMPACT) {
     const { newPos, apl } = getApplicationLayerCompact(data, pos, offset);
     return {
-      state: { data: data, pos: newPos },
+      state: { ...state, pos: newPos },
       applicationLayer: apl,
       linkLayer: getDummyLinkLayer(linkLayer),
     };
@@ -311,13 +311,9 @@ export async function decodeApplicationLayer(
     apl = res.apl;
     ll = mockLinkLayerFromApplicationLayer(apl, linkLayer);
   } else if (isPrios(linkLayer, ci)) {
-    return await decodePriosApplicationLayer(data, offset, linkLayer);
+    return decodePriosApplicationLayer(state, linkLayer);
   } else if (isTechem(linkLayer, ci)) {
-    return await decodeTechemApplicationLayer(
-      data,
-      offset,
-      linkLayer as LinkLayer
-    );
+    return decodeTechemApplicationLayer(state, linkLayer as LinkLayer);
   } else {
     throw new Error(
       `Unsupported CI Field 0x${ci.toString(16)}\nremaining payload is ${data.toString("hex", pos)}`

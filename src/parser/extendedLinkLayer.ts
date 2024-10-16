@@ -25,7 +25,11 @@ export function hasExtendedLinkLayer(state: ParserState) {
 export function decodeExtendedLinkLayer(
   state: ParserState,
   linkLayer: LinkLayer | WiredLinkLayer
-): { state: ParserState; extendedLinkLayer: ExtendedLinkLayer } {
+): { state: ParserState; extendedLinkLayer: ExtendedLinkLayer | undefined } {
+  if (!hasExtendedLinkLayer(state)) {
+    return { state, extendedLinkLayer: undefined };
+  }
+
   const { state: newState, ell } = parseHeader(state);
   const data = newState.data;
   let pos = newState.pos;
@@ -44,7 +48,7 @@ export function decodeExtendedLinkLayer(
     );
     pos += 2;
     return {
-      state: { ...newState, pos, data },
+      state: { ...newState, pos },
       extendedLinkLayer: ell,
     };
   }
@@ -119,7 +123,6 @@ function parseHeader(state: ParserState): {
       state: {
         ...state,
         pos: pos,
-        data: data,
       },
       ell: {
         ci,
@@ -144,7 +147,6 @@ function parseHeader(state: ParserState): {
       state: {
         ...state,
         pos: pos,
-        data: data,
       },
       ell: {
         ci,
@@ -175,7 +177,6 @@ function parseHeader(state: ParserState): {
       state: {
         ...state,
         pos: pos,
-        data: data,
       },
       ell: {
         ci,
@@ -194,7 +195,6 @@ function parseHeader(state: ParserState): {
       state: {
         ...state,
         pos: pos,
-        data: data,
       },
       ell: {
         ci,

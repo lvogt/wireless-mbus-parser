@@ -8,8 +8,14 @@ export function hasAuthenticationAndFragmentationLayer(state: ParserState) {
 
 export function decodeAuthenticationAndFragmentationLayer(state: ParserState): {
   state: ParserState;
-  authenticationAndFragmentationLayer: AuthenticationAndFragmentationLayer;
+  authenticationAndFragmentationLayer:
+    | AuthenticationAndFragmentationLayer
+    | undefined;
 } {
+  if (!hasAuthenticationAndFragmentationLayer(state)) {
+    return { state, authenticationAndFragmentationLayer: undefined };
+  }
+
   const data = state.data;
   let pos = state.pos;
 
@@ -129,7 +135,7 @@ export function decodeAuthenticationAndFragmentationLayer(state: ParserState): {
 
   return {
     state: {
-      data,
+      ...state,
       pos,
     },
     authenticationAndFragmentationLayer: {
