@@ -8,7 +8,6 @@ import type { LinkLayer, ParserState, WiredLinkLayer } from "@/types";
 
 export function decodeLinkLayer(state: ParserState): {
   state: ParserState;
-  isWired: boolean;
   linkLayer: LinkLayer | WiredLinkLayer;
 } {
   const { data, pos } = state;
@@ -21,7 +20,7 @@ export function decodeLinkLayer(state: ParserState): {
       cField: data[pos + 4],
       aField: data[pos + 5],
     };
-    return { state, isWired, linkLayer };
+    return { state, linkLayer };
   }
 
   state.pos += 10;
@@ -42,5 +41,5 @@ export function decodeLinkLayer(state: ParserState): {
     meterId: getMeterId(data, pos + 4),
   };
 
-  return { state, isWired, linkLayer };
+  return { state, linkLayer };
 }

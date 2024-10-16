@@ -11,7 +11,6 @@ describe("Link Layer", () => {
     });
 
     expect(result.state.pos).toBe(10);
-    expect(result.isWired).toBe(false);
     expect(result.linkLayer).toEqual({
       lField: 0x2e,
       cField: 0x44,
@@ -34,7 +33,6 @@ describe("Link Layer", () => {
     });
 
     expect(result.state.pos).toBe(15);
-    expect(result.isWired).toBe(false);
     expect(result.linkLayer).toEqual({
       lField: 0x2e,
       cField: 0x44,
@@ -57,7 +55,6 @@ describe("Link Layer", () => {
     });
 
     expect(result.state.pos).toBe(6);
-    expect(result.isWired).toBe(true);
     expect(result.linkLayer).toEqual({
       lField: 0x58,
       cField: 0x08,
