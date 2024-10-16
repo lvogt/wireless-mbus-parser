@@ -183,7 +183,6 @@ function evaluateDataRecord(
 
     const manufacturerSpecificTable =
       manufacturerSpecificPrimaryVif || lastExtManufacturerSpecific;
-    lastExtManufacturerSpecific = false;
 
     evaluateVifExtension(
       evaluatedData,

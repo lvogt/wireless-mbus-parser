@@ -302,12 +302,15 @@ describe("Raw Data Records - LVAR", () => {
   });
 
   it("Single value - Temperature - with manufacturer specific VIFE", () => {
-    const result = decode("01E7FF0F03", { ...dummyMeter, manufacturer: "KAM" });
+    const result = decode("01E7FF8F2003", {
+      ...dummyMeter,
+      manufacturer: "KAM",
+    });
 
     expect(result).toHaveLength(1);
     expect(result).toEqual([
       {
-        description: "External Temperature; (average)",
+        description: "External Temperature; (average); Unknown VIFE 0x20",
         type: EvaluatedDataType.Number,
         unit: "°C",
         value: 3,
