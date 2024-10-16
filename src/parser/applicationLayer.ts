@@ -378,6 +378,10 @@ export async function decodeApplicationLayer(
         `Encryption mode ${apl.config.mode.toString(16)} not implemented`
       );
     }
+
+    if (decryptedData.readUInt16LE(pos) != 0x2f2f) {
+      throw new ParserError("WRONG_AES_KEY", "Decryption failed, wrong key?");
+    }
   }
 
   return {

@@ -218,8 +218,8 @@ describe("Application Layer", () => {
         "434493157856341233038C2075900F002C25B30A000021924D4F3FB66E017A75002007109058475F4BC91DF878B80A1B0F98B629024AAC727942BFC549233C0140829B93",
         "000102030405060708090A0B0C0D0E0F"
       )
-    ).rejects.toThrow(
-      "Received MAC does not match. Corrupted data?\nMAC received: 21924d4f3fb66e01"
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      "[WRONG_AES_KEY: Received MAC does not match. Wrong key?\nMAC received: 21924d4f3fb66e01]"
     );
   });
 });
