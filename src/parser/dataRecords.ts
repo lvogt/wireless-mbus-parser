@@ -20,6 +20,7 @@ import {
   DIF_VIF_EXTENSION_BIT,
   DIF_VIF_EXTENSION_MASK,
 } from "@/helper/constants";
+import { ParserError } from "@/helper/error";
 import { decodeBCD } from "@/helper/helper";
 import { log } from "@/helper/logger";
 import type {
@@ -53,12 +54,15 @@ function decodeDataInformationBlock(
 
   while (dif & DIF_VIF_EXTENSION_BIT) {
     if (pos >= data.length) {
-      throw new Error("No data but DIF extension bit still set!");
+      throw new ParserError(
+        "UNEXPECTED_STATE",
+        "No data but DIF extension bit still set!"
+      );
     }
     dif = data[pos++];
 
     if (difExtNo > 9) {
-      throw new Error("Too many DIF extensions!");
+      throw new ParserError("UNEXPECTED_STATE", "Too many DIF extensions!");
     }
 
     dib.storageNo |= (dif & 0b00001111) << (difExtNo * 4 + 1);
@@ -121,7 +125,10 @@ function getPrimaryVif(
   } else if (firstVif == 0x7c || firstVif == 0xfc) {
     const length = data[pos++];
     if (length + pos >= data.length) {
-      throw new Error("Not enough bytes left for plain text VIF!");
+      throw new ParserError(
+        "UNEXPECTED_STATE",
+        "Not enough bytes left for plain text VIF!"
+      );
     }
     const plainTextVif = data
       .toString("ascii", pos, pos + length)
@@ -159,11 +166,14 @@ function decodeValueInformationBlock(
 
   while (extensionFollows) {
     if (vib.extensions.length > 11) {
-      throw new Error("Too many VIF extensions!");
+      throw new ParserError("UNEXPECTED_STATE", "Too many VIF extensions!");
     }
 
     if (newPos + 1 >= data.length) {
-      throw new Error("No data left but VIF extension bit still set!");
+      throw new ParserError(
+        "UNEXPECTED_STATE",
+        "No data left but VIF extension bit still set!"
+      );
     }
 
     const vife = data[newPos++];
@@ -186,7 +196,8 @@ function getDataRecordHeader(
 
   if (dib.dataField === DIF_SPECIAL_FUNCTIONS) {
     if (newPos < data.length) {
-      throw new Error(
+      throw new ParserError(
+        "UNEXPECTED_STATE",
         `DIF for special function at ${newPos} - remaining data: ${data.toString("hex", newPos)}`
       );
     }
@@ -250,7 +261,8 @@ function decodeDataRecordValue(
     case DIF_DATATYPE_VARLEN:
       return decodeLvarValue(data, pos);
     default:
-      throw new Error(
+      throw new ParserError(
+        "UNIMPLEMENTED_FEATURE",
         `Unknown DataInformationBlock.dataField type: 0x${header.dib.dataField.toString(16)}`
       );
   }
@@ -293,7 +305,10 @@ function decodeLvarValue(
   } else if (lvar === 0xf8) {
     return { newPos: pos + 8, value: data.readDoubleLE(pos) };
   } else {
-    throw new Error(`Unhandled LVAR field 0x${lvar.toString(16)}`);
+    throw new ParserError(
+      "UNIMPLEMENTED_FEATURE",
+      `Unhandled LVAR field 0x${lvar.toString(16)}`
+    );
   }
 }
 

@@ -66,8 +66,8 @@ describe("CRC unknown", () => {
     const data =
       "2C44A7320613996707047A821000202F2F0C06000000000C14000000000C22224101000B5A4102000B5E4000";
 
-    expect(() => handleCrc(data)).toThrow(
-      "Telegram data is too short! Expected at least 45 bytes, but got only 44"
+    expect(() => handleCrc(data)).toThrowErrorMatchingInlineSnapshot(
+      "[CRC_ERROR: Telegram data is too short! Expected at least 45 bytes, but got only 44]"
     );
   });
 
@@ -75,8 +75,8 @@ describe("CRC unknown", () => {
     const data =
       "2E44931578563412330333637A2A0020255923C95AAA26D1B2E7493BC2AD013EC4A6F6D3529B520EDFF0EA6DEFC955B29D6D69EBF3AA";
 
-    expect(() => handleCrc(data)).toThrow(
-      "Telegram data is too short! Expected at least 55 bytes, but got only 54"
+    expect(() => handleCrc(data)).toThrowErrorMatchingInlineSnapshot(
+      "[CRC_ERROR: Telegram data is too short! Expected at least 55 bytes, but got only 54]"
     );
   });
 
@@ -84,7 +84,9 @@ describe("CRC unknown", () => {
     const data =
       "2E44931578563412330333647A2A0020255923C95AAA26D1B2E7493BC2AD013EC4A6F6D3529B520EDFF0EA6DEFC955B29D6D69EBF3EC8A";
 
-    expect(() => handleCrc(data)).toThrow("Frame type A CRC check failed");
+    expect(() => handleCrc(data)).toThrowErrorMatchingInlineSnapshot(
+      "[CRC_ERROR: Frame type A CRC check failed!]"
+    );
   });
 });
 
@@ -130,8 +132,8 @@ describe("CRC specified", () => {
     const data =
       "2C44A7320613996707047A821000202F2F0C06000000000C14000000000C22224101000B5A4102000B5E4000";
 
-    expect(() => handleCrc(data, true)).toThrow(
-      "Telegram data is too short! Expected at least 45 bytes, but got only 44"
+    expect(() => handleCrc(data, true)).toThrowErrorMatchingInlineSnapshot(
+      "[CRC_ERROR: Telegram data is too short! Expected at least 45 bytes, but got only 44]"
     );
   });
 
@@ -139,8 +141,8 @@ describe("CRC specified", () => {
     const data =
       "2E44931578563412330333637A2A0020255923C95AAA26D1B2E7493BC2AD013EC4A6F6D3529B520EDFF0EA6DEFC955B29D6D69EBF3AA";
 
-    expect(() => handleCrc(data, true)).toThrow(
-      "Telegram data is too short! Expected at least 55 bytes, but got only 54"
+    expect(() => handleCrc(data, true)).toThrowErrorMatchingInlineSnapshot(
+      "[CRC_ERROR: Telegram data is too short! Expected at least 55 bytes, but got only 54]"
     );
   });
 
@@ -148,16 +150,16 @@ describe("CRC specified", () => {
     const data =
       "2E44931578563412330333647A2A0020255923C95AAA26D1B2E7493BC2AD013EC4A6F6D3529B520EDFF0EA6DEFC955B29D6D69EBF3EC8A";
 
-    expect(() => handleCrc(data, true)).toThrow(
-      "Frame type A CRC check failed"
+    expect(() => handleCrc(data, true)).toThrowErrorMatchingInlineSnapshot(
+      "[CRC_ERROR: Frame type A CRC check failed!]"
     );
   });
 
   it("Frame Type B with wrong CRC", () => {
     const data = "1444AE0C7856341201078C2027780B134365877AC4";
 
-    expect(() => handleCrc(data, true)).toThrow(
-      "Frame type B CRC check failed"
+    expect(() => handleCrc(data, true)).toThrowErrorMatchingInlineSnapshot(
+      "[CRC_ERROR: Frame type B CRC check failed!]"
     );
   });
 
@@ -187,8 +189,8 @@ describe("Wired M-Bus", () => {
     const data =
       "6858586808057281052661A51170073E3000000C13000200008C1013000000008C2013000200003B3BDDBDEB0B26504701025ADB000266B900046D0C0B752B4C1300020000CC101300000000CC201300020000426C5F2C42EC7E7F2CDE16";
 
-    expect(() => handleCrc(data, true)).toThrow(
-      "Wired M-Bus frame CRC check failed!"
+    expect(() => handleCrc(data, true)).toThrowErrorMatchingInlineSnapshot(
+      "[CRC_ERROR: Wired M-Bus frame CRC check failed!]"
     );
   });
 });

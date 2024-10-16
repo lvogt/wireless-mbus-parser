@@ -6,6 +6,7 @@ import {
   FIELD_TYPE_MAXIMUM,
   FIELD_TYPE_MINIMUM,
 } from "@/helper/constants";
+import { ParserError } from "@/helper/error";
 import {
   decodeDateTimeTypeF,
   decodeDateTimeTypeI,
@@ -29,7 +30,7 @@ export function multiply(
   } else if (typeof value === "bigint") {
     return value * BigInt(multiplicator);
   } else {
-    throw new Error("Wrong data types!");
+    throw new ParserError("UNEXPECTED_STATE", "Wrong data types!");
   }
 }
 
@@ -39,7 +40,7 @@ export function add(value: DataType | Date, summand: number): number | bigint {
   } else if (typeof value === "bigint") {
     return value + BigInt(summand);
   } else {
-    throw new Error("Wrong data types!");
+    throw new ParserError("UNEXPECTED_STATE", "Wrong data types!");
   }
 }
 
@@ -52,7 +53,7 @@ export function divide(
   } else if (typeof value === "bigint") {
     return value / BigInt(divisor);
   } else {
-    throw new Error("Unexpected type!");
+    throw new ParserError("UNEXPECTED_STATE", "Unexpected type!");
   }
 }
 
@@ -163,7 +164,7 @@ export function applyDateOrDateTimeDefault(
   dataRecord: DataRecord
 ): EvaluatedData {
   if (typeof dataRecord.value !== "number") {
-    throw new Error("Unexpected type!");
+    throw new ParserError("UNEXPECTED_STATE", "Unexpected type!");
   }
 
   if (dataRecord.header.dib.dataField === DIF_DATATYPE_INT16) {
@@ -178,7 +179,7 @@ export function applyDateDefault(
   dataRecord: DataRecord
 ): EvaluatedData {
   if (typeof dataRecord.value !== "number") {
-    throw new Error("Unexpected type!");
+    throw new ParserError("UNEXPECTED_STATE", "Unexpected type!");
   }
 
   const date = decodeDateTypeG(dataRecord.value);
@@ -196,7 +197,7 @@ export function applyDateTimeDefault(
   dataRecord: DataRecord
 ): EvaluatedData {
   if (typeof dataRecord.value !== "number") {
-    throw new Error("Unexpected type!");
+    throw new ParserError("UNEXPECTED_STATE", "Unexpected type!");
   }
 
   const date =
@@ -230,7 +231,7 @@ export function applyBufferOrNumberDefault(
     typeof dataRecord.value !== "number" &&
     typeof dataRecord.value !== "bigint"
   ) {
-    throw new Error("Unexpected type");
+    throw new ParserError("UNEXPECTED_STATE", "Unexpected type");
   }
   const type =
     typeof dataRecord.value === "bigint"
@@ -265,7 +266,7 @@ export function applyNumberEvaluated(
     evaluatedData.type !== EvaluatedDataType.BigInt &&
     evaluatedData.type !== EvaluatedDataType.Number
   ) {
-    throw new Error("Unexpected type");
+    throw new ParserError("UNEXPECTED_STATE", "Unexpected type");
   }
 
   evaluatedData.value = descriptor.calc(evaluatedData.value);
@@ -278,7 +279,7 @@ export function extendDescription(
   evaluatedData: EvaluatedData
 ) {
   if (descriptor.description === undefined) {
-    throw new Error("Description is missing!");
+    throw new ParserError("UNEXPECTED_STATE", "Description is missing!");
   }
   evaluatedData.description += `; ${descriptor.description}`;
   return evaluatedData;
@@ -290,7 +291,7 @@ export function extendDescriptionReplaceDateOrTime(
   evaluatedData: EvaluatedData
 ) {
   if (descriptor.description === undefined) {
-    throw new Error("Description is missing!");
+    throw new ParserError("UNEXPECTED_STATE", "Description is missing!");
   }
 
   const description =
@@ -308,7 +309,7 @@ export function extendUnit(
   evaluatedData: EvaluatedData
 ) {
   if (descriptor.unit === undefined) {
-    throw new Error("Unit is missing!");
+    throw new ParserError("UNEXPECTED_STATE", "Unit is missing!");
   }
   evaluatedData.unit += ` ${descriptor.unit}`;
   return evaluatedData;

@@ -1,3 +1,4 @@
+import { ParserError } from "@/helper/error";
 import { isPrimaryVifString } from "@/helper/helper";
 import { log } from "@/helper/logger";
 import {
@@ -43,7 +44,10 @@ function getDescriptor(dataRecord: DataRecord, meterType: MeterType) {
     case VifTable.Manufacturer:
       return getManufacturerSpecificsVifDescriptor(dataRecord, meterType);
     default:
-      throw new Error("Table not yet implemented");
+      throw new ParserError(
+        "UNIMPLEMENTED_FEATURE",
+        "Table not yet implemented"
+      );
   }
 }
 
@@ -96,7 +100,7 @@ function getVifeDescriptor(
 
 function getPlainTextDescriptor(primaryVif: PrimaryVif): VIFDescriptor {
   if (!isPrimaryVifString(primaryVif)) {
-    throw new Error("PrimaryVifString expected!");
+    throw new ParserError("UNEXPECTED_STATE", "PrimaryVifString expected!");
   }
 
   return {

@@ -4,6 +4,7 @@ import {
   FRAME_A_BLOCK_SIZE,
   FRAME_B_BLOCK_SIZE,
 } from "@/helper/constants";
+import { ParserError } from "@/helper/error";
 import { isWiredMbusFrame } from "@/helper/helper";
 
 function checkFrameTypeACrc(data: Buffer) {
@@ -82,7 +83,8 @@ function stripAndCheckCrcIfExists(data: Buffer) {
   const size = data[0] + 1;
 
   if (size > data.length) {
-    throw new Error(
+    throw new ParserError(
+      "CRC_ERROR",
       `Telegram data is too short! Expected at least ${size} bytes, but got only ${data.length}`
     );
   }
@@ -99,7 +101,8 @@ function stripAndCheckCrcIfExists(data: Buffer) {
   } else {
     // type A with CRC (or trailing data...)
     if (getSizeOfTypeAWithCrc(data) > data.length) {
-      throw new Error(
+      throw new ParserError(
+        "CRC_ERROR",
         `Telegram data is too short! Expected at least ${getSizeOfTypeAWithCrc(data)} bytes, but got only ${data.length}`
       );
     }
@@ -107,7 +110,7 @@ function stripAndCheckCrcIfExists(data: Buffer) {
     if (checkFrameTypeACrc(data)) {
       return stripFrameTypeACrc(data);
     } else {
-      throw new Error("Frame type A CRC check failed!");
+      throw new ParserError("CRC_ERROR", "Frame type A CRC check failed!");
     }
   }
 }
@@ -116,7 +119,8 @@ function stripAndCheckCrc(data: Buffer) {
   const size = data[0] + 1;
 
   if (size > data.length) {
-    throw new Error(
+    throw new ParserError(
+      "CRC_ERROR",
       `Telegram data is too short! Expected at least ${size} bytes, but got only ${data.length}`
     );
   }
@@ -128,14 +132,15 @@ function stripAndCheckCrc(data: Buffer) {
       return stripFrameTypeBCrc(data);
     } else {
       // assume without CRC - so A or B do not matter
-      throw new Error("Frame type B CRC check failed!");
+      throw new ParserError("CRC_ERROR", "Frame type B CRC check failed!");
     }
   } else {
     // type A with CRC (or trailing data...)
     const expectedSizeTypeA = getSizeOfTypeAWithCrc(data);
     let sizedData = data;
     if (expectedSizeTypeA > data.length) {
-      throw new Error(
+      throw new ParserError(
+        "CRC_ERROR",
         `Telegram data is too short! Expected at least ${getSizeOfTypeAWithCrc(data)} bytes, but got only ${data.length}`
       );
     } else if (expectedSizeTypeA < data.length) {
@@ -145,7 +150,7 @@ function stripAndCheckCrc(data: Buffer) {
     if (checkFrameTypeACrc(sizedData)) {
       return stripFrameTypeACrc(sizedData);
     } else {
-      throw new Error("Frame type A CRC check failed!");
+      throw new ParserError("CRC_ERROR", "Frame type A CRC check failed!");
     }
   }
 }
@@ -158,7 +163,10 @@ function trimData(data: Buffer) {
 function handleWiredMbusFrame(data: Buffer) {
   const size = data[1];
   if (data[2] != size) {
-    throw new Error("Telegram is not a valid wired M-Bus frame!");
+    throw new ParserError(
+      "CRC_ERROR",
+      "Telegram is not a valid wired M-Bus frame!"
+    );
   }
 
   // check checksum
@@ -168,7 +176,7 @@ function handleWiredMbusFrame(data: Buffer) {
   }
 
   if (csum != data[data.length - 2]) {
-    throw new Error("Wired M-Bus frame CRC check failed!");
+    throw new ParserError("CRC_ERROR", "Wired M-Bus frame CRC check failed!");
   }
 
   return Buffer.from(data.subarray(0, data.length - 2));

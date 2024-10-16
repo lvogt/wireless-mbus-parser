@@ -64,7 +64,9 @@ describe("Extended Link Layer", () => {
       decode(
         "24442D2C692845631B168D3050209CD621B006B1140AEF4953AE5B86FAFC0B00E70705B846"
       )
-    ).toThrow("Encrytped ELL, but no key provided!");
+    ).toThrowErrorMatchingInlineSnapshot(
+      "[NO_AES_KEY: Encrytped ELL, but no key provided!]"
+    );
   });
 
   it("No enc flag", () => {
@@ -133,7 +135,9 @@ describe("Extended Link Layer", () => {
         "24442D2C692845631B168D3050209CD621B006B1140AEF4953AE5B86FAFC0B00E70705B846",
         "4E1108544202058100DFEFA06B0934A5"
       )
-    ).toThrow("Payload CRC check failed on ExtendedLinkLayer, wrong AES key?");
+    ).toThrowErrorMatchingInlineSnapshot(
+      "[WRONG_AES_KEY: Payload CRC check failed on ExtendedLinkLayer, wrong AES key?]"
+    );
   });
 
   it("ELL Encryption - already decrypted", () => {

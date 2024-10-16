@@ -66,8 +66,10 @@ async function decode(data: string, key?: string) {
 
 describe("Application Layer", () => {
   it("CI does not match", async () => {
-    await expect(decodeApl("000000000000000000000000")).rejects.toThrow(
-      "Unsupported CI Field 0x0\nremaining payload is 0000000000000000000000"
+    await expect(
+      decodeApl("000000000000000000000000")
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      "[UNIMPLEMENTED_FEATURE: Unsupported CI Field 0x0\nremaining payload is 0000000000000000000000]"
     );
   });
 

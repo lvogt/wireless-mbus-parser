@@ -7,6 +7,7 @@ import {
 } from "crypto";
 
 import { CI_RESP_12 } from "@/helper/constants";
+import { ParserError } from "@/helper/error";
 import { log } from "@/helper/logger";
 import type {
   ApplicationLayer,
@@ -53,7 +54,8 @@ export function decryptInPlace(
 
   log.debug(`Decrypted data: ${decryptedData.toString("hex")}`);
   if (!decryptedData.length) {
-    throw new Error(
+    throw new ParserError(
+      "DECRYPTION_ERROR",
       `Decryption (${algorithm}) failed! IV: ${iv.toString("hex")}`
     );
   }
@@ -74,7 +76,10 @@ export async function calcKenc(
   }
 ): Promise<{ kenc: Buffer; kmac: Buffer }> {
   if (layers.afl.mcr === undefined) {
-    throw new Error("Cannot dervice Kenc without MCR from AFL!");
+    throw new ParserError(
+      "DECRYPTION_ERROR",
+      "Cannot dervice Kenc without MCR from AFL!"
+    );
   }
 
   const msg = Buffer.alloc(16, 0x07);
@@ -117,8 +122,9 @@ export async function checkAflMac(
 
   log.debug(`MAC: ${mac.toString("hex")}`);
   if (afl.mac.compare(mac.subarray(0, 8)) != 0) {
-    throw new Error(
-      `Received MAC does not match. Corrupted data?\nMAC received: ${afl.mac.toString("hex")}`
+    throw new ParserError(
+      "WRONG_AES_KEY",
+      `Received MAC does not match. Wrong key?\nMAC received: ${afl.mac.toString("hex")}`
     );
   }
 }

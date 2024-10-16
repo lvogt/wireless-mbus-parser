@@ -10,6 +10,7 @@ import {
   CI_RESP_TECHEM,
 } from "@/helper/constants";
 import { calcKenc, checkAflMac, decryptInPlace } from "@/helper/crypto";
+import { ParserError } from "@/helper/error";
 import {
   decodeManufacturer,
   getDeviceState,
@@ -226,7 +227,10 @@ function getConfig(
     case 13:
       return { config: getConfig13(mode, cw, data[pos]), newPos: pos + 1 };
     default:
-      throw new Error(`Unhandled config mode ${mode}`);
+      throw new ParserError(
+        "UNIMPLEMENTED_FEATURE",
+        `Unhandled config mode ${mode}`
+      );
   }
 }
 
@@ -281,7 +285,10 @@ export async function decodeApplicationLayer(
   const ci = data[pos++];
 
   if (ci === CI_RESP_SML_4 || ci === CI_RESP_SML_12) {
-    throw new Error("Payload is SML encoded. SML decoding is not implemented");
+    throw new ParserError(
+      "UNIMPLEMENTED_FEATURE",
+      "Payload is SML encoded. SML decoding is not implemented"
+    );
   }
 
   if (ci === CI_RESP_0) {
@@ -315,7 +322,8 @@ export async function decodeApplicationLayer(
   } else if (isTechem(linkLayer, ci)) {
     return decodeTechemApplicationLayer(state, linkLayer as LinkLayer);
   } else {
-    throw new Error(
+    throw new ParserError(
+      "UNIMPLEMENTED_FEATURE",
       `Unsupported CI Field 0x${ci.toString(16)}\nremaining payload is ${data.toString("hex", pos)}`
     );
   }
@@ -324,7 +332,10 @@ export async function decodeApplicationLayer(
 
   if (apl.config.mode !== 0) {
     if (state.key === undefined) {
-      throw new Error("Encrypted telegram but no AES key provided");
+      throw new ParserError(
+        "NO_AES_KEY",
+        "Encrypted telegram but no AES key provided"
+      );
     }
 
     if (apl.config.mode === 5) {
@@ -339,7 +350,10 @@ export async function decodeApplicationLayer(
       );
     } else if (apl.config.mode === 7) {
       if (afl === undefined) {
-        throw new Error("Mode 7 encryption but no AFL found");
+        throw new ParserError(
+          "UNEXPECTED_STATE",
+          "Mode 7 encryption but no AFL found"
+        );
       }
       const encryptedLength = apl.config.encryptedBlocks * AES_BLOCK_SIZE;
       const { kenc, kmac } = await calcKenc(state.key, {
@@ -359,7 +373,8 @@ export async function decodeApplicationLayer(
         encryptedLength
       );
     } else {
-      throw new Error(
+      throw new ParserError(
+        "UNIMPLEMENTED_FEATURE",
         `Encryption mode ${apl.config.mode.toString(16)} not implemented`
       );
     }

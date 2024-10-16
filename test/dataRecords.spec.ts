@@ -606,8 +606,8 @@ describe("Special DIF values", () => {
   });
 
   it("DIF_SPECIAL_FUNCTION", () => {
-    expect(() => decode("0f123456")).toThrow(
-      "DIF for special function at 1 - remaining data: 123456"
+    expect(() => decode("0f123456")).toThrowErrorMatchingInlineSnapshot(
+      "[UNEXPECTED_STATE: DIF for special function at 1 - remaining data: 123456]"
     );
   });
 });

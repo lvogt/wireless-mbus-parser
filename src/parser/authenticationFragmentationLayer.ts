@@ -1,4 +1,5 @@
 import { CI_AFL } from "@/helper/constants";
+import { ParserError } from "@/helper/error";
 import { log } from "@/helper/logger";
 import type { AuthenticationAndFragmentationLayer, ParserState } from "@/types";
 
@@ -21,7 +22,7 @@ export function decodeAuthenticationAndFragmentationLayer(state: ParserState): {
 
   const ci = data[pos++];
   if (ci !== CI_AFL) {
-    throw new Error(`Wrong AFL CI: ${ci}`);
+    throw new ParserError("UNEXPECTED_STATE", `Wrong AFL CI: ${ci}`);
   }
   log.debug("Authentification and Fragmentation Layer");
 
@@ -101,7 +102,10 @@ export function decodeAuthenticationAndFragmentationLayer(state: ParserState): {
 
   if (fcl.macp) {
     if (mcl === undefined) {
-      throw new Error("AFL MAC should be present but MCL is missing");
+      throw new ParserError(
+        "UNEXPECTED_STATE",
+        "AFL MAC should be present but MCL is missing"
+      );
     }
     // AFL MAC Field (AFL.MAC)
     // length of the MAC field depends on AFL.MCL.AT indicated by the AFL.MCL field
@@ -130,7 +134,10 @@ export function decodeAuthenticationAndFragmentationLayer(state: ParserState): {
   }
 
   if (fcl.mf) {
-    throw new Error("Fragmented messages are not supported yet.");
+    throw new ParserError(
+      "UNIMPLEMENTED_FEATURE",
+      "Fragmented messages are not supported yet."
+    );
   }
 
   return {

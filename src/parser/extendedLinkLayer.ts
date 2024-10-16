@@ -7,6 +7,7 @@ import {
   CI_ELL_16,
 } from "@/helper/constants";
 import { decryptInPlace } from "@/helper/crypto";
+import { ParserError } from "@/helper/error";
 import { isLinkLayer } from "@/helper/helper";
 import { log } from "@/helper/logger";
 import type {
@@ -54,11 +55,11 @@ export function decodeExtendedLinkLayer(
   }
 
   if (state.key === undefined) {
-    throw new Error("Encrytped ELL, but no key provided!");
+    throw new ParserError("NO_AES_KEY", "Encrytped ELL, but no key provided!");
   }
 
   if (!isLinkLayer(linkLayer)) {
-    throw new Error("Unexpected state: wired M-bus frame and ELL!");
+    throw new ParserError("UNEXPECTED_STATE", " wired M-bus frame and ELL!");
   }
 
   const iv = createIv(ell, linkLayer);
@@ -73,7 +74,8 @@ export function decodeExtendedLinkLayer(
     length
   );
   if (!checkCrcEll(decryptedData, pos, decryptedData.length)) {
-    throw new Error(
+    throw new ParserError(
+      "WRONG_AES_KEY",
       "Payload CRC check failed on ExtendedLinkLayer, wrong AES key?"
     );
   }
