@@ -21,6 +21,16 @@ export interface MeterType {
   manufacturer: string;
   type: number;
   version: number;
+  radio?: {
+    manufacturer: string;
+    type: number;
+    version: number;
+  };
+}
+
+export interface ParserResult {
+  data: EvaluatedData[];
+  type: MeterType;
 }
 
 export interface DataRecord {

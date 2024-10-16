@@ -1,7 +1,10 @@
-import { VALID_DEVICES_TYPES } from "@/helper/constants";
+import { CI_RESP_COMPACT, VALID_DEVICES_TYPES } from "@/helper/constants";
 import { log } from "@/helper/logger";
 import type {
+  ApplicationLayer,
+  ApplicationLayerCompact,
   LinkLayer,
+  MeterType,
   PrimaryVif,
   PrimaryVifString,
   WiredLinkLayer,
@@ -15,8 +18,37 @@ export function isLinkLayer(ll: LinkLayer | WiredLinkLayer): ll is LinkLayer {
   return (ll as LinkLayer).mField !== undefined;
 }
 
+export function isCompactFrame(
+  apl: ApplicationLayer
+): apl is ApplicationLayerCompact {
+  return (apl as ApplicationLayerCompact).ci === CI_RESP_COMPACT;
+}
+
 export function isPrimaryVifString(vif: PrimaryVif): vif is PrimaryVifString {
   return (vif as PrimaryVifString).plainText !== undefined;
+}
+
+export function getMeterType(
+  linkLayer: LinkLayer,
+  applicationLayer: ApplicationLayer
+): MeterType {
+  if (applicationLayer.ci === 0x72) {
+    return {
+      manufacturer: applicationLayer.meterManufacturerString,
+      type: applicationLayer.meterDevice,
+      version: applicationLayer.meterVersion,
+      radio: {
+        manufacturer: linkLayer.manufacturer,
+        type: linkLayer.type,
+        version: linkLayer.version,
+      },
+    };
+  }
+  return {
+    manufacturer: linkLayer.manufacturer,
+    type: linkLayer.type,
+    version: linkLayer.version,
+  };
 }
 
 export function decodeBCD(digits: number, data: Buffer, offset = 0) {
