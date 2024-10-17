@@ -39,14 +39,14 @@
     "wmbus"
   ],
   "scripts": {
-    "build": "$npm_execpath run test && $npm_execpath format && $npm_execpath run lint && $npm_execpath run build:code",
+    "build": "$npm_execpath run compile && $npm_execpath run test && $npm_execpath format && $npm_execpath run lint && $npm_execpath run build:code",
     "build:code": "tsup-node",
     "compile": "tsc",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:update": "vitest run --update",
     "coverage": "vitest run --coverage",
-    "clean": "rimraf dist",
+    "clean": "rimraf coverage dist node_modules",
     "lint": "eslint --cache --cache-strategy content .",
     "lint:fix": "eslint --cache --cache-strategy content . --fix",
     "format": "prettier --check .",
