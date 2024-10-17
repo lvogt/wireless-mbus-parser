@@ -39,6 +39,15 @@ export interface ParserResult {
   meter: MeterData;
 }
 
+export interface FullParserResult extends ParserResult {
+  linkLayer: LinkLayer;
+  extendedLinkLayer?: ExtendedLinkLayer;
+  authenticationAndFragmentationLayer?: AuthenticationAndFragmentationLayer;
+  applicationLayer: ApplicationLayer;
+  dataRecords: DataRecord[];
+  rawData: Buffer;
+}
+
 export interface DataRecord {
   header: DataRecordHeader;
   value: DataType;

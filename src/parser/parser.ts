@@ -14,6 +14,7 @@ import { decodeLinkLayer } from "@/parser/linkLayer";
 import type {
   ApplicationLayer,
   DataRecordHeader,
+  FullParserResult,
   ParserResult,
   ParserState,
 } from "@/types";
@@ -26,10 +27,10 @@ interface ParserOptions {
 export class WirelessMbusParser {
   private dataRecordHeaderCache: Record<number, DataRecordHeader[] | null> = {};
 
-  async parse(
+  async parseFullResult(
     data: Buffer,
     options?: Partial<ParserOptions>
-  ): Promise<ParserResult> {
+  ): Promise<FullParserResult> {
     const crcFreeData = stripAnyCrc(data, options?.containsCrc);
 
     const state = {
@@ -38,11 +39,10 @@ export class WirelessMbusParser {
       key: options?.key ?? undefined,
     };
 
-    // parserState needs to know key, and pass it on
     const { state: llState, linkLayer: llFromLinkLayer } =
       decodeLinkLayer(state);
 
-    const { state: ellState } = decodeExtendedLinkLayer(
+    const { state: ellState, extendedLinkLayer } = decodeExtendedLinkLayer(
       llState,
       llFromLinkLayer
     );
@@ -71,7 +71,24 @@ export class WirelessMbusParser {
     return {
       data: evaluatedData,
       meter: meterData,
+      linkLayer,
+      extendedLinkLayer,
+      authenticationAndFragmentationLayer,
+      applicationLayer,
+      dataRecords,
+      rawData: aplState.data,
     };
+  }
+
+  async parse(
+    data: Buffer,
+    options?: Partial<ParserOptions>
+  ): Promise<ParserResult> {
+    const { data: evaluatedData, meter } = await this.parseFullResult(
+      data,
+      options
+    );
+    return { data: evaluatedData, meter };
   }
 
   private handleDataRecordDecoding(
