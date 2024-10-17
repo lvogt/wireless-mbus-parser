@@ -41,6 +41,15 @@ describe("Parser", () => {
     );
 
     expect(result.data).toHaveLength(5);
+    expect(result.meter).toEqual({
+      accessNo: 130,
+      deviceType: "Heat",
+      id: "67991306",
+      manufacturer: "LUG",
+      status: "No error (temporary)",
+      type: 4,
+      version: 7,
+    });
   });
 });
 

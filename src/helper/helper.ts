@@ -4,7 +4,7 @@ import type {
   ApplicationLayer,
   ApplicationLayerCompact,
   LinkLayer,
-  MeterType,
+  MeterData,
   PrimaryVif,
   PrimaryVifString,
   WiredLinkLayer,
@@ -28,27 +28,38 @@ export function isPrimaryVifString(vif: PrimaryVif): vif is PrimaryVifString {
   return (vif as PrimaryVifString).plainText !== undefined;
 }
 
-export function getMeterType(
+export function getMeterData(
   linkLayer: LinkLayer,
-  applicationLayer: ApplicationLayer
-): MeterType {
-  if (applicationLayer.ci === 0x72) {
-    return {
-      manufacturer: applicationLayer.meterManufacturerString,
-      type: applicationLayer.meterDevice,
-      version: applicationLayer.meterVersion,
-      radio: {
-        manufacturer: linkLayer.manufacturer,
-        type: linkLayer.type,
-        version: linkLayer.version,
-      },
-    };
-  }
-  return {
+  applicationLayer?: ApplicationLayer
+): MeterData {
+  const linkLayerMeterData = {
     manufacturer: linkLayer.manufacturer,
+    id: linkLayer.meterId,
     type: linkLayer.type,
+    deviceType: getDeviceType(linkLayer.type),
     version: linkLayer.version,
   };
+
+  if (applicationLayer?.ci == 0x7a) {
+    return {
+      ...linkLayerMeterData,
+      status: applicationLayer.status,
+      accessNo: applicationLayer.accessNo,
+    };
+  } else if (applicationLayer?.ci === 0x72) {
+    return {
+      manufacturer: applicationLayer.meterManufacturerString,
+      id: applicationLayer.meterIdString,
+      type: applicationLayer.meterDevice,
+      deviceType: getDeviceType(applicationLayer.meterDevice),
+      version: applicationLayer.meterVersion,
+      status: applicationLayer.status,
+      accessNo: applicationLayer.accessNo,
+      radio: linkLayerMeterData,
+    };
+  } else {
+    return linkLayerMeterData;
+  }
 }
 
 export function decodeBCD(digits: number, data: Buffer, offset = 0) {

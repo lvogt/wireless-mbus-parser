@@ -54,7 +54,7 @@ export const VALID_DEVICES_TYPES = {
   0x03: "Gas",
   0x04: "Heat",
   0x05: "Steam",
-  0x06: "Warm Water (30 °C ... 90 °C)",
+  0x06: "Warm Water (30 - 90 °C)",
   0x07: "Water",
   0x08: "Heat Cost Allocator",
   0x09: "Compressed Air",

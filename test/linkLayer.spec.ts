@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 
+import { getMeterData } from "@/helper/helper";
 import { decodeApplicationLayer } from "@/parser/applicationLayer";
 import { decodeLinkLayer } from "@/parser/linkLayer";
+import type { LinkLayer } from "@/types";
 
 describe("Link Layer", () => {
   it("Check fields", () => {
@@ -23,6 +25,14 @@ describe("Link Layer", () => {
       manufacturer: "ELS",
       typeString: "Gas",
       meterId: "00345678",
+    });
+
+    expect(getMeterData(result.linkLayer as LinkLayer)).toEqual({
+      deviceType: "Gas",
+      manufacturer: "ELS",
+      id: "00345678",
+      type: 3,
+      version: 51,
     });
   });
 

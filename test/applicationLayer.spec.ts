@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { getMeterData } from "@/helper/helper";
 import { decodeApplicationLayer } from "@/parser/applicationLayer";
 import { decodeAuthenticationAndFragmentationLayer } from "@/parser/authenticationFragmentationLayer";
 import { decodeExtendedLinkLayer } from "@/parser/extendedLinkLayer";
@@ -157,6 +158,16 @@ describe("Application Layer", () => {
         hopCounter: 0,
       },
     });
+
+    expect(getMeterData(result.linkLayer, result.applicationLayer)).toEqual({
+      deviceType: "Gas",
+      manufacturer: "ELS",
+      id: "12345678",
+      type: 3,
+      version: 51,
+      accessNo: 42,
+      status: "No error",
+    });
   });
 
   it("Long Header - Encrypted Mode 5", async () => {
@@ -186,6 +197,23 @@ describe("Application Layer", () => {
         encryptedBlocks: 3,
         content: 0,
         hopCounter: 0,
+      },
+    });
+
+    expect(getMeterData(result.linkLayer, result.applicationLayer)).toEqual({
+      deviceType: "Radio converter (Meter side)",
+      manufacturer: "AMB",
+      id: "57000044",
+      type: 55,
+      version: 12,
+      accessNo: 163,
+      status: "No error",
+      radio: {
+        deviceType: "Radio converter (Meter side)",
+        id: "57000044",
+        manufacturer: "AMB",
+        type: 55,
+        version: 12,
       },
     });
   });
@@ -221,6 +249,30 @@ describe("Application Layer", () => {
     ).rejects.toThrowErrorMatchingInlineSnapshot(
       "[WRONG_AES_KEY: Received MAC does not match. Wrong key?\nMAC received: 21924d4f3fb66e01]"
     );
+  });
+
+  it("Meter with radio", async () => {
+    const result = await decode(
+      "530824484433221103378e80753a63665544330a31900f002c25b30a0000af5d74df73a600d972785634129315330375002007109058475f4bc91df878b80a1b0f98b629024aac727942bfc549233c0140829b93",
+      "000102030405060708090A0B0C0D0E0F"
+    );
+
+    expect(getMeterData(result.linkLayer, result.applicationLayer)).toEqual({
+      deviceType: "Gas",
+      manufacturer: "ELS",
+      id: "12345678",
+      type: 3,
+      version: 51,
+      accessNo: 117,
+      status: "No error",
+      radio: {
+        deviceType: "Radio converter (Meter side)",
+        id: "11223344",
+        manufacturer: "RAD",
+        type: 55,
+        version: 3,
+      },
+    });
   });
 });
 

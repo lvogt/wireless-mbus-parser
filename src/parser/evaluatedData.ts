@@ -10,7 +10,7 @@ import {
 import type {
   DataRecord,
   EvaluatedData,
-  MeterType,
+  MeterData,
   PrimaryVif,
   VIFDescriptor,
   VIFEDescriptor,
@@ -25,7 +25,7 @@ import {
 } from "@/vif/manufacturerSpecificVifs";
 import { vifExtensions } from "@/vif/vifExtension";
 
-function getDescriptor(dataRecord: DataRecord, meterType: MeterType) {
+function getDescriptor(dataRecord: DataRecord, meterType: MeterData) {
   switch (dataRecord.header.vib.primary.table) {
     case VifTable.Default:
       return defaultVIFs.find(
@@ -53,7 +53,7 @@ function getDescriptor(dataRecord: DataRecord, meterType: MeterType) {
 
 function getManufacturerSpecificsVifDescriptor(
   dataRecord: DataRecord,
-  meterType: MeterType
+  meterType: MeterData
 ) {
   if (meterType.manufacturer in manufacturerSpecificsVifs) {
     const descriptor = manufacturerSpecificsVifs[meterType.manufacturer].find(
@@ -68,7 +68,7 @@ function getManufacturerSpecificsVifDescriptor(
 
 function getManufacturerSpecificsVifeDescriptor(
   extension: number,
-  meterType: MeterType
+  meterType: MeterData
 ) {
   if (meterType.manufacturer in manufacturerSpecificsVifes) {
     const descriptor = manufacturerSpecificsVifes[meterType.manufacturer].find(
@@ -83,7 +83,7 @@ function getManufacturerSpecificsVifeDescriptor(
 
 function getVifeDescriptor(
   extension: number,
-  meterType: MeterType,
+  meterType: MeterData,
   manufacturerSpecific = false
 ) {
   if (manufacturerSpecific) {
@@ -136,7 +136,7 @@ function getFallbackExtensiontDescriptor(extension: number): VIFEDescriptor {
   };
 }
 
-function evaluatePrimaryVif(dataRecord: DataRecord, meterType: MeterType) {
+function evaluatePrimaryVif(dataRecord: DataRecord, meterType: MeterData) {
   let descriptor = getDescriptor(dataRecord, meterType);
   if (descriptor === undefined) {
     descriptor = getFallbackDescriptor(dataRecord);
@@ -153,7 +153,7 @@ function evaluatePrimaryVif(dataRecord: DataRecord, meterType: MeterType) {
 function evaluateVifExtension(
   data: EvaluatedData,
   dataRecord: DataRecord,
-  meterType: MeterType,
+  meterType: MeterData,
   extension: number,
   manufacturerSpecific: boolean
 ) {
@@ -172,7 +172,7 @@ function evaluateVifExtension(
 
 function evaluateDataRecord(
   dataRecord: DataRecord,
-  meterType: MeterType
+  meterType: MeterData
 ): EvaluatedData {
   const evaluatedData = evaluatePrimaryVif(dataRecord, meterType);
   const manufacturerSpecificPrimaryVif =
@@ -202,7 +202,7 @@ function evaluateDataRecord(
 
 export function evaluateDataRecords(
   dataRecords: DataRecord[],
-  meterType: MeterType
+  meterType: MeterData
 ): EvaluatedData[] {
   return dataRecords.map((record) => evaluateDataRecord(record, meterType));
 }

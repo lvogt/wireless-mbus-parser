@@ -1,6 +1,6 @@
 import { stripAnyCrc } from "@/crc/crcHandler";
 import { ParserError } from "@/helper/error";
-import { getMeterType, isCompactFrame } from "@/helper/helper";
+import { getMeterData, isCompactFrame } from "@/helper/helper";
 import { decodeApplicationLayer } from "@/parser/applicationLayer";
 import { decodeAuthenticationAndFragmentationLayer } from "@/parser/authenticationFragmentationLayer";
 import {
@@ -59,18 +59,18 @@ export class WirelessMbusParser {
       llFromLinkLayer,
       authenticationAndFragmentationLayer
     );
-    const meterType = getMeterType(linkLayer, applicationLayer);
+    const meterData = getMeterData(linkLayer, applicationLayer);
 
     const dataRecords = this.handleDataRecordDecoding(
       aplState,
       applicationLayer
     );
 
-    const evaluatedData = evaluateDataRecords(dataRecords, meterType);
+    const evaluatedData = evaluateDataRecords(dataRecords, meterData);
 
     return {
       data: evaluatedData,
-      type: meterType,
+      meter: meterData,
     };
   }
 

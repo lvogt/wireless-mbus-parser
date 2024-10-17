@@ -2,15 +2,17 @@ import { describe, expect, it } from "vitest";
 
 import { decodeDataRecords } from "@/parser/dataRecords";
 import { evaluateDataRecords } from "@/parser/evaluatedData";
-import { EvaluatedDataType, type MeterType } from "@/types";
+import { EvaluatedDataType, type MeterData } from "@/types";
 
-const dummyMeter: MeterType = {
+const dummyMeter: MeterData = {
   manufacturer: "ABC",
   version: 0x12,
   type: 0x42,
+  id: "12345678",
+  deviceType: "Device",
 };
 
-function decode(data: string, meterType?: MeterType) {
+function decode(data: string, meterType?: MeterData) {
   const result = decodeDataRecords({ data: Buffer.from(data, "hex"), pos: 0 });
   return evaluateDataRecords(result.dataRecords, meterType ?? dummyMeter);
 }
@@ -414,7 +416,7 @@ describe("Techem", () => {
   it("HCA #1 version 0x94", () => {
     const result = decode(
       "426c5f2c426e7500026c1936026e000002658e0a0265760a0d61e21800",
-      { manufacturer: "TCH", type: 0x80, version: 0x94 }
+      { ...dummyMeter, manufacturer: "TCH", type: 0x80, version: 0x94 }
     );
 
     expect(result).toHaveLength(7);
@@ -474,7 +476,7 @@ describe("Techem", () => {
   it("HCA #2 version 0x69", () => {
     const result = decode(
       "426c7f2c426e0204026c0832026e83000265c4080265f7090d61e2cdfe",
-      { manufacturer: "TCH", type: 0x80, version: 0x94 }
+      { ...dummyMeter, manufacturer: "TCH", type: 0x80, version: 0x94 }
     );
 
     expect(result).toHaveLength(7);
@@ -533,6 +535,7 @@ describe("Techem", () => {
 
   it("Water meter 0x62", () => {
     const result = decode("426c5f2c42155900026c1b340215310003158a0000", {
+      ...dummyMeter,
       manufacturer: "TCH",
       type: 0x62,
       version: 0x94,
@@ -580,6 +583,7 @@ describe("Techem", () => {
 
   it("Water meter 0x72", () => {
     const result = decode("426c5f2c4215f304026c1936021575000315680500", {
+      ...dummyMeter,
       manufacturer: "TCH",
       type: 0x72,
       version: 0x94,
@@ -627,6 +631,7 @@ describe("Techem", () => {
 
   it("Heat meter 0x43", () => {
     const result = decode("426c7f2c4306770100026c1e3b03067800000406ef010000 ", {
+      ...dummyMeter,
       manufacturer: "TCH",
       type: 0x43,
       version: 0x94,

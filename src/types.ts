@@ -17,20 +17,26 @@ export interface LinkLayer extends WiredLinkLayer {
   meterId: string;
 }
 
-export interface MeterType {
+export interface MeterData {
   manufacturer: string;
+  id: string;
   type: number;
+  deviceType: string;
   version: number;
+  status?: string;
+  accessNo?: number;
   radio?: {
     manufacturer: string;
+    id: string;
     type: number;
+    deviceType: string;
     version: number;
   };
 }
 
 export interface ParserResult {
   data: EvaluatedData[];
-  type: MeterType;
+  meter: MeterData;
 }
 
 export interface DataRecord {
