@@ -11,6 +11,7 @@ import {
   decodeNoYearDateTypeTechem,
   encodeDateTypeG,
   getDeviceState,
+  guessDeviceId,
 } from "@/helper/helper";
 
 describe("decodeBCD", () => {
@@ -140,5 +141,29 @@ describe("decodeDateType2Techem", () => {
   ])("Date $expected", ({ dataDay, dataMonth, expected }) => {
     const result = decodeNoYearDateType2Techem(dataDay, dataMonth);
     expect(result.toISOString()).toBe(expected);
+  });
+});
+
+describe("guessDeviceId", () => {
+  it.each([
+    {
+      data: "1234",
+      expected: "ERR-XXXXXXXX",
+      offset: 0,
+    },
+    {
+      data: "434493157856341233038C2075900F002C25B30A000021924D4F2F",
+      expected: "ELS-12345678",
+      offset: 0,
+    },
+    {
+      data: "12345678434493157856341233038C2075900F002C25B30A000021924D4F2F",
+      expected: "ELS-12345678",
+      offset: 4,
+    },
+  ])("Device ID $expected", ({ data, expected, offset }) => {
+    const buf = Buffer.from(data, "hex");
+    const id = guessDeviceId(buf, offset);
+    expect(id).toBe(expected);
   });
 });

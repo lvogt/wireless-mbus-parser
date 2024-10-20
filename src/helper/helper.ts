@@ -225,3 +225,14 @@ export function encodeDateTypeG(date: Date) {
 
   return (yearMSB << 12) | (month << 8) | (yearLSB << 5) | day;
 }
+
+export function guessDeviceId(data: Buffer, offset = 0) {
+  if (data.length < 8 + offset) {
+    return "ERR-XXXXXXXX";
+  }
+
+  const manufacturer = decodeManufacturer(data.readUint16LE(offset + 2));
+  const id = getMeterId(data, offset + 4);
+
+  return `${manufacturer}-${id}`;
+}
