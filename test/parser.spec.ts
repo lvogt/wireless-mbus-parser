@@ -54,11 +54,12 @@ describe("Parser", () => {
 
   it("Full result", async () => {
     const parser = new WirelessMbusParser();
-    const result = await parser.parseFullResult(
+    const result = await parser.parse(
       Buffer.from(
         "2C44A7320613996707047A821000202F2F0C06000000000C14000000000C22224101000B5A4102000B5E4000F0",
         "hex"
-      )
+      ),
+      { verbose: true }
     );
 
     expect(Object.keys(result)).toEqual([
@@ -77,12 +78,15 @@ describe("Parser", () => {
 
   it("All fields", async () => {
     const parser = new WirelessMbusParser();
-    const result = await parser.parseFullResult(
+    const result = await parser.parse(
       Buffer.from(
         "434493157856341233038C2075900F002C25B30A000021924D4F2FB66E017A75002007109058475F4BC91DF878B80A1B0F98B629024AAC727942BFC549233C0140829B93",
         "hex"
       ),
-      { key: Buffer.from("000102030405060708090A0B0C0D0E0F", "hex") }
+      {
+        key: Buffer.from("000102030405060708090A0B0C0D0E0F", "hex"),
+        verbose: true,
+      }
     );
 
     expect(Object.keys(result)).toEqual([

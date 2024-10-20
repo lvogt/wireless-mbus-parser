@@ -34,12 +34,27 @@ export interface MeterData {
   };
 }
 
+export interface ParserOptionsCommon {
+  key?: Buffer;
+  containsCrc?: boolean;
+}
+
+export interface ParserOptionsFull extends ParserOptionsCommon {
+  verbose: true;
+}
+
+export interface ParserOptionsSimple extends ParserOptionsCommon {
+  verbose?: false;
+}
+
+export type ParserOptions = ParserOptionsFull | ParserOptionsSimple;
+
 export interface ParserResult {
   data: EvaluatedData[];
   meter: MeterData;
 }
 
-export interface FullParserResult extends ParserResult {
+export interface ParserResultVerbose extends ParserResult {
   linkLayer: LinkLayer;
   extendedLinkLayer?: ExtendedLinkLayer;
   authenticationAndFragmentationLayer?: AuthenticationAndFragmentationLayer;

@@ -14,23 +14,42 @@ import { decodeLinkLayer } from "@/parser/linkLayer";
 import type {
   ApplicationLayer,
   DataRecordHeader,
-  FullParserResult,
+  ParserOptions,
+  ParserOptionsCommon,
+  ParserOptionsFull,
+  ParserOptionsSimple,
   ParserResult,
+  ParserResultVerbose,
   ParserState,
 } from "@/types";
-
-interface ParserOptions {
-  key?: Buffer;
-  containsCrc?: boolean;
-}
 
 export class WirelessMbusParser {
   private dataRecordHeaderCache: Record<number, DataRecordHeader[] | null> = {};
 
-  async parseFullResult(
+  async parse(
     data: Buffer,
-    options?: Partial<ParserOptions>
-  ): Promise<FullParserResult> {
+    options: ParserOptionsFull
+  ): Promise<ParserResultVerbose>;
+  async parse(
+    data: Buffer,
+    options?: ParserOptionsSimple
+  ): Promise<ParserResult>;
+
+  async parse(
+    data: Buffer,
+    options?: ParserOptions
+  ): Promise<ParserResultVerbose | ParserResult> {
+    if (options?.verbose) {
+      return this.parseFullResult(data, options);
+    } else {
+      return this.parseSimple(data, options);
+    }
+  }
+
+  private async parseFullResult(
+    data: Buffer,
+    options?: Partial<ParserOptionsCommon>
+  ): Promise<ParserResultVerbose> {
     const crcFreeData = stripAnyCrc(data, options?.containsCrc);
 
     const state = {
@@ -80,9 +99,9 @@ export class WirelessMbusParser {
     };
   }
 
-  async parse(
+  private async parseSimple(
     data: Buffer,
-    options?: Partial<ParserOptions>
+    options?: Partial<ParserOptionsCommon>
   ): Promise<ParserResult> {
     const { data: evaluatedData, meter } = await this.parseFullResult(
       data,
