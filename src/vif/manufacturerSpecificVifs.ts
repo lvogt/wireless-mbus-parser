@@ -73,7 +73,7 @@ export const manufacturerSpecificsVifs: Record<string, VIFDescriptor[]> = {
     {
       vif: 0x11,
       legacyName: "VIF_KAMSTRUP_CONFIG",
-      unit: "s",
+      unit: "",
       description: "Config number (0x11)",
       calc: (val) => val,
       apply: applyBufferOrNumberDefault,
@@ -81,7 +81,7 @@ export const manufacturerSpecificsVifs: Record<string, VIFDescriptor[]> = {
     {
       vif: 0x1a,
       legacyName: "VIF_KAMSTRUP_METER_TYPE",
-      unit: "s",
+      unit: "",
       description: "Meter type",
       calc: (val) => val,
       apply: applyBufferOrNumberDefault,
@@ -89,7 +89,7 @@ export const manufacturerSpecificsVifs: Record<string, VIFDescriptor[]> = {
     {
       vif: 0x20,
       legacyName: "VIF_KAMSTRUP_INFO_20",
-      unit: "s",
+      unit: "",
       description: "Info register (0x20)",
       calc: (val) => val,
       apply: applyBufferOrNumberDefault,
@@ -97,7 +97,7 @@ export const manufacturerSpecificsVifs: Record<string, VIFDescriptor[]> = {
     {
       vif: 0x22,
       legacyName: "VIF_KAMSTRUP_INFO_22",
-      unit: "s",
+      unit: "",
       description: "Info register (0x22)",
       calc: (val) => val,
       apply: applyBufferOrNumberDefault,
