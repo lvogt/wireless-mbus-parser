@@ -296,3 +296,28 @@ export interface ParserState {
   pos: number;
   key?: Buffer;
 }
+
+export interface LegacyResult {
+  deviceInformation: {
+    AccessNumber: number;
+    Id: string;
+    Manufacturer: string;
+    Medium: string;
+    Status: number;
+    StatusString: string;
+    Version: number;
+    Address: string;
+  };
+  dataRecord: {
+    number: number;
+    value: string | number;
+    unit: string;
+    type: string;
+    description: string;
+    tariff: number;
+    storageNo: number;
+    devUnit: number;
+    functionFieldText: string;
+    functionField: number;
+  }[];
+}

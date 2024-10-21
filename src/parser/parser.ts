@@ -10,6 +10,7 @@ import {
 } from "@/parser/dataRecords";
 import { evaluateDataRecords } from "@/parser/evaluatedData";
 import { decodeExtendedLinkLayer } from "@/parser/extendedLinkLayer";
+import { createLegacyResult } from "@/parser/legacy";
 import { decodeLinkLayer } from "@/parser/linkLayer";
 import type {
   ApplicationLayer,
@@ -44,6 +45,10 @@ export class WirelessMbusParser {
     } else {
       return this.parseSimple(data, options);
     }
+  }
+
+  static toLegacyResult(result: ParserResultVerbose) {
+    return createLegacyResult(result);
   }
 
   private async parseFullResult(

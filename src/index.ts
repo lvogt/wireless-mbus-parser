@@ -36,6 +36,7 @@ export type {
   ExtendedLinkLayer10,
   ExtendedLinkLayer8,
   ExtendedLinkLayer16,
+  LegacyResult,
 } from "@/types";
 
 export { EvaluatedDataType, VifTable } from "@/types";
