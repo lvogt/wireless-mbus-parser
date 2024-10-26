@@ -51,7 +51,7 @@ export function divide(
   if (typeof value === "number") {
     return value / divisor;
   } else if (typeof value === "bigint") {
-    return value / BigInt(divisor);
+    return Number((value * BigInt(divisor)) / BigInt(divisor)) / divisor;
   } else {
     throw new ParserError("UNEXPECTED_STATE", "Unexpected type!");
   }
