@@ -17,6 +17,14 @@ export default [
   {
     rules: {
       "no-restricted-imports": ["error", { patterns: ["\\..*"] }],
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
     },
   },
   eslint.configs.recommended,

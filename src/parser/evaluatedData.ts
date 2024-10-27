@@ -176,7 +176,7 @@ function evaluateVifExtension(
   try {
     return descriptor.apply(descriptor, dataRecord, data);
   } catch (e: unknown) {
-    log.debug(`Applying VIFE failed: ${JSON.stringify(e)}`);
+    log.error(`Applying VIFE failed: ${JSON.stringify(e)}`);
   }
 }
 
