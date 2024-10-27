@@ -2,7 +2,7 @@ import {
   applyDateDefault,
   applyDateTimeDefault,
   applyNumberDefault,
-  applyStringifyDefault,
+  applyNumberOrStringifyDefault,
   divide,
   multiply,
 } from "@/helper/vifHelper";
@@ -968,7 +968,7 @@ export const defaultVIFs: VIFDescriptor[] = [
     unit: "",
     description: "Fabrication No",
     calc: (val) => val,
-    apply: applyStringifyDefault,
+    apply: applyNumberOrStringifyDefault,
   },
   {
     vif: 0x79,
@@ -976,7 +976,7 @@ export const defaultVIFs: VIFDescriptor[] = [
     unit: "",
     description: "Owner No",
     calc: (val) => val,
-    apply: applyStringifyDefault,
+    apply: applyNumberOrStringifyDefault,
   },
   {
     vif: 0x7a,
@@ -984,6 +984,6 @@ export const defaultVIFs: VIFDescriptor[] = [
     unit: "",
     description: "Bus Address",
     calc: (val) => val,
-    apply: applyStringifyDefault,
+    apply: applyNumberOrStringifyDefault,
   },
 ];

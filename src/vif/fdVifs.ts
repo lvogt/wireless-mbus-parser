@@ -3,6 +3,7 @@ import {
   applyDateOrDateTimeDefault,
   applyDateTimeDefault,
   applyNumberDefault,
+  applyNumberOrStringifyDefault,
   applyStringifyDefault,
   divide,
   multiply,
@@ -104,7 +105,7 @@ export const fdVifs: VIFDescriptor[] = [
     unit: "",
     description: "Parameter set identification",
     calc: (val) => val,
-    apply: applyStringifyDefault,
+    apply: applyNumberOrStringifyDefault,
   },
   {
     vif: 0x0c,
@@ -112,7 +113,7 @@ export const fdVifs: VIFDescriptor[] = [
     unit: "",
     description: "Model / Version",
     calc: (val) => val,
-    apply: applyStringifyDefault,
+    apply: applyNumberOrStringifyDefault,
   },
   {
     vif: 0x0d,
@@ -120,7 +121,7 @@ export const fdVifs: VIFDescriptor[] = [
     unit: "",
     description: "Hardware version #",
     calc: (val) => val,
-    apply: applyStringifyDefault,
+    apply: applyNumberOrStringifyDefault,
   },
   {
     vif: 0x0e,
@@ -128,7 +129,7 @@ export const fdVifs: VIFDescriptor[] = [
     unit: "",
     description: "Firmware version #",
     calc: (val) => val,
-    apply: applyStringifyDefault,
+    apply: applyNumberOrStringifyDefault,
   },
   {
     vif: 0x0f,
@@ -136,7 +137,7 @@ export const fdVifs: VIFDescriptor[] = [
     unit: "",
     description: "Software version #",
     calc: (val) => val,
-    apply: applyStringifyDefault,
+    apply: applyNumberOrStringifyDefault,
   },
   {
     vif: 0x10,
@@ -144,7 +145,7 @@ export const fdVifs: VIFDescriptor[] = [
     unit: "",
     description: "Customer location",
     calc: (val) => val,
-    apply: applyStringifyDefault,
+    apply: applyNumberOrStringifyDefault,
   },
   {
     vif: 0x11,
@@ -152,7 +153,7 @@ export const fdVifs: VIFDescriptor[] = [
     unit: "",
     description: "Customer",
     calc: (val) => val,
-    apply: applyStringifyDefault,
+    apply: applyNumberOrStringifyDefault,
   },
   {
     vif: 0x12,
@@ -160,7 +161,7 @@ export const fdVifs: VIFDescriptor[] = [
     unit: "",
     description: "Access Code User",
     calc: (val) => val,
-    apply: applyStringifyDefault,
+    apply: applyNumberOrStringifyDefault,
   },
   {
     vif: 0x13,
@@ -168,7 +169,7 @@ export const fdVifs: VIFDescriptor[] = [
     unit: "",
     description: "Access Code Operator",
     calc: (val) => val,
-    apply: applyStringifyDefault,
+    apply: applyNumberOrStringifyDefault,
   },
   {
     vif: 0x14,
@@ -176,7 +177,7 @@ export const fdVifs: VIFDescriptor[] = [
     unit: "",
     description: "Access Code Sytem Operator",
     calc: (val) => val,
-    apply: applyStringifyDefault,
+    apply: applyNumberOrStringifyDefault,
   },
   {
     vif: 0x15,
@@ -184,7 +185,7 @@ export const fdVifs: VIFDescriptor[] = [
     unit: "",
     description: "Access Code Developer",
     calc: (val) => val,
-    apply: applyStringifyDefault,
+    apply: applyNumberOrStringifyDefault,
   },
   {
     vif: 0x16,
@@ -192,7 +193,7 @@ export const fdVifs: VIFDescriptor[] = [
     unit: "",
     description: "Password",
     calc: (val) => val,
-    apply: applyStringifyDefault,
+    apply: applyNumberOrStringifyDefault,
   },
   {
     vif: 0x17,
