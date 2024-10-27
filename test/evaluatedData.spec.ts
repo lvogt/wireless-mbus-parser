@@ -138,7 +138,7 @@ describe("Evaluate data records", () => {
         type: EvaluatedDataType.String,
         unit: "",
         value: "256",
-        info: info("VIF_UNKNOWN"),
+        info: info("VIF_TYPE_MANUFACTURER_UNKOWN"),
       },
     ]);
   });

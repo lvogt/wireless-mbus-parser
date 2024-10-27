@@ -78,7 +78,7 @@ function getManufacturerSpecificsVifeDescriptor(
       return descriptor;
     }
   }
-  return getFallbackExtensiontDescriptor(extension);
+  return getFallbackExtensiontDescriptor(extension, true);
 }
 
 function getVifeDescriptor(
@@ -117,21 +117,31 @@ function getFallbackDescriptor(
   dataRecord: DataRecord,
   manufacturerSpecific = false
 ): VIFDescriptor {
+  if (dataRecord.header.vib.primary.vif === 0x7f) {
+    manufacturerSpecific = true;
+  }
   return {
     vif: dataRecord.header.vib.primary.vif,
-    legacyName: "VIF_UNKNOWN",
+    legacyName: manufacturerSpecific
+      ? "VIF_TYPE_MANUFACTURER_UNKOWN"
+      : "VIF_UNKNOWN",
     unit: "",
-    description: `Unknown ${manufacturerSpecific ? "manufacturer specific " : ""}VIF 0x${dataRecord.header.vib.primary.vif.toString(16)}`,
+    description: `Unknown ${manufacturerSpecific ? "manufacturer specific " : ""}VIF 0x${dataRecord.header.vib.primary.vif.toString(16).padStart(2, "0")}`,
     calc: (val) => val,
     apply: applyStringifyDefault,
   };
 }
 
-function getFallbackExtensiontDescriptor(extension: number): VIFEDescriptor {
+function getFallbackExtensiontDescriptor(
+  extension: number,
+  manufacturerSpecific = false
+): VIFEDescriptor {
   return {
     vif: extension,
-    legacyName: "VIFE_UNKNOWN",
-    description: `Unknown VIFE 0x${extension.toString(16)}`,
+    legacyName: manufacturerSpecific
+      ? "VIFE_MANUFACTURER_UNKNOWN"
+      : "VIFE_UNKNOWN",
+    description: `Unknown VIFE 0x${extension.toString(16).padStart(2, "0")}`,
     apply: extendDescription,
   };
 }
