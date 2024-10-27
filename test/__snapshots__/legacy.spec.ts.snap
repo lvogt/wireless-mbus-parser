@@ -49,7 +49,7 @@ exports[`JMBus Test Case > Decode negative temperature 1`] = `
       "tariff": 0,
       "type": "VIF_FLOW_TEMP",
       "unit": "°C",
-      "value": "24.1",
+      "value": 24.1,
     },
     {
       "description": "Return Temperature",
@@ -102,7 +102,7 @@ exports[`JMBus Test Case > Decryption Test - Good Key 1`] = `
       "tariff": 0,
       "type": "VIF_VOLUME",
       "unit": "m³",
-      "value": "474.240",
+      "value": 474.24,
     },
     {
       "description": "Volume",
@@ -114,7 +114,7 @@ exports[`JMBus Test Case > Decryption Test - Good Key 1`] = `
       "tariff": 0,
       "type": "VIF_VOLUME",
       "unit": "m³",
-      "value": "473.247",
+      "value": 473.247,
     },
   ],
   "deviceInformation": {
@@ -143,7 +143,7 @@ exports[`JMBus Test Case > General Test #1 1`] = `
       "tariff": 0,
       "type": "VIF_ERROR_FLAGS",
       "unit": "",
-      "value": "1",
+      "value": 1,
     },
   ],
   "deviceInformation": {
@@ -208,7 +208,7 @@ exports[`JMBus Test Case > General Test #2 1`] = `
       "tariff": 0,
       "type": "VIF_FLOW_TEMP",
       "unit": "°C",
-      "value": "21.7",
+      "value": 21.7,
     },
     {
       "description": "Return Temperature",
@@ -220,7 +220,7 @@ exports[`JMBus Test Case > General Test #2 1`] = `
       "tariff": 0,
       "type": "VIF_RETURN_TEMP",
       "unit": "°C",
-      "value": "21.7",
+      "value": 21.7,
     },
   ],
   "deviceInformation": {
@@ -278,7 +278,7 @@ exports[`JMBus Test Case > Magnetic Sensor Test #2 1`] = `
       "tariff": 0,
       "type": "VIF_ERROR_FLAGS",
       "unit": "",
-      "value": "0",
+      "value": 0,
     },
     {
       "description": "Access number (transmission count)",
@@ -310,7 +310,7 @@ exports[`JMBus Test Case > Short Telegram Test #1 1`] = `
 {
   "dataRecord": [
     {
-      "description": "Owner No",
+      "description": "Owner No; Unknown VIFE 0x15",
       "devUnit": 0,
       "functionField": 0,
       "functionFieldText": "Instantaneous value",
@@ -334,7 +334,7 @@ exports[`JMBus Test Case > Short Telegram Test #1 1`] = `
       "value": 25879000,
     },
     {
-      "description": "Units for H.C.A.",
+      "description": "Units for H.C.A.; Unknown VIFE 0x07",
       "devUnit": 0,
       "functionField": 0,
       "functionFieldText": "Instantaneous value",
@@ -346,7 +346,7 @@ exports[`JMBus Test Case > Short Telegram Test #1 1`] = `
       "value": 43199,
     },
     {
-      "description": "Units for H.C.A.",
+      "description": "Units for H.C.A.; Unknown VIFE 0x08",
       "devUnit": 0,
       "functionField": 0,
       "functionFieldText": "Instantaneous value",
@@ -367,7 +367,7 @@ exports[`JMBus Test Case > Short Telegram Test #1 1`] = `
       "tariff": 0,
       "type": "VIF_VOLUME",
       "unit": "m³",
-      "value": "644.33",
+      "value": 644.33,
     },
     {
       "description": "Error flags (binary)",
@@ -379,7 +379,7 @@ exports[`JMBus Test Case > Short Telegram Test #1 1`] = `
       "tariff": 0,
       "type": "VIF_ERROR_FLAGS",
       "unit": "",
-      "value": "0",
+      "value": 0,
     },
     {
       "description": "Time point",
@@ -427,7 +427,7 @@ exports[`JMBus Test Case > Short Telegram Test #1 1`] = `
       "tariff": 0,
       "type": "VIF_VOLUME",
       "unit": "m³",
-      "value": "642.32",
+      "value": 642.32,
     },
     {
       "description": "Volume Flow",
@@ -439,7 +439,7 @@ exports[`JMBus Test Case > Short Telegram Test #1 1`] = `
       "tariff": 0,
       "type": "VIF_VOLUME_FLOW",
       "unit": "m³/h",
-      "value": "0.011",
+      "value": 0.011,
     },
     {
       "description": "Flow Temperature",
@@ -451,7 +451,7 @@ exports[`JMBus Test Case > Short Telegram Test #1 1`] = `
       "tariff": 0,
       "type": "VIF_FLOW_TEMP",
       "unit": "°C",
-      "value": "45.71",
+      "value": 45.71,
     },
     {
       "description": "Return Temperature",
@@ -463,7 +463,7 @@ exports[`JMBus Test Case > Short Telegram Test #1 1`] = `
       "tariff": 0,
       "type": "VIF_RETURN_TEMP",
       "unit": "°C",
-      "value": "28.44",
+      "value": 28.44,
     },
   ],
   "deviceInformation": {
@@ -503,8 +503,8 @@ exports[`JMBus Test Case > Short Telegram Test #2 1`] = `
       "storageNo": 0,
       "tariff": 0,
       "type": "VIF_ENERGY_E8",
-      "unit": "kWh",
-      "value": 4430,
+      "unit": "Wh",
+      "value": 4430000,
     },
     {
       "description": "Heating energy E9",
@@ -515,8 +515,8 @@ exports[`JMBus Test Case > Short Telegram Test #2 1`] = `
       "storageNo": 0,
       "tariff": 0,
       "type": "VIF_ENERGY_E9",
-      "unit": "kWh",
-      "value": 1811,
+      "unit": "Wh",
+      "value": 1811000,
     },
     {
       "description": "Volume",
@@ -528,7 +528,7 @@ exports[`JMBus Test Case > Short Telegram Test #2 1`] = `
       "tariff": 0,
       "type": "VIF_VOLUME",
       "unit": "m³",
-      "value": "68.57",
+      "value": 68.57,
     },
     {
       "description": "Error flags (binary)",
@@ -540,7 +540,7 @@ exports[`JMBus Test Case > Short Telegram Test #2 1`] = `
       "tariff": 0,
       "type": "VIF_ERROR_FLAGS",
       "unit": "",
-      "value": "0",
+      "value": 0,
     },
     {
       "description": "Volume Flow",
@@ -564,7 +564,7 @@ exports[`JMBus Test Case > Short Telegram Test #2 1`] = `
       "tariff": 0,
       "type": "VIF_FLOW_TEMP",
       "unit": "°C",
-      "value": "29.93",
+      "value": 29.93,
     },
     {
       "description": "Return Temperature",
@@ -576,7 +576,7 @@ exports[`JMBus Test Case > Short Telegram Test #2 1`] = `
       "tariff": 0,
       "type": "VIF_RETURN_TEMP",
       "unit": "°C",
-      "value": "24.07",
+      "value": 24.07,
     },
   ],
   "deviceInformation": {
@@ -617,7 +617,7 @@ exports[`JMBus Test Case > WMBus Demo Message Test #1 1`] = `
       "tariff": 0,
       "type": "VIF_VOLUME",
       "unit": "m³",
-      "value": "1.234",
+      "value": 1.234,
     },
     {
       "description": "Time point",
@@ -644,7 +644,7 @@ exports[`JMBus Test Case > WMBus Demo Message Test #1 1`] = `
       "value": 0,
     },
     {
-      "description": "Time point",
+      "description": "Time point (during error state)",
       "devUnit": 0,
       "functionField": 3,
       "functionFieldText": "Value during error state",
@@ -656,16 +656,16 @@ exports[`JMBus Test Case > WMBus Demo Message Test #1 1`] = `
       "value": "2128-03-31",
     },
     {
-      "description": "Reserved",
+      "description": "Unknown VIF 0x73",
       "devUnit": 0,
       "functionField": 0,
       "functionFieldText": "Instantaneous value",
       "number": 6,
       "storageNo": 0,
       "tariff": 0,
-      "type": "VIF_RES_E111xxxx",
+      "type": "VIF_UNKNOWN",
       "unit": "",
-      "value": 0,
+      "value": "0",
     },
   ],
   "deviceInformation": {
@@ -673,7 +673,7 @@ exports[`JMBus Test Case > WMBus Demo Message Test #1 1`] = `
     "Address": "6532821851582c06",
     "Id": "58511882",
     "Manufacturer": "LSE",
-    "Medium": "Warm Water (30 °C ... 90 °C)",
+    "Medium": "Warm Water (30 - 90 °C)",
     "Status": 0,
     "StatusString": "no errors",
     "Version": 44,
@@ -694,7 +694,7 @@ exports[`JMBus Test Case > WMBus Demo Message Test #2 1`] = `
       "tariff": 0,
       "type": "VIF_VOLUME",
       "unit": "m³",
-      "value": "1.123",
+      "value": 1.123,
     },
     {
       "description": "Time point",
@@ -718,7 +718,7 @@ exports[`JMBus Test Case > WMBus Demo Message Test #2 1`] = `
       "tariff": 0,
       "type": "VIF_ERROR_FLAGS",
       "unit": "",
-      "value": "101",
+      "value": 257,
     },
     {
       "description": "Fabrication No",
@@ -758,30 +758,30 @@ exports[`JMBus Test Case > WMBus Demo Message Test #2 1`] = `
     },
     {
       "description": "Volume",
-      "devUnit": 1,
+      "devUnit": 0,
       "functionField": 0,
       "functionFieldText": "Instantaneous value",
       "number": 7,
       "storageNo": 2,
-      "tariff": 1,
+      "tariff": 0,
       "type": "VIF_VOLUME",
       "unit": "m³",
       "value": 0,
     },
     {
-      "description": "Energy; Duration of last lower limit exceed: 1",
-      "devUnit": 1,
+      "description": "Energy; Duration of last upper limit exceed: 1",
+      "devUnit": 0,
       "functionField": 0,
       "functionFieldText": "Instantaneous value",
       "number": 8,
       "storageNo": 2,
-      "tariff": 1,
+      "tariff": 0,
       "type": "VIF_ENERGY_JOULE",
       "unit": "J",
       "value": 643260000000,
     },
     {
-      "description": "Power",
+      "description": "Power (minimum value)",
       "devUnit": 0,
       "functionField": 2,
       "functionFieldText": "Minimum value",
@@ -793,7 +793,7 @@ exports[`JMBus Test Case > WMBus Demo Message Test #2 1`] = `
       "value": -9520000000,
     },
     {
-      "description": "Actuality Duration",
+      "description": "Actuality Duration (during error state)",
       "devUnit": 0,
       "functionField": 3,
       "functionFieldText": "Value during error state",
@@ -831,7 +831,7 @@ exports[`JMBus Test Case > WMBus Demo Message Test #3 1`] = `
       "tariff": 0,
       "type": "VIF_VOLUME",
       "unit": "m³",
-      "value": "0.494",
+      "value": 0.494,
     },
     {
       "description": "Time point",
@@ -855,19 +855,19 @@ exports[`JMBus Test Case > WMBus Demo Message Test #3 1`] = `
       "tariff": 0,
       "type": "VIF_VOLUME",
       "unit": "m³",
-      "value": "0.274",
+      "value": 0.274,
     },
     {
       "description": "Volume",
-      "devUnit": 1,
+      "devUnit": 0,
       "functionField": 0,
       "functionFieldText": "Instantaneous value",
       "number": 4,
       "storageNo": 2,
-      "tariff": 1,
+      "tariff": 0,
       "type": "VIF_VOLUME",
       "unit": "m³",
-      "value": "0.325",
+      "value": 0.325,
     },
     {
       "description": "Error flags (binary)",
@@ -879,7 +879,7 @@ exports[`JMBus Test Case > WMBus Demo Message Test #3 1`] = `
       "tariff": 0,
       "type": "VIF_ERROR_FLAGS",
       "unit": "",
-      "value": "400",
+      "value": 1024,
     },
   ],
   "deviceInformation": {
@@ -899,7 +899,7 @@ exports[`OMS Examples > DIF 64bit integer as manufacturer specific 1`] = `
 {
   "dataRecord": [
     {
-      "description": "0x7f Manufacturer specific VIF(E)",
+      "description": "Unknown manufacturer specific VIF 0x7f",
       "devUnit": 0,
       "functionField": 0,
       "functionFieldText": "Instantaneous value",
@@ -937,7 +937,7 @@ exports[`OMS Examples > DIF 64bit integer with calc 1`] = `
       "tariff": 0,
       "type": "VIF_VOLUME",
       "unit": "m³",
-      "value": "1234605616436508.750",
+      "value": "1234605616436508.8",
     },
   ],
   "deviceInformation": {
@@ -966,7 +966,7 @@ exports[`OMS Examples > Frame type B 1`] = `
       "tariff": 0,
       "type": "VIF_VOLUME",
       "unit": "m³",
-      "value": "876.543",
+      "value": 876.543,
     },
   ],
   "deviceInformation": {
@@ -995,7 +995,7 @@ exports[`OMS Examples > Frame type B without CRC 1`] = `
       "tariff": 0,
       "type": "VIF_VOLUME",
       "unit": "m³",
-      "value": "876.543",
+      "value": 876.543,
     },
   ],
   "deviceInformation": {
@@ -1089,7 +1089,7 @@ exports[`OMS Examples > wM-Bus Meter with Security profile A 1`] = `
       "tariff": 0,
       "type": "VIF_VOLUME",
       "unit": "m³",
-      "value": "28504.27",
+      "value": 28504.27,
     },
     {
       "description": "Time point",
@@ -1113,7 +1113,7 @@ exports[`OMS Examples > wM-Bus Meter with Security profile A 1`] = `
       "tariff": 0,
       "type": "VIF_ERROR_FLAGS",
       "unit": "",
-      "value": "0",
+      "value": 0,
     },
   ],
   "deviceInformation": {
@@ -1142,7 +1142,7 @@ exports[`OMS Examples > wM-Bus Meter with integrated radio and Security profile 
       "tariff": 0,
       "type": "VIF_VOLUME",
       "unit": "m³",
-      "value": "28504.27",
+      "value": 28504.27,
     },
     {
       "description": "Time point",
@@ -1166,7 +1166,7 @@ exports[`OMS Examples > wM-Bus Meter with integrated radio and Security profile 
       "tariff": 0,
       "type": "VIF_ERROR_FLAGS",
       "unit": "",
-      "value": "0",
+      "value": 0,
     },
   ],
   "deviceInformation": {
@@ -1195,7 +1195,7 @@ exports[`OMS Examples > wM-Bus Meter with radio adapter and Security profile B 1
       "tariff": 0,
       "type": "VIF_VOLUME",
       "unit": "m³",
-      "value": "28504.27",
+      "value": 28504.27,
     },
     {
       "description": "Time point",
@@ -1219,7 +1219,7 @@ exports[`OMS Examples > wM-Bus Meter with radio adapter and Security profile B 1
       "tariff": 0,
       "type": "VIF_ERROR_FLAGS",
       "unit": "",
-      "value": "0",
+      "value": 0,
     },
   ],
   "deviceInformation": {
