@@ -14,15 +14,13 @@ A legacy result format to (mostly) match the output from parser included in the
 [iobroker.wireless-mbus](https://www.npmjs.com/package/iobroker.wireless-mbus) package
 is also available.
 
-
 ## Features
 
-* automatic CRC detection / handling
-* ELL encryption and encryption modes 5 and 7
-* compact frame handling
-* Diehl PRIOS telegram are supported
-* Techem heat, water and HCA meters are partially supported
-
+- automatic CRC detection / handling
+- ELL encryption and encryption modes 5 and 7
+- compact frame handling
+- Diehl PRIOS telegram are supported
+- Techem heat, water and HCA meters are partially supported
 
 ## Sample Usage
 
@@ -59,15 +57,14 @@ fails in some circumstances.
 
 The legacy result can only be generated from the "verbose" result.
 
-
 ## TODO
 
 - manufacturer specific "blob" handler
 - TCH smoke detector?
 - github actions
 
-
 ## Changelog
 
 ### WIP
-* First release
+
+- First release
