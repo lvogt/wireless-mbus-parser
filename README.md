@@ -60,12 +60,14 @@ fails in some circumstances.
 The legacy result can only be generated from the "verbose" result.
 
 
+## TODO
+
+- manufacturer specific "blob" handler
+- TCH smoke detector?
+- github actions
+
+
 ## Changelog
 
 ### WIP
 * First release
-
-### TODO
-
-- TCH smoke detector?
-- github actions
