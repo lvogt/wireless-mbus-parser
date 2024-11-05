@@ -1,0 +1,14 @@
+version: 2
+updates:
+  - package-ecosystem: "pnpm" # See documentation for possible values
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "weekly"
+    assignees:
+      - lvogt
+
+groups:
+  production-dependencies:
+    dependency-type: "production"
+  development-dependencies:
+    dependency-type: "development"
