@@ -61,10 +61,9 @@ The legacy result can only be generated from the "verbose" result.
 
 - manufacturer specific "blob" handler
 - TCH smoke detector?
-- github actions
 
 ## Changelog
 
-### WIP
+### 1.0.0
 
 - First release
