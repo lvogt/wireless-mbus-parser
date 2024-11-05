@@ -1,27 +1,29 @@
-name: Main workflow
+name: Publish
 on:
-  push:
-    branches:
-      - "main"
-  pull_request:
+  release:
+    types: [published]
 
 jobs:
-  build:
+  publish:
+    env:
+      nodeVersion: 20
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [20, 22]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install pnpm
         uses: pnpm/action-setup@v4
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js $nodeVersion
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: $nodeVersion
+          registry-url: https://registry.npmjs.org
           cache: "pnpm"
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Check, test and build
         run: pnpm build
+      - name: Publish to npm
+        run: pnpm publish --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
