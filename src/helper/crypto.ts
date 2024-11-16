@@ -1,4 +1,3 @@
-//@ts-expect-error Library needs to updated for newer type exports
 import { AesCmac } from "aes-cmac";
 import {
   type CipherGCMTypes,
