@@ -4,14 +4,6 @@ import type { VIFDescriptor } from "@/types";
 export const fbVifs: VIFDescriptor[] = [
   {
     vif: 0x00,
-    legacyName: "VIF_ENERGY_WATT",
-    unit: "Wh",
-    description: "Energy",
-    calc: (val) => divide(val, 1000),
-    apply: applyNumberDefault,
-  },
-  {
-    vif: 0x00,
     legacyName: "VIF_ENERGY_MWH",
     unit: "MWh",
     description: "Energy",
