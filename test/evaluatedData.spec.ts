@@ -3,6 +3,14 @@ import { describe, expect, it } from "vitest";
 import { decodeDataRecords } from "@/parser/dataRecords";
 import { evaluateDataRecords } from "@/parser/evaluatedData";
 import { EvaluatedDataType, type MeterData } from "@/types";
+import { defaultVIFs } from "@/vif/defaultVifs";
+import { fbVifs } from "@/vif/fbVifs";
+import { fdVifs } from "@/vif/fdVifs";
+import {
+  manufacturerSpecificsVifes,
+  manufacturerSpecificsVifs,
+} from "@/vif/manufacturerSpecificVifs";
+import { vifExtensions } from "@/vif/vifExtension";
 
 const dummyMeter: MeterData = {
   manufacturer: "ABC",
@@ -28,6 +36,33 @@ function info(
     tariff: dib?.tariff ?? 0,
   };
 }
+
+interface MinimalVif {
+  vif: number;
+}
+
+function assertAllVifsAreUnique<T extends MinimalVif>(arr: T[]) {
+  for (const element of arr) {
+    if (arr.filter((el) => el.vif === element.vif).length > 1) {
+      throw new Error(`Duplicate entry for VIF 0x${element.vif.toString(16)}`);
+    }
+  }
+}
+
+describe("VIF data consistency", () => {
+  it("No duplicate entries", () => {
+    assertAllVifsAreUnique(defaultVIFs);
+    assertAllVifsAreUnique(fbVifs);
+    assertAllVifsAreUnique(fdVifs);
+    assertAllVifsAreUnique(vifExtensions);
+    for (const mfVifs of Object.values(manufacturerSpecificsVifs)) {
+      assertAllVifsAreUnique(mfVifs);
+    }
+    for (const mfVifes of Object.values(manufacturerSpecificsVifes)) {
+      assertAllVifsAreUnique(mfVifes);
+    }
+  });
+});
 
 describe("Evaluate data records", () => {
   it("INT8/16/24/32/48/64", () => {
