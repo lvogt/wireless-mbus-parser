@@ -64,6 +64,10 @@ The legacy result can only be generated from the "verbose" result.
 
 ## Changelog
 
+### 1.0.1
+
+- Fix duplicate VIF in 0xFB table (thanks @mathis92)
+
 ### 1.0.0
 
 - First release
