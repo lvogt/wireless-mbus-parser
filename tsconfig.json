@@ -4,6 +4,7 @@
     "target": "ESNext",
     "moduleResolution": "Bundler",
     "module": "ESNext",
+    "erasableSyntaxOnly": true,
     "declaration": true,
     "noEmit": true,
     "stripInternal": true,

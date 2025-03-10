@@ -5,7 +5,7 @@ import {
   decodeDataRecords,
   extractDataRecordHeaders,
 } from "@/parser/dataRecords";
-import type { DataRecordHeader } from "@/types";
+import { type DataRecordHeader, VifTable } from "@/types";
 
 function decode(data: string, headers?: DataRecordHeader[]) {
   return decodeDataRecords(
@@ -38,7 +38,7 @@ describe("Raw Data Records", () => {
       vib: {
         primary: {
           vif: 0x1b,
-          table: 2,
+          table: VifTable.FB,
           extensionBitSet: false,
         },
         extensions: [],
@@ -60,7 +60,7 @@ describe("Raw Data Records", () => {
       vib: {
         primary: {
           vif: 102,
-          table: 0,
+          table: VifTable.Default,
           extensionBitSet: false,
         },
         extensions: [],
@@ -82,7 +82,7 @@ describe("Raw Data Records", () => {
       vib: {
         primary: {
           vif: 19,
-          table: 0,
+          table: VifTable.Default,
           extensionBitSet: false,
         },
         extensions: [],
@@ -104,7 +104,7 @@ describe("Raw Data Records", () => {
       vib: {
         primary: {
           vif: 0x6d,
-          table: 0,
+          table: VifTable.Default,
           extensionBitSet: false,
         },
         extensions: [],
@@ -126,7 +126,7 @@ describe("Raw Data Records", () => {
       vib: {
         primary: {
           vif: 19,
-          table: 0,
+          table: VifTable.Default,
           extensionBitSet: false,
         },
         extensions: [],
@@ -148,7 +148,7 @@ describe("Raw Data Records", () => {
       vib: {
         primary: {
           vif: 0x4,
-          table: 0,
+          table: VifTable.Default,
           extensionBitSet: true,
         },
         extensions: [0x00],
@@ -178,7 +178,7 @@ describe("Raw Data Records", () => {
       vib: {
         primary: {
           vif: 0x13,
-          table: 0,
+          table: VifTable.Default,
           extensionBitSet: false,
         },
         extensions: [],
@@ -200,7 +200,7 @@ describe("Raw Data Records", () => {
       vib: {
         primary: {
           vif: 59,
-          table: 0,
+          table: VifTable.Default,
           extensionBitSet: false,
         },
         extensions: [],
@@ -222,7 +222,7 @@ describe("Raw Data Records", () => {
       vib: {
         primary: {
           vif: 4,
-          table: 0,
+          table: VifTable.Default,
           extensionBitSet: false,
         },
         extensions: [],
@@ -244,7 +244,7 @@ describe("Raw Data Records", () => {
       vib: {
         primary: {
           vif: 20,
-          table: 0,
+          table: VifTable.Default,
           extensionBitSet: false,
         },
         extensions: [],
@@ -266,7 +266,7 @@ describe("Raw Data Records", () => {
       vib: {
         primary: {
           vif: 2,
-          table: 0,
+          table: VifTable.Default,
           extensionBitSet: true,
         },
         extensions: [0x3c],
@@ -293,7 +293,7 @@ describe("Raw Data Records", () => {
       vib: {
         primary: {
           vif: 0x20,
-          table: 4,
+          table: VifTable.Manufacturer,
           extensionBitSet: false,
         },
         extensions: [],
@@ -320,7 +320,7 @@ describe("Raw Data Records", () => {
       vib: {
         primary: {
           vif: 23,
-          table: 1,
+          table: VifTable.FD,
           extensionBitSet: false,
         },
         extensions: [],
@@ -347,7 +347,7 @@ describe("Raw Data Records", () => {
       vib: {
         primary: {
           vif: 0x6c,
-          table: 0,
+          table: VifTable.Default,
           extensionBitSet: false,
         },
         extensions: [],
@@ -374,7 +374,7 @@ describe("Raw Data Records", () => {
       vib: {
         primary: {
           vif: 0x7c,
-          table: 3,
+          table: VifTable.Plain,
           plainText: "Synthetic",
           extensionBitSet: false,
         },
@@ -404,7 +404,7 @@ describe("Raw Data Records - LVAR", () => {
       vib: {
         primary: {
           vif: 0xc,
-          table: 1,
+          table: VifTable.FD,
           extensionBitSet: false,
         },
         extensions: [],
@@ -431,7 +431,7 @@ describe("Raw Data Records - LVAR", () => {
       vib: {
         primary: {
           vif: 0x13,
-          table: 0,
+          table: VifTable.Default,
           extensionBitSet: false,
         },
         extensions: [],
@@ -458,7 +458,7 @@ describe("Raw Data Records - LVAR", () => {
       vib: {
         primary: {
           vif: 0x13,
-          table: 0,
+          table: VifTable.Default,
           extensionBitSet: false,
         },
         extensions: [],
@@ -485,7 +485,7 @@ describe("Raw Data Records - LVAR", () => {
       vib: {
         primary: {
           vif: 0x6d,
-          table: 0,
+          table: VifTable.Default,
           extensionBitSet: false,
         },
         extensions: [],
@@ -512,7 +512,7 @@ describe("Raw Data Records - LVAR", () => {
       vib: {
         primary: {
           vif: 0x6d,
-          table: 0,
+          table: VifTable.Default,
           extensionBitSet: false,
         },
         extensions: [],
@@ -539,7 +539,7 @@ describe("Raw Data Records - LVAR", () => {
       vib: {
         primary: {
           vif: 19,
-          table: 0,
+          table: VifTable.Default,
           extensionBitSet: false,
         },
         extensions: [],
@@ -568,7 +568,7 @@ describe("Special DIF values", () => {
       vib: {
         primary: {
           vif: 0x13,
-          table: 0,
+          table: VifTable.Default,
           extensionBitSet: false,
         },
         extensions: [],
@@ -595,7 +595,7 @@ describe("Special DIF values", () => {
       vib: {
         primary: {
           vif: 0x13,
-          table: 0,
+          table: VifTable.Default,
           extensionBitSet: false,
         },
         extensions: [],
