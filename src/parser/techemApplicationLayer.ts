@@ -17,12 +17,14 @@ import type {
   ParserState,
 } from "@/types";
 
-enum TCHDeviceType {
-  HCA,
-  Heat,
-  Water,
-  Smoke,
-}
+const TCHDeviceType = {
+  HCA: "HCA",
+  Heat: "Heat",
+  Water: "Water",
+  Smoke: "Smoke",
+} as const;
+
+type TCHDeviceType = (typeof TCHDeviceType)[keyof typeof TCHDeviceType];
 
 const HCA_VERSIONS = [0x61, 0x64, 0x69, 0x94];
 

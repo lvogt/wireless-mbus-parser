@@ -99,15 +99,18 @@ export interface VIFEDescriptor {
   ) => EvaluatedData;
 }
 
-export enum EvaluatedDataType {
-  Number,
-  BigInt,
-  String,
-  Date,
-  DateTime,
-  Buffer,
-  Null,
-}
+export const EvaluatedDataType = {
+  Number: "Number",
+  BigInt: "BigInt",
+  String: "String",
+  Date: "Date",
+  DateTime: "DateTime",
+  Buffer: "Buffer",
+  Null: "Null",
+} as const;
+
+export type EvaluatedDataType =
+  (typeof EvaluatedDataType)[keyof typeof EvaluatedDataType];
 
 export interface EvaluatedData {
   value: DataType | Date;
@@ -122,13 +125,15 @@ export interface EvaluatedData {
   };
 }
 
-export enum VifTable {
-  Default,
-  FD,
-  FB,
-  Plain,
-  Manufacturer,
-}
+export const VifTable = {
+  Default: "Default",
+  FD: "FD",
+  FB: "FB",
+  Plain: "Plain",
+  Manufacturer: "Manufacturer",
+} as const;
+
+export type VifTable = (typeof VifTable)[keyof typeof VifTable];
 
 export interface DataInformationBlock {
   tariff: number;
@@ -142,13 +147,13 @@ export type PrimaryVif = PrimaryVifNumber | PrimaryVifString;
 
 export interface PrimaryVifNumber {
   vif: number;
-  table: Exclude<VifTable, VifTable.Plain>;
+  table: Exclude<VifTable, typeof VifTable.Plain>;
   extensionBitSet: boolean;
 }
 
 export interface PrimaryVifString {
   vif: number;
-  table: VifTable.Plain;
+  table: typeof VifTable.Plain;
   plainText: string;
   extensionBitSet: boolean;
 }
