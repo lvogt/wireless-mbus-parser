@@ -64,6 +64,11 @@ The legacy result can only be generated from the "verbose" result.
 
 ## Changelog
 
+### 1.1.0
+
+- Enable "erasableSyntaxOnly" tsc option - output of "type" (EvaluatedDataType) and "table" (VifTable) changes from numeric to readable string
+- Do not throw on DIF_SPECIAL_FUNCTIONS
+
 ### 1.0.1
 
 - Fix duplicate VIF in 0xFB table (thanks @mathis92)
