@@ -195,12 +195,13 @@ function getDataRecordHeader(
   const { dib, newPos } = decodeDataInformationBlock(data, pos);
 
   if (dib.dataField === DIF_SPECIAL_FUNCTIONS) {
+    log.debug("DIF_SPECIAL_FUNCTIONS found");
     if (newPos < data.length) {
-      throw new ParserError(
-        "UNEXPECTED_STATE",
-        `DIF for special function at ${newPos} - remaining data: ${data.toString("hex", newPos)}`
+      log.debug(
+        `at position ${newPos} - remaining data: ${data.toString("hex", newPos)}`
       );
     }
+    return { newPos: data.length, dataRecordHeader: null };
   }
 
   const { vib, newPos: newPosAfterVib } = decodeValueInformationBlock(
@@ -317,6 +318,9 @@ function decodeDataRecord(
   pos: number
 ): { newPos: number; dr: DataRecord } {
   const { newPos, dataRecordHeader } = getDataRecordHeader(data, pos);
+  if (dataRecordHeader === null) {
+    return { newPos, dr: null };
+  }
   const { newPos: newPosAfterValue, value } = decodeDataRecordValue(
     data,
     newPos,
@@ -403,15 +407,18 @@ export function decodeDataRecords(
 
   const dataRecords: DataRecord[] = [];
 
-  outerloop: while (pos < data.length) {
+  outerLoop: while (pos < data.length) {
     while (data[pos] === DIF_FILL_BYTE) {
       pos++;
       if (pos >= data.length) {
-        break outerloop;
+        break outerLoop;
       }
     }
 
     const { newPos, dr } = decodeDataRecord(data, pos);
+    if (dr === null) {
+      break outerLoop;
+    }
     pos = newPos;
     dataRecords.push(dr);
   }

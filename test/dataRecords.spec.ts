@@ -606,9 +606,29 @@ describe("Special DIF values", () => {
   });
 
   it("DIF_SPECIAL_FUNCTION", () => {
-    expect(() => decode("0f123456")).toThrowErrorMatchingInlineSnapshot(
-      "[UNEXPECTED_STATE: DIF for special function at 1 - remaining data: 123456]"
-    );
+    const result = decode("01fb1b360f123456");
+
+    expect(result.dataRecords).toHaveLength(1);
+    expect(result.dataRecords[0].value).toEqual(54);
+    expect(result.dataRecords[0].header).toEqual({
+      dib: {
+        dataField: 1,
+        deviceUnit: 0,
+        functionField: 0,
+        storageNo: 0,
+        tariff: 0,
+      },
+      vib: {
+        primary: {
+          vif: 0x1b,
+          table: VifTable.FB,
+          extensionBitSet: false,
+        },
+        extensions: [],
+      },
+      length: 3,
+      offset: 0,
+    });
   });
 });
 
