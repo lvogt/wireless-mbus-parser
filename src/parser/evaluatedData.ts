@@ -78,7 +78,7 @@ function getManufacturerSpecificsVifeDescriptor(
       return descriptor;
     }
   }
-  return getFallbackExtensiontDescriptor(extension, true);
+  return getFallbackExtensionDescriptor(extension, true);
 }
 
 function getVifeDescriptor(
@@ -92,7 +92,7 @@ function getVifeDescriptor(
 
   const descriptor = vifExtensions.find((item) => item.vif === extension);
   if (descriptor === undefined) {
-    return getFallbackExtensiontDescriptor(extension);
+    return getFallbackExtensionDescriptor(extension);
   } else {
     return descriptor;
   }
@@ -132,7 +132,7 @@ function getFallbackDescriptor(
   };
 }
 
-function getFallbackExtensiontDescriptor(
+function getFallbackExtensionDescriptor(
   extension: number,
   manufacturerSpecific = false
 ): VIFEDescriptor {
