@@ -1,7 +1,7 @@
 {
   "name": "wireless-mbus-parser",
   "description": "Parse telegram data received via wireless mbus",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "license": "MIT",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
@@ -54,28 +54,28 @@
   },
   "type": "module",
   "devDependencies": {
-    "@eslint/js": "9.24.0",
-    "@trivago/prettier-plugin-sort-imports": "5.2.2",
-    "@types/node": "22.14.0",
-    "@vitest/coverage-istanbul": "3.1.1",
-    "eslint": "9.24.0",
-    "eslint-config-prettier": "10.1.1",
-    "eslint-plugin-prettier": "5.2.6",
-    "globals": "16.0.0",
-    "prettier": "3.5.3",
-    "rimraf": "6.0.1",
-    "tsup": "8.4.0",
-    "typescript": "5.8.3",
-    "typescript-eslint": "8.29.0",
-    "vite-tsconfig-paths": "5.1.4",
-    "vitest": "3.1.1"
+    "@eslint/js": "9.39.2",
+    "@trivago/prettier-plugin-sort-imports": "6.0.2",
+    "@types/node": "22.19.9",
+    "@vitest/coverage-istanbul": "4.0.18",
+    "eslint": "9.39.2",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-prettier": "5.5.5",
+    "globals": "17.3.0",
+    "prettier": "3.8.1",
+    "rimraf": "6.1.2",
+    "tsup": "8.5.1",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.54.0",
+    "vite-tsconfig-paths": "6.1.0",
+    "vitest": "4.0.18"
   },
-  "packageManager": "pnpm@9.15.4",
+  "packageManager": "pnpm@10.29.1",
   "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=9.0.0"
+    "node": ">=20.0.0",
+    "npm": ">=9.6.0"
   },
   "dependencies": {
-    "aes-cmac": "3.1.0"
+    "aes-cmac": "4.0.0"
   }
 }
