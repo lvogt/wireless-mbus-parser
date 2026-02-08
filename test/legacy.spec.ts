@@ -31,7 +31,7 @@ function decodeLegacy(data: string, key?: string, typeB = false) {
 
   const cmd = `node ../ioBroker.wireless-mbus/lib/decode.js ${data} ${withCrc ? "withCrc" : "withOut"} ${key ? key : "none"} ${typeB ? "typeB" : ""}`;
   const result = subProcess.execSync(cmd, { encoding: "utf8" });
-  return JSON.parse(result) as LegacyResult;
+  return JSON.parse(result) satisfies LegacyResult;
 }
 
 describe("JMBus Test Case", () => {

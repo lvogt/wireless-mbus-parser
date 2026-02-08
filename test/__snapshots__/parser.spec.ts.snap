@@ -1,5 +1,175 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Errors > Compact frame without cache, afterwards with 1`] = `
+{
+  "data": [
+    {
+      "description": "Owner No; Unknown VIFE 0x15",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_OWNER_NO",
+        "storageNo": 0,
+        "tariff": 0,
+      },
+      "type": "Number",
+      "unit": "",
+      "value": 4353,
+    },
+    {
+      "description": "Energy",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_ENERGY_WATT",
+        "storageNo": 0,
+        "tariff": 0,
+      },
+      "type": "Number",
+      "unit": "Wh",
+      "value": 25879000,
+    },
+    {
+      "description": "Units for H.C.A.; Unknown VIFE 0x07",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_HCA",
+        "storageNo": 0,
+        "tariff": 0,
+      },
+      "type": "Number",
+      "unit": "",
+      "value": 43199,
+    },
+    {
+      "description": "Units for H.C.A.; Unknown VIFE 0x08",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_HCA",
+        "storageNo": 0,
+        "tariff": 0,
+      },
+      "type": "Number",
+      "unit": "",
+      "value": 20434,
+    },
+    {
+      "description": "Volume",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_VOLUME",
+        "storageNo": 0,
+        "tariff": 0,
+      },
+      "type": "Number",
+      "unit": "m³",
+      "value": 644.33,
+    },
+    {
+      "description": "Error flags (binary)",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_ERROR_FLAGS",
+        "storageNo": 0,
+        "tariff": 0,
+      },
+      "type": "Number",
+      "unit": "",
+      "value": 0,
+    },
+    {
+      "description": "Time point",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_TIME_POINT_DATE",
+        "storageNo": 0,
+        "tariff": 0,
+      },
+      "type": "Date",
+      "unit": "",
+      "value": 2015-09-09T00:00:00.000Z,
+    },
+    {
+      "description": "Time point",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_TIME_POINT_DATE",
+        "storageNo": 1,
+        "tariff": 0,
+      },
+      "type": "Date",
+      "unit": "",
+      "value": 2015-08-31T00:00:00.000Z,
+    },
+    {
+      "description": "Energy",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_ENERGY_WATT",
+        "storageNo": 1,
+        "tariff": 0,
+      },
+      "type": "Number",
+      "unit": "Wh",
+      "value": 25847000,
+    },
+    {
+      "description": "Volume",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_VOLUME",
+        "storageNo": 1,
+        "tariff": 0,
+      },
+      "type": "Number",
+      "unit": "m³",
+      "value": 642.32,
+    },
+    {
+      "description": "Volume Flow",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_VOLUME_FLOW",
+        "storageNo": 0,
+        "tariff": 0,
+      },
+      "type": "Number",
+      "unit": "m³/h",
+      "value": 0.011,
+    },
+    {
+      "description": "Flow Temperature",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_FLOW_TEMP",
+        "storageNo": 0,
+        "tariff": 0,
+      },
+      "type": "Number",
+      "unit": "°C",
+      "value": 45.71,
+    },
+    {
+      "description": "Return Temperature",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_RETURN_TEMP",
+        "storageNo": 0,
+        "tariff": 0,
+      },
+      "type": "Number",
+      "unit": "°C",
+      "value": 28.44,
+    },
+  ],
+  "meter": {
+    "deviceType": "Heat (Volume measured at flow temperature: inlet)",
+    "id": "60723506",
+    "manufacturer": "KAM",
+    "type": 12,
+    "version": 25,
+  },
+}
+`;
+
 exports[`Parser > All fields 1`] = `
 {
   "applicationLayer": {

@@ -387,7 +387,7 @@ export function extractDataRecordHeaders(dataRecords: DataRecord[]) {
       },
       offset: header.offset,
       length: header.length,
-    } as DataRecordHeader;
+    } satisfies DataRecordHeader;
   });
 }
 
