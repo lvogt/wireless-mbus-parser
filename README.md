@@ -64,9 +64,14 @@ The legacy result can only be generated from the "verbose" result.
 
 ## Changelog
 
+### 1.2.0
+
+- Provide access to data record header cache
+- Data record header cache can be populated when parser object is constructed
+
 ### 1.1.0
 
-- Enable "erasableSyntaxOnly" tsc option - output of "type" (EvaluatedDataType) and "table" (VifTable) changes from numeric to readable string
+- Enable "erasableSyntaxOnly" tsc option -- output of "type" (EvaluatedDataType) and "table" (VifTable) changes from numeric to readable string
 - Do not throw on DIF_SPECIAL_FUNCTIONS
 
 ### 1.0.1

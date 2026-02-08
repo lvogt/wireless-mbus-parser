@@ -34,6 +34,10 @@ export interface MeterData {
   };
 }
 
+export interface ParserConfiguration {
+  cachedDataRecordHeaders?: DataRecordHeadersCacheEntry[];
+}
+
 export interface ParserOptionsCommon {
   key?: Buffer;
   containsCrc?: boolean;
@@ -60,6 +64,7 @@ export interface ParserResultVerbose extends ParserResult {
   authenticationAndFragmentationLayer?: AuthenticationAndFragmentationLayer;
   applicationLayer: ApplicationLayer;
   dataRecords: DataRecord[];
+  dataRecordHeadersCrc: number;
   rawData: Buffer;
 }
 
@@ -73,6 +78,17 @@ export interface DataRecordHeader {
   vib: ValueInformationBlock;
   offset: number;
   length: number;
+}
+
+export type CachedDataRecordHeaders = Omit<
+  DataRecordHeader,
+  "offset" | "length"
+>;
+
+export interface DataRecordHeadersCacheEntry {
+  cachedDataRecordHeaders: CachedDataRecordHeaders[];
+  crc: number;
+  version: "v1";
 }
 
 export type DataType = string | number | bigint | Buffer | null;

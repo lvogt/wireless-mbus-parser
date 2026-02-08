@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { ParserError } from "@/helper/error";
 import { WirelessMbusParser } from "@/parser/parser";
+import type { DataRecordHeadersCacheEntry } from "@/types";
 
 async function decode(data: string, key?: string) {
   const parser = new WirelessMbusParser();
@@ -70,6 +71,7 @@ describe("Parser", () => {
       "authenticationAndFragmentationLayer",
       "applicationLayer",
       "dataRecords",
+      "dataRecordHeadersCrc",
       "rawData",
     ]);
 
@@ -97,6 +99,7 @@ describe("Parser", () => {
       "authenticationAndFragmentationLayer",
       "applicationLayer",
       "dataRecords",
+      "dataRecordHeadersCrc",
       "rawData",
     ]);
 
@@ -170,6 +173,7 @@ describe("Errors", () => {
     }
 
     expect(parser["dataRecordHeaderCache"]).toEqual({ 0x82dd: null });
+    expect(parser.cache).toEqual([]);
 
     await parser.parse(
       Buffer.from(
@@ -189,6 +193,38 @@ describe("Errors", () => {
     expect(parser["dataRecordHeaderCache"][0x82dd]).not.toEqual(null);
 
     expect(result).toMatchSnapshot();
+    expect(parser.cache).toMatchSnapshot();
+  });
+
+  it("Preload cache entry", async () => {
+    let cacheEntry: DataRecordHeadersCacheEntry;
+    {
+      const parser = new WirelessMbusParser();
+      parser["dataRecordHeaderCache"][0x82dd] = null;
+      const fullResult = await parser.parse(
+        Buffer.from(
+          "5C442D2C06357260190C8D207B70032F21271D7802F9FF15011104061765000004EEFF07BFA8000004EEFF08D24F00000414B1FB000002FD170000026CE919426CFF184406F76400004414E8FA0000043B0B0000000259DB11025D1C0B",
+          "hex"
+        ),
+        { verbose: true }
+      );
+      cacheEntry =
+        WirelessMbusParser.getDataRecordHeadersCacheEntry(fullResult);
+    }
+
+    const newParser = new WirelessMbusParser({
+      cachedDataRecordHeaders: [cacheEntry],
+    });
+
+    const compactFrameResult = await newParser.parse(
+      Buffer.from(
+        "3F442D2C06357260190C8D207C71032F21255C79DD829283011117650000BFA80000D24F0000B1FB00000000E919FF18F7640000E8FA00000B000000DB111C0B",
+        "hex"
+      )
+    );
+
+    expect(compactFrameResult.data).toHaveLength(13);
+    expect(compactFrameResult).toMatchSnapshot();
   });
 
   it("Cache only populated if needed", async () => {
