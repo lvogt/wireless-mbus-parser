@@ -187,6 +187,8 @@ describe("Errors", () => {
 
     expect(result.data).toHaveLength(13);
     expect(parser["dataRecordHeaderCache"][0x82dd]).not.toEqual(null);
+
+    expect(result).toMatchSnapshot();
   });
 
   it("Cache only populated if needed", async () => {
