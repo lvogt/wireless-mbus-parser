@@ -64,6 +64,11 @@ The legacy result can only be generated from the "verbose" result.
 
 ## Changelog
 
+### 1.1.1
+
+- Add additional parse step for manufacturer specific blobs
+- Add data evaluation for 
+
 ### 1.1.0
 
 - Enable "erasableSyntaxOnly" tsc option - output of "type" (EvaluatedDataType) and "table" (VifTable) changes from numeric to readable string

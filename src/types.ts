@@ -326,3 +326,8 @@ export interface LegacyResult {
     functionField: number;
   }[];
 }
+
+export type ManufacturerSpecificDataRecordHandler = (
+  dataRecord: DataRecord,
+  meterData: MeterData
+) => EvaluatedData;

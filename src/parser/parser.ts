@@ -12,6 +12,7 @@ import { evaluateDataRecords } from "@/parser/evaluatedData";
 import { decodeExtendedLinkLayer } from "@/parser/extendedLinkLayer";
 import { createLegacyResult } from "@/parser/legacy";
 import { decodeLinkLayer } from "@/parser/linkLayer";
+import { evaluateManufacturerSpecificData } from "@/parser/manufacturerSpecificData";
 import type {
   ApplicationLayer,
   DataRecordHeader,
@@ -92,8 +93,13 @@ export class WirelessMbusParser {
 
     const evaluatedData = evaluateDataRecords(dataRecords, meterData);
 
+    const manufacturerSpecificData = evaluateManufacturerSpecificData(
+      dataRecords,
+      meterData
+    );
+
     return {
-      data: evaluatedData,
+      data: [...evaluatedData, ...manufacturerSpecificData],
       meter: meterData,
       linkLayer,
       extendedLinkLayer,
