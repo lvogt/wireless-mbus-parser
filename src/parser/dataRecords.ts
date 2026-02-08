@@ -24,9 +24,11 @@ import { ParserError } from "@/helper/error";
 import { decodeBCD } from "@/helper/helper";
 import { log } from "@/helper/logger";
 import type {
+  CachedDataRecordHeaders,
   DataInformationBlock,
   DataRecord,
   DataRecordHeader,
+  DataRecordHeadersCacheEntry,
   ParserState,
   PrimaryVif,
   ValueInformationBlock,
@@ -391,6 +393,28 @@ export function extractDataRecordHeaders(dataRecords: DataRecord[]) {
   });
 }
 
+export function handleCachedDataRecordHeaders(
+  entry: DataRecordHeadersCacheEntry
+) {
+  if (entry.version !== "v1") {
+    throw new ParserError(
+      "UNEXPECTED_STATE",
+      "Unknown data record headers cache entry version: ${version}"
+    );
+  }
+
+  return {
+    crc: entry.crc,
+    dataRecordHeaders: entry.cachedDataRecordHeaders.map((dataRecordHeader) => {
+      return {
+        ...dataRecordHeader,
+        offset: 0,
+        length: 0,
+      } satisfies DataRecordHeader;
+    }),
+  };
+}
+
 export function decodeDataRecords(
   state: ParserState,
   cachedHeaders?: DataRecordHeader[]
@@ -430,4 +454,13 @@ export function decodeDataRecords(
     },
     dataRecords: dataRecords,
   };
+}
+
+export function reduceToCachedDataRecordHeaders(headers: DataRecordHeader[]) {
+  return headers.map((header) => {
+    return {
+      dib: header.dib,
+      vib: header.vib,
+    } satisfies CachedDataRecordHeaders;
+  });
 }

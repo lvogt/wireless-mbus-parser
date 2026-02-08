@@ -7,6 +7,8 @@ import {
   calcHeaderCrc,
   decodeDataRecords,
   extractDataRecordHeaders,
+  handleCachedDataRecordHeaders as handleDataRecordHeadersCacheEntry,
+  reduceToCachedDataRecordHeaders,
 } from "@/parser/dataRecords";
 import { evaluateDataRecords } from "@/parser/evaluatedData";
 import { decodeExtendedLinkLayer } from "@/parser/extendedLinkLayer";
@@ -15,6 +17,8 @@ import { decodeLinkLayer } from "@/parser/linkLayer";
 import type {
   ApplicationLayer,
   DataRecordHeader,
+  DataRecordHeadersCacheEntry,
+  ParserConfiguration,
   ParserOptions,
   ParserOptionsCommon,
   ParserOptionsFull,
@@ -26,6 +30,30 @@ import type {
 
 export class WirelessMbusParser {
   private dataRecordHeaderCache: Record<number, DataRecordHeader[] | null> = {};
+
+  constructor(configuration?: ParserConfiguration) {
+    if (configuration?.cachedDataRecordHeaders?.length > 0) {
+      configuration.cachedDataRecordHeaders.forEach((entry) => {
+        const { crc, dataRecordHeaders } =
+          handleDataRecordHeadersCacheEntry(entry);
+        this.dataRecordHeaderCache[crc] = dataRecordHeaders;
+      });
+    }
+  }
+
+  get cache() {
+    const entries: DataRecordHeadersCacheEntry[] = [];
+    for (const [crc, entry] of Object.entries(this.dataRecordHeaderCache)) {
+      if (entry !== null) {
+        entries.push({
+          cachedDataRecordHeaders: reduceToCachedDataRecordHeaders(entry),
+          crc: +crc,
+          version: "v1",
+        } satisfies DataRecordHeadersCacheEntry);
+      }
+    }
+    return entries;
+  }
 
   async parse(
     data: Buffer,
@@ -49,6 +77,16 @@ export class WirelessMbusParser {
 
   static toLegacyResult(result: ParserResultVerbose) {
     return createLegacyResult(result);
+  }
+
+  static getDataRecordHeadersCacheEntry(result: ParserResultVerbose) {
+    return {
+      cachedDataRecordHeaders: reduceToCachedDataRecordHeaders(
+        result.dataRecords.map((record) => record.header)
+      ),
+      crc: result.dataRecordHeadersCrc,
+      version: "v1",
+    } satisfies DataRecordHeadersCacheEntry;
   }
 
   private async parseFullResult(
@@ -85,7 +123,7 @@ export class WirelessMbusParser {
     );
     const meterData = getMeterData(linkLayer, applicationLayer);
 
-    const dataRecords = this.handleDataRecordDecoding(
+    const { dataRecords, headerCrc } = this.handleDataRecordDecoding(
       aplState,
       applicationLayer
     );
@@ -100,6 +138,7 @@ export class WirelessMbusParser {
       authenticationAndFragmentationLayer,
       applicationLayer,
       dataRecords,
+      dataRecordHeadersCrc: headerCrc,
       rawData: aplState.data,
     };
   }
@@ -130,7 +169,7 @@ export class WirelessMbusParser {
         );
       }
       const { dataRecords } = decodeDataRecords(state, dataRecordHeaders);
-      return dataRecords;
+      return { dataRecords, headerCrc: applicationLayer.headerCrc };
     } else {
       const { dataRecords } = decodeDataRecords(state);
 
@@ -140,7 +179,7 @@ export class WirelessMbusParser {
           extractDataRecordHeaders(dataRecords);
       }
 
-      return dataRecords;
+      return { dataRecords, headerCrc };
     }
   }
 }

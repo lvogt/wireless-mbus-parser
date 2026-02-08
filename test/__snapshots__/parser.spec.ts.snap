@@ -170,6 +170,417 @@ exports[`Errors > Compact frame without cache, afterwards with 1`] = `
 }
 `;
 
+exports[`Errors > Compact frame without cache, afterwards with 2`] = `
+[
+  {
+    "cachedDataRecordHeaders": [
+      {
+        "dib": {
+          "dataField": 2,
+          "deviceUnit": 0,
+          "functionField": 0,
+          "storageNo": 0,
+          "tariff": 0,
+        },
+        "vib": {
+          "extensions": [
+            127,
+            21,
+          ],
+          "primary": {
+            "extensionBitSet": true,
+            "table": "Default",
+            "vif": 121,
+          },
+        },
+      },
+      {
+        "dib": {
+          "dataField": 4,
+          "deviceUnit": 0,
+          "functionField": 0,
+          "storageNo": 0,
+          "tariff": 0,
+        },
+        "vib": {
+          "extensions": [],
+          "primary": {
+            "extensionBitSet": false,
+            "table": "Default",
+            "vif": 6,
+          },
+        },
+      },
+      {
+        "dib": {
+          "dataField": 4,
+          "deviceUnit": 0,
+          "functionField": 0,
+          "storageNo": 0,
+          "tariff": 0,
+        },
+        "vib": {
+          "extensions": [
+            127,
+            7,
+          ],
+          "primary": {
+            "extensionBitSet": true,
+            "table": "Default",
+            "vif": 110,
+          },
+        },
+      },
+      {
+        "dib": {
+          "dataField": 4,
+          "deviceUnit": 0,
+          "functionField": 0,
+          "storageNo": 0,
+          "tariff": 0,
+        },
+        "vib": {
+          "extensions": [
+            127,
+            8,
+          ],
+          "primary": {
+            "extensionBitSet": true,
+            "table": "Default",
+            "vif": 110,
+          },
+        },
+      },
+      {
+        "dib": {
+          "dataField": 4,
+          "deviceUnit": 0,
+          "functionField": 0,
+          "storageNo": 0,
+          "tariff": 0,
+        },
+        "vib": {
+          "extensions": [],
+          "primary": {
+            "extensionBitSet": false,
+            "table": "Default",
+            "vif": 20,
+          },
+        },
+      },
+      {
+        "dib": {
+          "dataField": 2,
+          "deviceUnit": 0,
+          "functionField": 0,
+          "storageNo": 0,
+          "tariff": 0,
+        },
+        "vib": {
+          "extensions": [],
+          "primary": {
+            "extensionBitSet": false,
+            "table": "FD",
+            "vif": 23,
+          },
+        },
+      },
+      {
+        "dib": {
+          "dataField": 2,
+          "deviceUnit": 0,
+          "functionField": 0,
+          "storageNo": 0,
+          "tariff": 0,
+        },
+        "vib": {
+          "extensions": [],
+          "primary": {
+            "extensionBitSet": false,
+            "table": "Default",
+            "vif": 108,
+          },
+        },
+      },
+      {
+        "dib": {
+          "dataField": 2,
+          "deviceUnit": 0,
+          "functionField": 0,
+          "storageNo": 1,
+          "tariff": 0,
+        },
+        "vib": {
+          "extensions": [],
+          "primary": {
+            "extensionBitSet": false,
+            "table": "Default",
+            "vif": 108,
+          },
+        },
+      },
+      {
+        "dib": {
+          "dataField": 4,
+          "deviceUnit": 0,
+          "functionField": 0,
+          "storageNo": 1,
+          "tariff": 0,
+        },
+        "vib": {
+          "extensions": [],
+          "primary": {
+            "extensionBitSet": false,
+            "table": "Default",
+            "vif": 6,
+          },
+        },
+      },
+      {
+        "dib": {
+          "dataField": 4,
+          "deviceUnit": 0,
+          "functionField": 0,
+          "storageNo": 1,
+          "tariff": 0,
+        },
+        "vib": {
+          "extensions": [],
+          "primary": {
+            "extensionBitSet": false,
+            "table": "Default",
+            "vif": 20,
+          },
+        },
+      },
+      {
+        "dib": {
+          "dataField": 4,
+          "deviceUnit": 0,
+          "functionField": 0,
+          "storageNo": 0,
+          "tariff": 0,
+        },
+        "vib": {
+          "extensions": [],
+          "primary": {
+            "extensionBitSet": false,
+            "table": "Default",
+            "vif": 59,
+          },
+        },
+      },
+      {
+        "dib": {
+          "dataField": 2,
+          "deviceUnit": 0,
+          "functionField": 0,
+          "storageNo": 0,
+          "tariff": 0,
+        },
+        "vib": {
+          "extensions": [],
+          "primary": {
+            "extensionBitSet": false,
+            "table": "Default",
+            "vif": 89,
+          },
+        },
+      },
+      {
+        "dib": {
+          "dataField": 2,
+          "deviceUnit": 0,
+          "functionField": 0,
+          "storageNo": 0,
+          "tariff": 0,
+        },
+        "vib": {
+          "extensions": [],
+          "primary": {
+            "extensionBitSet": false,
+            "table": "Default",
+            "vif": 93,
+          },
+        },
+      },
+    ],
+    "crc": 33501,
+    "version": "v1",
+  },
+]
+`;
+
+exports[`Errors > Preload cache entry 1`] = `
+{
+  "data": [
+    {
+      "description": "Owner No; Unknown VIFE 0x15",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_OWNER_NO",
+        "storageNo": 0,
+        "tariff": 0,
+      },
+      "type": "Number",
+      "unit": "",
+      "value": 4353,
+    },
+    {
+      "description": "Energy",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_ENERGY_WATT",
+        "storageNo": 0,
+        "tariff": 0,
+      },
+      "type": "Number",
+      "unit": "Wh",
+      "value": 25879000,
+    },
+    {
+      "description": "Units for H.C.A.; Unknown VIFE 0x07",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_HCA",
+        "storageNo": 0,
+        "tariff": 0,
+      },
+      "type": "Number",
+      "unit": "",
+      "value": 43199,
+    },
+    {
+      "description": "Units for H.C.A.; Unknown VIFE 0x08",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_HCA",
+        "storageNo": 0,
+        "tariff": 0,
+      },
+      "type": "Number",
+      "unit": "",
+      "value": 20434,
+    },
+    {
+      "description": "Volume",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_VOLUME",
+        "storageNo": 0,
+        "tariff": 0,
+      },
+      "type": "Number",
+      "unit": "m³",
+      "value": 644.33,
+    },
+    {
+      "description": "Error flags (binary)",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_ERROR_FLAGS",
+        "storageNo": 0,
+        "tariff": 0,
+      },
+      "type": "Number",
+      "unit": "",
+      "value": 0,
+    },
+    {
+      "description": "Time point",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_TIME_POINT_DATE",
+        "storageNo": 0,
+        "tariff": 0,
+      },
+      "type": "Date",
+      "unit": "",
+      "value": 2015-09-09T00:00:00.000Z,
+    },
+    {
+      "description": "Time point",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_TIME_POINT_DATE",
+        "storageNo": 1,
+        "tariff": 0,
+      },
+      "type": "Date",
+      "unit": "",
+      "value": 2015-08-31T00:00:00.000Z,
+    },
+    {
+      "description": "Energy",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_ENERGY_WATT",
+        "storageNo": 1,
+        "tariff": 0,
+      },
+      "type": "Number",
+      "unit": "Wh",
+      "value": 25847000,
+    },
+    {
+      "description": "Volume",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_VOLUME",
+        "storageNo": 1,
+        "tariff": 0,
+      },
+      "type": "Number",
+      "unit": "m³",
+      "value": 642.32,
+    },
+    {
+      "description": "Volume Flow",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_VOLUME_FLOW",
+        "storageNo": 0,
+        "tariff": 0,
+      },
+      "type": "Number",
+      "unit": "m³/h",
+      "value": 0.011,
+    },
+    {
+      "description": "Flow Temperature",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_FLOW_TEMP",
+        "storageNo": 0,
+        "tariff": 0,
+      },
+      "type": "Number",
+      "unit": "°C",
+      "value": 45.71,
+    },
+    {
+      "description": "Return Temperature",
+      "info": {
+        "deviceUnit": 0,
+        "legacyVif": "VIF_RETURN_TEMP",
+        "storageNo": 0,
+        "tariff": 0,
+      },
+      "type": "Number",
+      "unit": "°C",
+      "value": 28.44,
+    },
+  ],
+  "meter": {
+    "deviceType": "Heat (Volume measured at flow temperature: inlet)",
+    "id": "60723506",
+    "manufacturer": "KAM",
+    "type": 12,
+    "version": 25,
+  },
+}
+`;
+
 exports[`Parser > All fields 1`] = `
 {
   "applicationLayer": {
@@ -262,6 +673,7 @@ exports[`Parser > All fields 1`] = `
       "value": 0,
     },
   ],
+  "dataRecordHeadersCrc": 61330,
   "dataRecords": [
     {
       "header": {
@@ -536,6 +948,7 @@ exports[`Parser > Full result 1`] = `
       "value": -4,
     },
   ],
+  "dataRecordHeadersCrc": 16874,
   "dataRecords": [
     {
       "header": {
