@@ -32,12 +32,10 @@ export class WirelessMbusParser {
   private dataRecordHeaderCache: Record<number, DataRecordHeader[] | null> = {};
 
   constructor(configuration?: ParserConfiguration) {
-    if (configuration?.cachedDataRecordHeaders?.length > 0) {
-      configuration.cachedDataRecordHeaders.forEach((entry) => {
-        const { crc, dataRecordHeaders } =
-          handleDataRecordHeadersCacheEntry(entry);
-        this.dataRecordHeaderCache[crc] = dataRecordHeaders;
-      });
+    for (const entry of configuration?.cachedDataRecordHeaders ?? []) {
+      const { crc, dataRecordHeaders } =
+        handleDataRecordHeadersCacheEntry(entry);
+      this.dataRecordHeaderCache[crc] = dataRecordHeaders;
     }
   }
 

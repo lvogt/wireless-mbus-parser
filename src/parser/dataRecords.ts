@@ -78,23 +78,22 @@ function decodeDataInformationBlock(
 
 function buildPrimaryVif(
   vif: number,
-  table: VifTable,
-  plainText?: string
+  table: Exclude<VifTable, typeof VifTable.Plain>
 ): PrimaryVif {
-  if (table === VifTable.Plain) {
-    return {
-      vif: vif & DIF_VIF_EXTENSION_MASK,
-      table: VifTable.Plain,
-      plainText: plainText,
-      extensionBitSet: (vif & DIF_VIF_EXTENSION_BIT) !== 0,
-    };
-  } else {
-    return {
-      vif: vif & DIF_VIF_EXTENSION_MASK,
-      table: table,
-      extensionBitSet: (vif & DIF_VIF_EXTENSION_BIT) !== 0,
-    };
-  }
+  return {
+    vif: vif & DIF_VIF_EXTENSION_MASK,
+    table: table,
+    extensionBitSet: (vif & DIF_VIF_EXTENSION_BIT) !== 0,
+  };
+}
+
+function buildPlainTextVif(vif: number, plainText: string): PrimaryVif {
+  return {
+    vif: vif & DIF_VIF_EXTENSION_MASK,
+    table: VifTable.Plain,
+    plainText: plainText,
+    extensionBitSet: (vif & DIF_VIF_EXTENSION_BIT) !== 0,
+  };
 }
 
 function getPrimaryVif(
@@ -140,7 +139,7 @@ function getPrimaryVif(
     pos += length;
     return {
       newPos: pos,
-      primary: buildPrimaryVif(firstVif, VifTable.Plain, plainTextVif),
+      primary: buildPlainTextVif(firstVif, plainTextVif),
     };
   } else {
     return {
@@ -192,7 +191,7 @@ function decodeValueInformationBlock(
 function getDataRecordHeader(
   data: Buffer,
   pos: number
-): { newPos: number; dataRecordHeader: DataRecordHeader } {
+): { newPos: number; dataRecordHeader: DataRecordHeader | null } {
   const offset = pos;
   const { dib, newPos } = decodeDataInformationBlock(data, pos);
 
@@ -318,7 +317,7 @@ function decodeLvarValue(
 function decodeDataRecord(
   data: Buffer,
   pos: number
-): { newPos: number; dr: DataRecord } {
+): { newPos: number; dr: DataRecord | null } {
   const { newPos, dataRecordHeader } = getDataRecordHeader(data, pos);
   if (dataRecordHeader === null) {
     return { newPos, dr: null };

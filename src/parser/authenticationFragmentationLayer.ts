@@ -54,7 +54,7 @@ export function decodeAuthenticationAndFragmentationLayer(state: ParserState): {
     fid: fclRaw & 0b0000000011111111 /* fragment ID */,
   };
 
-  let mclRaw: number;
+  let mclRaw: number | undefined;
   let mcl: AuthenticationAndFragmentationLayer["mcl"];
 
   if (fcl.mclp) {
@@ -75,7 +75,7 @@ export function decodeAuthenticationAndFragmentationLayer(state: ParserState): {
     };
   }
 
-  let kiRaw: number;
+  let kiRaw: number | undefined;
   let ki: AuthenticationAndFragmentationLayer["ki"];
 
   if (fcl.kip) {
@@ -90,7 +90,7 @@ export function decodeAuthenticationAndFragmentationLayer(state: ParserState): {
     };
   }
 
-  let mcr: number;
+  let mcr: number | undefined;
 
   if (fcl.mcrp) {
     // AFL Message Counter Field (AFL.MCR)
@@ -98,7 +98,7 @@ export function decodeAuthenticationAndFragmentationLayer(state: ParserState): {
     pos += 4;
   }
 
-  let mac: Buffer;
+  let mac: Buffer | undefined;
 
   if (fcl.macp) {
     if (mcl === undefined) {
@@ -125,7 +125,7 @@ export function decodeAuthenticationAndFragmentationLayer(state: ParserState): {
     log.debug(`AFL MAC ${mac.toString("hex")}`);
   }
 
-  let ml: number;
+  let ml: number | undefined;
 
   if (fcl.mlp) {
     // AFL Message Length Field (AFL.ML)
