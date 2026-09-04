@@ -312,7 +312,7 @@ function decodeLvarValue(
       .split("")
       .reverse()
       .join("");
-    return { newPos: (pos += lvar), value: stringValue };
+    return { newPos: pos + lvar, value: stringValue };
   } else if (lvar <= 0xcf) {
     // positive BCD number with (lvar - 0xC0) * 2 digits
     const bytes = lvar - 0xc0;

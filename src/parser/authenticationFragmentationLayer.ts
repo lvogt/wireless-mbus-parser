@@ -10,8 +10,7 @@ export function hasAuthenticationAndFragmentationLayer(state: ParserState) {
 export function decodeAuthenticationAndFragmentationLayer(state: ParserState): {
   state: ParserState;
   authenticationAndFragmentationLayer:
-    | AuthenticationAndFragmentationLayer
-    | undefined;
+    AuthenticationAndFragmentationLayer | undefined;
 } {
   if (!hasAuthenticationAndFragmentationLayer(state)) {
     return { state, authenticationAndFragmentationLayer: undefined };

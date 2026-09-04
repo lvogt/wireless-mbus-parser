@@ -133,7 +133,6 @@ function createValidDataRecordsHca(data: Buffer, pos: number, version: number) {
   result[i++] = 0x61;
   result[i++] = 0xe2; //binary number; 2 bytes
   result.writeInt16LE(diff, i);
-  i += 2;
 
   return result;
 }
