@@ -4,6 +4,7 @@ import {
   DIF_DATATYPE_INT32,
   DIF_DATATYPE_VARLEN,
 } from "@/helper/constants";
+import { ParserError } from "@/helper/error";
 import { getDeviceType, getMeterId, isLinkLayer } from "@/helper/helper";
 import type {
   ApplicationLayer,
@@ -12,6 +13,9 @@ import type {
   ParserState,
   WiredLinkLayer,
 } from "@/types";
+
+// CI, 15 bytes of payload - everything createValidDataRecords() reads
+const PRIOS_PAYLOAD_SIZE = 16;
 
 const KEY_1 = Buffer.from("39BC8A10E66D83F8", "hex");
 const KEY_2 = Buffer.from("51728910E66D83F8", "hex");
@@ -88,7 +92,10 @@ function getKey(rawAddress: Buffer, data: Buffer, pos: number) {
     if (checkKey(preparedKey2, data, pos)) {
       return preparedKey2;
     } else {
-      throw new Error("No matching key to decrypt PRIOS telegram found!");
+      throw new ParserError(
+        "DECRYPTION_ERROR",
+        "No matching key to decrypt PRIOS telegram found!"
+      );
     }
   }
 }
@@ -225,10 +232,20 @@ export function decodePriosApplicationLayer(
   linkLayer: LinkLayer;
 } {
   if (!isLinkLayer(linkLayer)) {
-    throw new Error("PRIOS telegram without full link layer!");
+    throw new ParserError(
+      "UNEXPECTED_STATE",
+      "PRIOS telegram without full link layer!"
+    );
   }
 
   const { pos, data } = state;
+
+  if (data.length - pos < PRIOS_PAYLOAD_SIZE) {
+    throw new ParserError(
+      "UNEXPECTED_STATE",
+      `Telegram is too short for PRIOS coding! Expected at least ${pos + PRIOS_PAYLOAD_SIZE} bytes, but got only ${data.length}`
+    );
+  }
 
   const key = getKey(linkLayer.addressRaw, data, pos);
   const decryptedData = decrypt(key, data, pos);

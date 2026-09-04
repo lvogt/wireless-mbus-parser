@@ -1,5 +1,5 @@
 import { stripAnyCrc } from "@/crc/crcHandler";
-import { ParserError } from "@/helper/error";
+import { ParserError, toParserError } from "@/helper/error";
 import { getMeterData, isCompactFrame } from "@/helper/helper";
 import { decodeApplicationLayer } from "@/parser/applicationLayer";
 import { decodeAuthenticationAndFragmentationLayer } from "@/parser/authenticationFragmentationLayer";
@@ -88,6 +88,17 @@ export class WirelessMbusParser {
   }
 
   private async parseFullResult(
+    data: Buffer,
+    options?: Partial<ParserOptionsCommon>
+  ): Promise<ParserResultVerbose> {
+    try {
+      return await this.decodeTelegram(data, options);
+    } catch (error: unknown) {
+      throw toParserError(error);
+    }
+  }
+
+  private async decodeTelegram(
     data: Buffer,
     options?: Partial<ParserOptionsCommon>
   ): Promise<ParserResultVerbose> {

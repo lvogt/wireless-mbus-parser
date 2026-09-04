@@ -47,6 +47,10 @@ export function checkCrc(data: Buffer, start: number, end: number) {
 }
 
 export function checkCrcEll(data: Buffer, start: number, end: number) {
+  if (data.length < start + 2) {
+    return false;
+  }
+
   const expected = data.readUInt16LE(start);
   const checksum = calcCrc(data, start + 2, end);
   return checksum === expected;

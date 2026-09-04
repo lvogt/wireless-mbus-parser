@@ -106,6 +106,14 @@ function createIv(
   return iv;
 }
 
+// header size per CI, without the CI itself and the payload CRC
+const ELL_HEADER_SIZES = {
+  [CI_ELL_2]: 2,
+  [CI_ELL_8]: 6,
+  [CI_ELL_10]: 10,
+  [CI_ELL_16]: 14,
+};
+
 function parseHeader(state: ParserState): {
   ell: ExtendedLinkLayer;
   state: ParserState;
@@ -115,6 +123,13 @@ function parseHeader(state: ParserState): {
 
   log.debug("Extended Link Layer");
   const ci = data[pos++] as ExtendedLinkLayer["ci"];
+
+  if (data.length < pos + ELL_HEADER_SIZES[ci]) {
+    throw new ParserError(
+      "UNEXPECTED_STATE",
+      `Telegram is too short for an extended link layer with CI 0x${ci.toString(16)}!`
+    );
+  }
 
   // common to all headers
   const communicationControl = data[pos++];

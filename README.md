@@ -83,9 +83,9 @@ try {
 }
 ```
 
-Beware: badly malformed data can still surface other errors - most
-notably a `RangeError` while reading beyond the end of the telegram - if
-the CRC did not reject it beforehand.
+Telegram data is arbitrary radio data, so anything unexpected which is
+not caught while parsing is wrapped in a `ParserError` as well - the
+original error is available as its `cause`.
 
 ## Compact Frames
 
@@ -149,6 +149,8 @@ const parser = new WirelessMbusParser({ cachedDataRecordHeaders: [entry] });
 - Fix the ELL encryption flag, which was reported as a negative number if
   its most significant bit was set
 - Enable the "strict" tsc option
+- Malformed telegrams always throw a `ParserError` - reading beyond the end of
+  a telegram surfaced as a `RangeError` before
 - Ship unminified code with source maps
 - Mark the package as side effect free
 
