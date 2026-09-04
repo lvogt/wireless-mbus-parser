@@ -363,14 +363,13 @@ function decodeDataRecordsFromCache(
 }
 
 export function calcHeaderCrc(dataRecords: DataRecord[], data: Buffer) {
-  let crcBuffer = Buffer.alloc(0);
-  for (const record of dataRecords) {
-    const offset = record.header.offset;
-    crcBuffer = Buffer.concat([
-      crcBuffer,
-      data.subarray(offset, offset + record.header.length),
-    ]);
-  }
+  const headers = dataRecords.map((record) =>
+    data.subarray(
+      record.header.offset,
+      record.header.offset + record.header.length
+    )
+  );
+  const crcBuffer = Buffer.concat(headers);
 
   return calcCrc(crcBuffer, 0, crcBuffer.length);
 }

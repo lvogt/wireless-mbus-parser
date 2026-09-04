@@ -38,7 +38,8 @@ export function decryptData(
   return decryptedData.subarray(0, length);
 }
 
-export function decryptInPlace(
+// returns a copy of the data with the decrypted range replaced
+export function decryptRange(
   data: Buffer,
   key: Buffer,
   iv: Buffer,
