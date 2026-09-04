@@ -9,7 +9,7 @@ import {
   CI_RESP_SML_12,
   CI_RESP_TECHEM,
 } from "@/helper/constants";
-import { calcKenc, checkAflMac, decryptInPlace } from "@/helper/crypto";
+import { calcKenc, checkAflMac, decryptRange } from "@/helper/crypto";
 import { ParserError } from "@/helper/error";
 import {
   decodeManufacturer,
@@ -340,7 +340,7 @@ export async function decodeApplicationLayer(
 
     if (apl.config.mode === 5) {
       const encryptedLength = apl.config.encryptedBlocks * AES_BLOCK_SIZE;
-      decryptedData = decryptInPlace(
+      decryptedData = decryptRange(
         data,
         state.key,
         createIvMode5(apl, ll),
@@ -364,7 +364,7 @@ export async function decodeApplicationLayer(
       const msgData = data.subarray(apl.offset, pos + encryptedLength);
       await checkAflMac(kmac, msgData, afl);
 
-      decryptedData = decryptInPlace(
+      decryptedData = decryptRange(
         data,
         kenc,
         createIvMode7(),

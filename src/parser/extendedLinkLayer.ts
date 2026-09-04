@@ -6,7 +6,7 @@ import {
   CI_ELL_10,
   CI_ELL_16,
 } from "@/helper/constants";
-import { decryptInPlace } from "@/helper/crypto";
+import { decryptRange } from "@/helper/crypto";
 import { ParserError } from "@/helper/error";
 import { isLinkLayer } from "@/helper/helper";
 import { log } from "@/helper/logger";
@@ -65,7 +65,7 @@ export function decodeExtendedLinkLayer(
   const iv = createIv(ell, linkLayer);
   const length = data.length - pos;
 
-  const decryptedData = decryptInPlace(
+  const decryptedData = decryptRange(
     data,
     state.key,
     iv,
