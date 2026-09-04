@@ -27,33 +27,32 @@ is also available.
 ```typescript
 import { WirelessMbusParser } from "wireless-mbus-parser";
 
-const data = "2E44931578563412330333637A2A0020255923C95AAA26D1B2E7493BC2AD013EC4A6F6D3529B520EDFF0EA6DEFC955B29D6D69EBF3EC8A";
+const data =
+  "2E44931578563412330333637A2A0020255923C95AAA26D1B2E7493BC2AD013EC4A6F6D3529B520EDFF0EA6DEFC955B29D6D69EBF3EC8A";
 const key = "0102030405060708090A0B0C0D0E0F11";
 
 const parser = new WirelessMbusParser();
-const evaluatedData = await parser.parse(
-  Buffer.from(data, "hex"),
-  { key: Buffer.from(key, "hex") }
-);
 
-const fullData = await parser.parser(
-  Buffer.from(, "hex"),
-  {
-    verbose: true,
-    containsCrc: undefined,
-    key: Buffer.from(key, "hex")
-  }
-);
+const result = await parser.parse(Buffer.from(data, "hex"), {
+  key: Buffer.from(key, "hex"),
+});
 
-const legacyResult = WirelessMbusParser.toLegacyResult(fullData)
+const fullResult = await parser.parse(Buffer.from(data, "hex"), {
+  verbose: true,
+  containsCrc: undefined,
+  key: Buffer.from(key, "hex"),
+});
+
+const legacyResult = WirelessMbusParser.toLegacyResult(fullResult);
 ```
 
 **Notes:**
 
 If `containsCrc` is undefined, the parser tries to guess whether
-the data contains CRC or not. This works if the telegram data has the
-correct length, if it contains trailing data, the auto-detection
-fails in some circumstances.
+the data contains CRC or not. Trailing data is ignored. Only a frame
+without CRC which happens to carry exactly as many trailing bytes as
+its CRCs would occupy is mistaken for a frame with CRC - in that case
+the CRC check fails and `containsCrc` has to be set explicitly.
 
 The legacy result can only be generated from the "verbose" result.
 
@@ -63,6 +62,25 @@ The legacy result can only be generated from the "verbose" result.
 - TCH smoke detector?
 
 ## Changelog
+
+### Unreleased
+
+- Fix Techem and PRIOS telegrams: the first data record was skipped, which
+  shifted all decoded values
+- Fix truncation of the current period energy of TCH heat meters
+- CRC auto detection: ignore trailing data instead of failing
+- `ParserError` is exported as a class, so errors can be checked with
+  `instanceof` instead of comparing `name`
+- `EvaluatedData.type` now describes the value which is actually returned:
+  scaling a 64 bit value yields a `Number` and is no longer reported as
+  `BigInt` -- in the legacy result such a value changes from string to number
+- Fix the invalid date warning for type F date/times, which never triggered
+- Fix the error message for unknown data record header cache versions
+- Checking the AFL MAC without the required AFL fields now throws a
+  `ParserError` instead of a `TypeError`
+- Fix the ELL encryption flag, which was reported as a negative number if
+  its most significant bit was set
+- Enable the "strict" tsc option
 
 ### 1.2.0
 
