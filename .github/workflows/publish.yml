@@ -6,6 +6,10 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # required for trusted publishing and provenance
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -17,11 +21,18 @@ jobs:
           node-version: 22
           registry-url: https://registry.npmjs.org
           cache: "pnpm"
+      - name: Check that the release tag matches the version
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if [ "$TAG" != "v$VERSION" ] && [ "$TAG" != "$VERSION" ]; then
+            echo "Release tag '$TAG' does not match the package version '$VERSION'"
+            exit 1
+          fi
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Check, test and build
         run: pnpm build
       - name: Publish to npm
-        run: pnpm publish --access public --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: pnpm publish --access public --no-git-checks --provenance
