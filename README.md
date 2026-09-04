@@ -131,30 +131,40 @@ const parser = new WirelessMbusParser({ cachedDataRecordHeaders: [entry] });
 
 ## Changelog
 
-### Unreleased
+### 1.3.0
+
+Breaking changes:
+
+- Require node 22 -- node 20 reached its end of life in April 2026
+- `EvaluatedData.type` now describes the value which is actually returned:
+  scaling a 64 bit value yields a `Number` and is no longer reported as
+  `BigInt` -- in the legacy result such a value changes from string to number
+- Malformed telegrams always throw a `ParserError` -- reading beyond the end
+  of a telegram surfaced as a `RangeError` before, and the manufacturer
+  specific decoders threw plain `Error`s
+
+Fixes:
 
 - Fix Techem and PRIOS telegrams: the first data record was skipped, which
   shifted all decoded values
 - Fix truncation of the current period energy of TCH heat meters
 - CRC auto detection: ignore trailing data instead of failing
-- `ParserError` is exported as a class, so errors can be checked with
-  `instanceof` instead of comparing `name`
-- `EvaluatedData.type` now describes the value which is actually returned:
-  scaling a 64 bit value yields a `Number` and is no longer reported as
-  `BigInt` -- in the legacy result such a value changes from string to number
-- Fix the invalid date warning for type F date/times, which never triggered
-- Fix the error message for unknown data record header cache versions
-- Checking the AFL MAC without the required AFL fields now throws a
-  `ParserError` instead of a `TypeError`
 - Fix the ELL encryption flag, which was reported as a negative number if
   its most significant bit was set
-- Enable the "strict" tsc option
-- Update dependencies: eslint 10, vitest 5 and pnpm 11
-- Require node 22 -- node 20 reached its end of life in April 2026
-- Malformed telegrams always throw a `ParserError` - reading beyond the end of
-  a telegram surfaced as a `RangeError` before
+- Checking the AFL MAC without the required AFL fields now throws a
+  `ParserError` instead of a `TypeError`
+- Fix the invalid date warning for type F date/times, which never triggered
+- Fix the error message for unknown data record header cache versions
+
+Other changes:
+
+- `ParserError` is exported as a class, so errors can be checked with
+  `instanceof` instead of comparing `name`
+- Document error handling and compact frames
 - Ship unminified code with source maps
 - Mark the package as side effect free
+- Enable the "strict" tsc option
+- Update dependencies: eslint 10, vitest 5 and pnpm 11
 
 ### 1.2.0
 
