@@ -227,6 +227,20 @@ describe("Errors", () => {
     expect(compactFrameResult).toMatchSnapshot();
   });
 
+  it("Unknown cache entry version", async () => {
+    const cacheEntry = {
+      cachedDataRecordHeaders: [],
+      crc: 0x1234,
+      version: "v2",
+    } as unknown as DataRecordHeadersCacheEntry;
+
+    expect(
+      () => new WirelessMbusParser({ cachedDataRecordHeaders: [cacheEntry] })
+    ).toThrowErrorMatchingInlineSnapshot(
+      "[UNEXPECTED_STATE: Unknown data record headers cache entry version: v2]"
+    );
+  });
+
   it("Cache only populated if needed", async () => {
     const parser = new WirelessMbusParser();
     await parser.parse(

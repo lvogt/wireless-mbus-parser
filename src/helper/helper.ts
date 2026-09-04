@@ -136,7 +136,8 @@ export function decodeDateTimeTypeF(value: number) {
   //   YYYY MMMM YYYD DDDD zrrh hhhh vrmm mmmm
   // 0b0001 0101 0001 1111 0011 0111 0011 0010 = 2008-05-31 23:50
 
-  const valid = (value & 0x80) >> 8 === 0;
+  // the invalid flag is bit 7 of the minute byte
+  const valid = (value & 0x80) === 0;
   if (!valid) {
     log.debug("Warning: Invalid date encountered!");
   }

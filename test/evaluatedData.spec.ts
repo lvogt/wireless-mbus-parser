@@ -744,3 +744,51 @@ describe("Special DIF values", () => {
     ]);
   });
 });
+
+describe("64 bit values", () => {
+  it("stays a BigInt if the VIF does not scale the value", () => {
+    // DIF 0x07 = INT64, VIF 0x03 = energy in Wh (no scaling)
+    const result = decode("07038877665544332211");
+
+    expect(result).toEqual([
+      {
+        description: "Energy",
+        type: EvaluatedDataType.BigInt,
+        unit: "Wh",
+        value: 1234605616436508552n,
+        info: info("VIF_ENERGY_WATT"),
+      },
+    ]);
+  });
+
+  it("becomes a Number if the VIF scales the value", () => {
+    // DIF 0x07 = INT64, VIF 0x13 = volume in m³ (value / 1000)
+    const result = decode("07138877665544332211");
+
+    expect(result).toEqual([
+      {
+        description: "Volume",
+        type: EvaluatedDataType.Number,
+        unit: "m³",
+        value: 1234605616436508.8,
+        info: info("VIF_VOLUME"),
+      },
+    ]);
+  });
+
+  it("becomes a Number if a VIFE scales the value", () => {
+    // DIF 0x07 = INT64, VIF 0x83 = energy in Wh + extension,
+    // VIFE 0x70 = multiplicator 1e-6
+    const result = decode("0783708877665544332211");
+
+    expect(result).toEqual([
+      {
+        description: "Energy",
+        type: EvaluatedDataType.Number,
+        unit: "Wh",
+        value: 1234605616436.5088,
+        info: info("VIF_ENERGY_WATT"),
+      },
+    ]);
+  });
+});
