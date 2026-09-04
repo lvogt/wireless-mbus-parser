@@ -67,7 +67,7 @@ function dataTypeToLegacyDataType(data: EvaluatedData, dr: DataRecord) {
         return formatDate(data.value as Date, "YYYY-MM-DD hh:mm");
       }
     default:
-      return data.value.toString();
+      return data.value?.toString() ?? "null";
   }
 }
 

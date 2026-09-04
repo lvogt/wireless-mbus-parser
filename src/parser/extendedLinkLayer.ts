@@ -120,98 +120,59 @@ function parseHeader(state: ParserState): {
   const communicationControl = data[pos++];
   const accessNumber = data[pos++];
 
+  // common to all headers
+  const common = { communicationControl, accessNumber };
+
   if (ci == CI_ELL_2) {
     return {
-      state: {
-        ...state,
-        pos: pos,
-      },
-      ell: {
-        ci,
-        communicationControl,
-        accessNumber,
-      },
+      state: { ...state, pos: pos },
+      ell: { ci, ...common },
     };
-  }
-
-  let manufacturer: number;
-  let address: Buffer;
-
-  if (ci === CI_ELL_10 || ci === CI_ELL_16) {
-    manufacturer = data.readUInt16LE(pos);
-    pos += 2;
-    address = data.subarray(pos, pos + 6);
-    pos += 6;
   }
 
   if (ci == CI_ELL_10) {
+    const { newPos, ...address } = parseAddress(data, pos);
     return {
-      state: {
-        ...state,
-        pos: pos,
-      },
-      ell: {
-        ci,
-        communicationControl,
-        accessNumber,
-        manufacturer,
-        address,
-      },
+      state: { ...state, pos: newPos },
+      ell: { ci, ...common, ...address },
     };
-  }
-
-  let sessionNumber: number;
-  let enc: number;
-  let time: number;
-  let session: number;
-
-  if (ci == CI_ELL_8 || ci == CI_ELL_16) {
-    sessionNumber = data.readUInt32LE(pos);
-    pos += 4;
-
-    // unsigned shift - the session number may use the full 32 bits
-    enc = (sessionNumber & 0b11100000000000000000000000000000) >>> 29;
-    time = (sessionNumber & 0b00011111111111111111111111110000) >> 4; //unused
-    session = sessionNumber & 0b00000000000000000000000000001111; //unused
   }
 
   if (ci == CI_ELL_8) {
+    const { newPos, ...session } = parseSession(data, pos);
     return {
-      state: {
-        ...state,
-        pos: pos,
-      },
-      ell: {
-        ci,
-        communicationControl,
-        accessNumber,
-        sessionNumber,
-        session: {
-          enc,
-          time,
-          session,
-        },
-      },
-    };
-  } else {
-    return {
-      state: {
-        ...state,
-        pos: pos,
-      },
-      ell: {
-        ci,
-        communicationControl,
-        accessNumber,
-        manufacturer,
-        address,
-        sessionNumber,
-        session: {
-          enc,
-          time,
-          session,
-        },
-      },
+      state: { ...state, pos: newPos },
+      ell: { ci, ...common, ...session },
     };
   }
+
+  const { newPos: posAfterAddress, ...address } = parseAddress(data, pos);
+  const { newPos, ...session } = parseSession(data, posAfterAddress);
+  return {
+    state: { ...state, pos: newPos },
+    ell: { ci, ...common, ...address, ...session },
+  };
+}
+
+function parseAddress(data: Buffer, pos: number) {
+  return {
+    manufacturer: data.readUInt16LE(pos),
+    address: data.subarray(pos + 2, pos + 8),
+    newPos: pos + 8,
+  };
+}
+
+function parseSession(data: Buffer, pos: number) {
+  const sessionNumber = data.readUInt32LE(pos);
+
+  return {
+    sessionNumber,
+    session: {
+      // unsigned shift - the session number may use the full 32 bits
+      enc: (sessionNumber & 0b11100000000000000000000000000000) >>> 29,
+      time: (sessionNumber & 0b00011111111111111111111111110000) >> 4, //unused
+      session: sessionNumber & 0b00000000000000000000000000001111, //unused
+    },
+    newPos: pos + 4,
+  };
 }

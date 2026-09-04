@@ -328,7 +328,7 @@ export async function decodeApplicationLayer(
     );
   }
 
-  let decryptedData: Buffer;
+  let decryptedData: Buffer | undefined;
 
   if (apl.config.mode !== 0) {
     if (state.key === undefined) {

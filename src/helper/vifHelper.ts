@@ -275,6 +275,10 @@ export function applyNumberEvaluated(
     throw new ParserError("UNEXPECTED_STATE", "Unexpected type");
   }
 
+  if (descriptor.calc === undefined) {
+    throw new ParserError("UNEXPECTED_STATE", "Calculation is missing!");
+  }
+
   // calc may turn a bigint into a number, so update the type as well
   evaluatedData.value = descriptor.calc(evaluatedData.value);
   evaluatedData.type = getNumberType(evaluatedData.value);

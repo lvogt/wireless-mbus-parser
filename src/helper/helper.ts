@@ -100,6 +100,8 @@ export function getDeviceType(type: number) {
   return VALID_DEVICES_TYPES[idx] || "unknown";
 }
 
+const DEVICE_STATES = ["No error", "Busy", "Error", "Alarm"];
+
 export function getDeviceState(statusCode: number) {
   const lowPower = statusCode & 0b00000100;
   const permanentError = statusCode & 0b00001000;
@@ -115,17 +117,7 @@ export function getDeviceState(statusCode: number) {
         manufacturerSpecific.toString(2).padStart(8, "0")
       : "");
 
-  const bit01 = statusCode & 0b00000011;
-  switch (bit01) {
-    case 0x00:
-      return "No error" + suffix;
-    case 0x01:
-      return "Busy" + suffix;
-    case 0x02:
-      return "Error" + suffix;
-    case 0x03:
-      return "Alarm" + suffix;
-  }
+  return DEVICE_STATES[statusCode & 0b00000011] + suffix;
 }
 
 // this assumes the telegram contains a local time and
