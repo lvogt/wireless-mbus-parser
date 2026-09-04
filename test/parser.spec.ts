@@ -227,6 +227,66 @@ describe("Errors", () => {
     expect(compactFrameResult).toMatchSnapshot();
   });
 
+  it("Preload cache entry without a compact frame being lost", async () => {
+    const parser = new WirelessMbusParser();
+    const fullResult = await parser.parse(
+      Buffer.from(
+        "5C442D2C06357260190C8D207B70032F21271D7802F9FF15011104061765000004EEFF07BFA8000004EEFF08D24F00000414B1FB000002FD170000026CE919426CFF184406F76400004414E8FA0000043B0B0000000259DB11025D1C0B",
+        "hex"
+      ),
+      { verbose: true }
+    );
+
+    // the cache of the parser itself is still empty
+    expect(parser.cache).toEqual([]);
+
+    const newParser = new WirelessMbusParser({
+      cachedDataRecordHeaders: [
+        WirelessMbusParser.getDataRecordHeadersCacheEntry(fullResult),
+      ],
+    });
+
+    const compactFrameResult = await newParser.parse(
+      Buffer.from(
+        "3F442D2C06357260190C8D207C71032F21255C79DD829283011117650000BFA80000D24F0000B1FB00000000E919FF18F7640000E8FA00000B000000DB111C0B",
+        "hex"
+      )
+    );
+
+    expect(compactFrameResult.data).toHaveLength(13);
+  });
+
+  it("Cache entries survive a JSON round trip", async () => {
+    const parser = new WirelessMbusParser();
+    const fullResult = await parser.parse(
+      Buffer.from(
+        "5C442D2C06357260190C8D207B70032F21271D7802F9FF15011104061765000004EEFF07BFA8000004EEFF08D24F00000414B1FB000002FD170000026CE919426CFF184406F76400004414E8FA0000043B0B0000000259DB11025D1C0B",
+        "hex"
+      ),
+      { verbose: true }
+    );
+
+    const seededParser = new WirelessMbusParser({
+      cachedDataRecordHeaders: [
+        WirelessMbusParser.getDataRecordHeadersCacheEntry(fullResult),
+      ],
+    });
+
+    const storedCache = JSON.stringify(seededParser.cache);
+    const newParser = new WirelessMbusParser({
+      cachedDataRecordHeaders: JSON.parse(storedCache),
+    });
+
+    const compactFrameResult = await newParser.parse(
+      Buffer.from(
+        "3F442D2C06357260190C8D207C71032F21255C79DD829283011117650000BFA80000D24F0000B1FB00000000E919FF18F7640000E8FA00000B000000DB111C0B",
+        "hex"
+      )
+    );
+
+    expect(compactFrameResult.data).toHaveLength(13);
+  });
+
   it("Unknown cache entry version", async () => {
     const cacheEntry = {
       cachedDataRecordHeaders: [],
