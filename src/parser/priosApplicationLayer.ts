@@ -234,7 +234,7 @@ export function decodePriosApplicationLayer(
   const decryptedData = decrypt(key, data, pos);
 
   const rawDataRecords = createValidDataRecords(decryptedData);
-  const fixedData = Buffer.concat([data.subarray(0, pos), rawDataRecords]);
+  const fixedData = Buffer.concat([data.subarray(0, pos + 1), rawDataRecords]);
 
   const apl: ApplicationLayerDummy = {
     ci: data[pos] as ApplicationLayerDummy["ci"],
