@@ -213,7 +213,7 @@ function createValidDataRecordsHeat(data: Buffer, pos: number) {
   result[i++] = data[pos + 8];
   result[i++] = data[pos + 9];
   result[i++] = data[pos + 10];
-  const currentPeriod = data.readUint16LE(pos + 8);
+  const currentPeriod = data.readUintLE(pos + 8, 3);
 
   // total
   result[i++] = DIF_DATATYPE_INT32;
@@ -257,7 +257,7 @@ export function decodeTechemApplicationLayer(
     pos,
     linkLayer.version
   );
-  const fixedData = Buffer.concat([data.subarray(0, pos), rawDataRecords]);
+  const fixedData = Buffer.concat([data.subarray(0, pos + 1), rawDataRecords]);
   const apl: ApplicationLayerDummy = {
     ci: data[pos] as ApplicationLayerDummy["ci"],
     offset: pos,
