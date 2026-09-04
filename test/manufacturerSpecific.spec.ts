@@ -24,6 +24,11 @@ async function decode(data: string) {
   });
 }
 
+async function decodeWithCrcAutoDetection(data: string) {
+  const parser = new WirelessMbusParser();
+  return await parser.parse(Buffer.from(data, "hex"), { verbose: true });
+}
+
 function info(
   legacyVif: string,
   dib?: { storageNo?: number; deviceUnit?: number; tariff?: number }
@@ -170,6 +175,23 @@ describe("Techem", () => {
         type: EvaluatedDataType.Number,
         info: info("VIF_TEMP_DIFF"),
       },
+    ]);
+  });
+
+  it("HCA version 0x69 with CRC auto detection", async () => {
+    // the telegram has 3 trailing bytes and no CRC
+    const result = await decodeWithCrcAutoDetection(
+      "31446850226677116980A0119F27020480048300C408F709143C003D341A2B0B2A0707000000000000062D114457563D71A1850000"
+    );
+
+    expect(result.data.map((data) => data.value)).toEqual([
+      date("2019-12-31T00:00:00.000Z"),
+      1026,
+      date("2024-02-08T00:00:00.000Z"),
+      131,
+      22.44,
+      25.51,
+      -3.07,
     ]);
   });
 
