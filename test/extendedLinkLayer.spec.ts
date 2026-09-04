@@ -140,6 +140,26 @@ describe("Extended Link Layer", () => {
     );
   });
 
+  it("Encryption flag using the whole 3 bits", () => {
+    // same telegram as below, but with all encryption bits set - the session
+    // number must not be interpreted as a signed value
+    const result = decode(
+      "3F442D2C06357260190C8D207C71032FE1255C79DD829283011117650000BFA80000D24F0000B1FB00000000E919FF18F7640000E8FA00000B000000DB111C0B"
+    );
+
+    expect(result.extendedLinkLayer).toEqual({
+      ci: 0x8d,
+      communicationControl: 32,
+      accessNumber: 124,
+      sessionNumber: 3777954673,
+      session: {
+        enc: 7,
+        time: 1241143,
+        session: 1,
+      },
+    });
+  });
+
   it("ELL Encryption - already decrypted", () => {
     const result = decode(
       "3F442D2C06357260190C8D207C71032F21255C79DD829283011117650000BFA80000D24F0000B1FB00000000E919FF18F7640000E8FA00000B000000DB111C0B"

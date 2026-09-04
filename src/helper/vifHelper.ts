@@ -51,7 +51,9 @@ export function divide(
   if (typeof value === "number") {
     return value / divisor;
   } else if (typeof value === "bigint") {
-    return Number((value * BigInt(divisor)) / BigInt(divisor)) / divisor;
+    // the result is usually not an integer, so it cannot stay a bigint -
+    // values above Number.MAX_SAFE_INTEGER lose precision
+    return Number(value) / divisor;
   } else {
     throw new ParserError("UNEXPECTED_STATE", "Unexpected type!");
   }
@@ -87,6 +89,12 @@ export function applyFunctionFieldType(
     default:
       return data;
   }
+}
+
+function getNumberType(value: DataType | Date) {
+  return typeof value === "bigint"
+    ? EvaluatedDataType.BigInt
+    : EvaluatedDataType.Number;
 }
 
 function getInfo(vif: VIFDescriptor, dataRecord: DataRecord) {
@@ -146,15 +154,13 @@ export function applyNumberDefault(
   vif: VIFDescriptor,
   dataRecord: DataRecord
 ): EvaluatedData {
-  const type =
-    typeof dataRecord.value === "bigint"
-      ? EvaluatedDataType.BigInt
-      : EvaluatedDataType.Number;
+  // calc may turn a bigint into a number, so derive the type from the result
+  const value = vif.calc(dataRecord.value);
   return {
-    value: vif.calc(dataRecord.value),
+    value: value,
     unit: vif.unit,
     description: vif.description,
-    type: type,
+    type: getNumberType(value),
     info: getInfo(vif, dataRecord),
   };
 }
@@ -269,7 +275,9 @@ export function applyNumberEvaluated(
     throw new ParserError("UNEXPECTED_STATE", "Unexpected type");
   }
 
+  // calc may turn a bigint into a number, so update the type as well
   evaluatedData.value = descriptor.calc(evaluatedData.value);
+  evaluatedData.type = getNumberType(evaluatedData.value);
   return evaluatedData;
 }
 

@@ -108,11 +108,35 @@ export async function checkAflMac(
   msgData: Buffer,
   afl: AuthenticationAndFragmentationLayer
 ) {
-  const msgStart = Buffer.alloc(5 + (afl.fcl.mlp ? 2 : 0));
+  if (afl.mac === undefined) {
+    throw new ParserError(
+      "UNEXPECTED_STATE",
+      "Cannot check the AFL MAC without a MAC field!"
+    );
+  }
+
+  if (afl.mclRaw === undefined || afl.mcr === undefined) {
+    throw new ParserError(
+      "UNEXPECTED_STATE",
+      "Cannot check the AFL MAC without MCL and MCR from AFL!"
+    );
+  }
+
+  // the message length is only part of the MAC if it is present
+  const messageLength = afl.fcl.mlp ? afl.ml : undefined;
+
+  if (afl.fcl.mlp && messageLength === undefined) {
+    throw new ParserError(
+      "UNEXPECTED_STATE",
+      "AFL message length is announced but missing!"
+    );
+  }
+
+  const msgStart = Buffer.alloc(messageLength === undefined ? 5 : 7);
   msgStart[0] = afl.mclRaw;
   msgStart.writeUInt32LE(afl.mcr, 1);
-  if (afl.fcl.mlp) {
-    msgStart.writeUInt16LE(afl.ml, 5);
+  if (messageLength !== undefined) {
+    msgStart.writeUInt16LE(messageLength, 5);
   }
 
   const msg = Buffer.concat([msgStart, msgData]);

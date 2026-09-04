@@ -937,7 +937,7 @@ exports[`OMS Examples > DIF 64bit integer with calc 1`] = `
       "tariff": 0,
       "type": "VIF_VOLUME",
       "unit": "m³",
-      "value": "1234605616436508.8",
+      "value": 1234605616436508.8,
     },
   ],
   "deviceInformation": {

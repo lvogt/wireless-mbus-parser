@@ -44,6 +44,8 @@ export type {
 
 export { EvaluatedDataType, VifTable } from "@/types";
 
-export type { ErrorName, ParserError } from "@/helper/error";
+export { ParserError } from "@/helper/error";
+
+export type { ErrorName } from "@/helper/error";
 
 export { guessDeviceId } from "@/helper/helper";

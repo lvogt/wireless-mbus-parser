@@ -169,7 +169,8 @@ function parseHeader(state: ParserState): {
     sessionNumber = data.readUInt32LE(pos);
     pos += 4;
 
-    enc = (sessionNumber & 0b11100000000000000000000000000000) >> 29;
+    // unsigned shift - the session number may use the full 32 bits
+    enc = (sessionNumber & 0b11100000000000000000000000000000) >>> 29;
     time = (sessionNumber & 0b00011111111111111111111111110000) >> 4; //unused
     session = sessionNumber & 0b00000000000000000000000000001111; //unused
   }

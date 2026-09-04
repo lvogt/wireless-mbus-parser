@@ -399,7 +399,7 @@ export function handleCachedDataRecordHeaders(
   if (entry.version !== "v1") {
     throw new ParserError(
       "UNEXPECTED_STATE",
-      "Unknown data record headers cache entry version: ${version}"
+      `Unknown data record headers cache entry version: ${entry.version}`
     );
   }
 
