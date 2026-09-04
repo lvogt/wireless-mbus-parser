@@ -4,6 +4,7 @@ import {
   DIF_DATATYPE_INT32,
   DIF_DATATYPE_VARLEN,
 } from "@/helper/constants";
+import { ParserError } from "@/helper/error";
 import {
   decodeDateTypeTechem,
   decodeNoYearDateType2Techem,
@@ -45,20 +46,31 @@ function checkType(type: number): TCHDeviceType {
       return TCHDeviceType.Smoke;
 
     default:
-      throw new Error(`Unkown Techem device type! 0x${type.toString(16)}`);
+      throw new ParserError(
+        "UNIMPLEMENTED_FEATURE",
+        `Unkown Techem device type! 0x${type.toString(16)}`
+      );
+  }
+}
+
+function checkLength(data: Buffer, pos: number, size: number) {
+  if (data.length < pos + size) {
+    throw new ParserError(
+      "UNEXPECTED_STATE",
+      `Telegram is too short for Techem coding! Expected at least ${pos + size} bytes, but got only ${data.length}`
+    );
   }
 }
 
 function createValidDataRecordsHca(data: Buffer, pos: number, version: number) {
   if (!HCA_VERSIONS.includes(version)) {
-    throw new Error(`Unknown TCH HCA version 0x${version.toString(16)}`);
+    throw new ParserError(
+      "UNIMPLEMENTED_FEATURE",
+      `Unknown TCH HCA version 0x${version.toString(16)}`
+    );
   }
 
-  const neededLength = version == 0x94 ? 15 : version == 0x69 ? 14 : 10;
-
-  if (pos + neededLength > data.length) {
-    throw new Error("Telegram to short for TCH HCA coding!");
-  }
+  checkLength(data, pos, version == 0x94 ? 15 : version == 0x69 ? 14 : 10);
 
   const result = Buffer.alloc(29);
   let i = 0;
@@ -127,6 +139,8 @@ function createValidDataRecordsHca(data: Buffer, pos: number, version: number) {
 }
 
 function createValidDataRecordsWater(data: Buffer, pos: number) {
+  checkLength(data, pos, 10);
+
   const result = Buffer.alloc(21);
   let i = 0;
 
@@ -173,6 +187,8 @@ function createValidDataRecordsWater(data: Buffer, pos: number) {
 }
 
 function createValidDataRecordsHeat(data: Buffer, pos: number) {
+  checkLength(data, pos, 12);
+
   const result = Buffer.alloc(24);
   let i = 0;
 
@@ -237,7 +253,7 @@ function createValidDataRecords(
     case TCHDeviceType.Heat:
       return createValidDataRecordsHeat(data, pos);
     default:
-      throw new Error("Not yet implemented!");
+      throw new ParserError("UNIMPLEMENTED_FEATURE", "Not yet implemented!");
   }
 }
 

@@ -214,6 +214,13 @@ function getConfig(
   config: Config;
   newPos: number;
 } {
+  if (data.length < pos + 2) {
+    throw new ParserError(
+      "UNEXPECTED_STATE",
+      "Telegram ended before the configuration word!"
+    );
+  }
+
   const cw = data.readUInt16LE(pos);
   pos += 2;
 
@@ -282,6 +289,14 @@ export async function decodeApplicationLayer(
   let pos = state.pos;
 
   const offset = pos;
+
+  if (pos >= data.length) {
+    throw new ParserError(
+      "UNEXPECTED_STATE",
+      "Telegram ended before the application layer!"
+    );
+  }
+
   const ci = data[pos++];
 
   if (ci === CI_RESP_SML_4 || ci === CI_RESP_SML_12) {
@@ -379,7 +394,10 @@ export async function decodeApplicationLayer(
       );
     }
 
-    if (decryptedData.readUInt16LE(pos) != 0x2f2f) {
+    if (
+      decryptedData.length < pos + 2 ||
+      decryptedData.readUInt16LE(pos) != 0x2f2f
+    ) {
       throw new ParserError("WRONG_AES_KEY", "Decryption failed, wrong key?");
     }
   }

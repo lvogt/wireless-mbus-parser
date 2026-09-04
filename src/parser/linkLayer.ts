@@ -1,3 +1,5 @@
+import { DATA_LINK_LAYER_SIZE } from "@/helper/constants";
+import { ParserError } from "@/helper/error";
 import {
   decodeManufacturer,
   getDeviceType,
@@ -5,6 +7,17 @@ import {
   isWiredMbusFrame,
 } from "@/helper/helper";
 import type { LinkLayer, ParserState, WiredLinkLayer } from "@/types";
+
+const WIRED_DATA_LINK_LAYER_SIZE = 6;
+
+function checkLength(data: Buffer, pos: number, size: number) {
+  if (data.length < pos + size) {
+    throw new ParserError(
+      "UNEXPECTED_STATE",
+      `Telegram is too short for a link layer! Expected at least ${pos + size} bytes, but got only ${data.length}`
+    );
+  }
+}
 
 export function decodeLinkLayer(state: ParserState): {
   state: ParserState;
@@ -14,7 +27,8 @@ export function decodeLinkLayer(state: ParserState): {
   const isWired = isWiredMbusFrame(data);
 
   if (isWired) {
-    state.pos += 6;
+    checkLength(data, pos, WIRED_DATA_LINK_LAYER_SIZE);
+    state.pos += WIRED_DATA_LINK_LAYER_SIZE;
     const linkLayer: WiredLinkLayer = {
       lField: data[pos + 1],
       cField: data[pos + 4],
@@ -23,7 +37,8 @@ export function decodeLinkLayer(state: ParserState): {
     return { state, linkLayer };
   }
 
-  state.pos += 10;
+  checkLength(data, pos, DATA_LINK_LAYER_SIZE);
+  state.pos += DATA_LINK_LAYER_SIZE;
 
   const linkLayer: LinkLayer = {
     lField: data[pos + 0],

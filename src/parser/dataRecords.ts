@@ -221,6 +221,29 @@ function getDataRecordHeader(
   };
 }
 
+// Byte counts of the data fields which are read as a whole and would throw a
+// RangeError on a truncated telegram. BCD and variable length fields are
+// missing on purpose: they decode as much as the telegram contains, which
+// real telegrams ending in a partial record rely on.
+const FIXED_WIDTH_DATA_FIELDS: Record<number, number> = {
+  [DIF_DATATYPE_INT8]: 1,
+  [DIF_DATATYPE_INT16]: 2,
+  [DIF_DATATYPE_INT24]: 3,
+  [DIF_DATATYPE_INT32]: 4,
+  [DIF_DATATYPE_INT48]: 6,
+  [DIF_DATATYPE_INT64]: 8,
+  [DIF_DATATYPE_FLOAT32]: 4,
+};
+
+function checkLength(data: Buffer, pos: number, size: number) {
+  if (data.length < pos + size) {
+    throw new ParserError(
+      "UNEXPECTED_STATE",
+      `Telegram is too short for the announced data! Expected at least ${pos + size} bytes, but got only ${data.length}`
+    );
+  }
+}
+
 function decodeDataRecordValue(
   data: Buffer,
   pos: number,
@@ -229,6 +252,8 @@ function decodeDataRecordValue(
   value: DataRecord["value"];
   newPos: number;
 } {
+  checkLength(data, pos, FIXED_WIDTH_DATA_FIELDS[header.dib.dataField] ?? 0);
+
   switch (header.dib.dataField) {
     case DIF_DATATYPE_NONE:
       log.debug("DIF_NONE found!");
@@ -277,6 +302,7 @@ function decodeLvarValue(
   value: DataRecord["value"];
   newPos: number;
 } {
+  checkLength(data, pos, 1);
   const lvar = data[pos++];
 
   if (lvar <= 0xbf) {
@@ -299,12 +325,14 @@ function decodeLvarValue(
     // binary number (lvar - E0h) bytes
     const count = lvar - 0xe0;
     if (count <= 6) {
+      checkLength(data, pos, count);
       return { newPos: pos + count, value: data.readIntLE(pos, count) };
     } else {
       const hexString = data.toString("hex", pos, pos + count);
       return { newPos: pos + count, value: hexString };
     }
   } else if (lvar === 0xf8) {
+    checkLength(data, pos, 8);
     return { newPos: pos + 8, value: data.readDoubleLE(pos) };
   } else {
     throw new ParserError(
