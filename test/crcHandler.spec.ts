@@ -36,8 +36,26 @@ describe("CRC unknown", () => {
     checkResult(strippedData, expected);
   });
 
+  it("Frame Type A with CRC and more trailing data than a whole block", () => {
+    const data =
+      "2E44931578563412330333637A2A0020255923C95AAA26D1B2E7493BC2AD013EC4A6F6D3529B520EDFF0EA6DEFC955B29D6D69EBF3EC8A123456789012345678901234";
+    const expected =
+      "2E4493157856341233037A2A0020255923C95AAA26D1B2E7493B013EC4A6F6D3529B520EDFF0EA6DEFC99D6D69EBF3";
+
+    const strippedData = handleCrc(data);
+    checkResult(strippedData, expected);
+  });
+
   it("Frame Type B with CRC", () => {
     const data = "1444AE0C7856341201078C2027780B134365877AC5";
+    const expected = "1444AE0C7856341201078C2027780B13436587";
+
+    const strippedData = handleCrc(data);
+    checkResult(strippedData, expected);
+  });
+
+  it("Frame Type B with CRC and trailing data", () => {
+    const data = "1444AE0C7856341201078C2027780B134365877AC51234";
     const expected = "1444AE0C7856341201078C2027780B13436587";
 
     const strippedData = handleCrc(data);
@@ -62,6 +80,28 @@ describe("CRC unknown", () => {
     checkResult(strippedData, data);
   });
 
+  it("Frame Type A/B without CRC but trailing data", () => {
+    const data =
+      "2C44A7320613996707047A821000202F2F0C06000000000C14000000000C22224101000B5A4102000B5E4000F05E123456";
+    const expected =
+      "2C44A7320613996707047A821000202F2F0C06000000000C14000000000C22224101000B5A4102000B5E4000F0";
+
+    const strippedData = handleCrc(data);
+    checkResult(strippedData, expected);
+  });
+
+  it("Frame without CRC but too short for a type A CRC", () => {
+    // Techem telegram with 3 trailing bytes - a type A frame with CRC would
+    // have to be 58 bytes long, so the data cannot contain a CRC
+    const data =
+      "31446850226677116980A0119F27020480048300C408F709143C003D341A2B0B2A0707000000000000062D114457563D71A1850000";
+    const expected =
+      "31446850226677116980A0119F27020480048300C408F709143C003D341A2B0B2A0707000000000000062D114457563D71A1";
+
+    const strippedData = handleCrc(data);
+    checkResult(strippedData, expected);
+  });
+
   it("Any frame type too short", () => {
     const data =
       "2C44A7320613996707047A821000202F2F0C06000000000C14000000000C22224101000B5A4102000B5E4000";
@@ -72,6 +112,8 @@ describe("CRC unknown", () => {
   });
 
   it("Frame Type A with CRC but too short", () => {
+    // the CRC of the first block matches, so this is a truncated type A frame
+    // with CRC and not a frame without CRC plus trailing data
     const data =
       "2E44931578563412330333637A2A0020255923C95AAA26D1B2E7493BC2AD013EC4A6F6D3529B520EDFF0EA6DEFC955B29D6D69EBF3AA";
 

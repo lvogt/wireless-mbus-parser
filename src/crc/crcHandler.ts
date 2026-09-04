@@ -7,8 +7,17 @@ import {
 import { ParserError } from "@/helper/error";
 import { isWiredMbusFrame } from "@/helper/helper";
 
+// the smallest frame containing a CRC is a single data link layer block
+const MIN_SIZE_WITH_CRC = DATA_LINK_LAYER_SIZE + 2;
+
+function checkFirstBlockCrc(data: Buffer) {
+  return (
+    data.length >= MIN_SIZE_WITH_CRC && checkCrc(data, 0, DATA_LINK_LAYER_SIZE)
+  );
+}
+
 function checkFrameTypeACrc(data: Buffer) {
-  if (!checkCrc(data, 0, DATA_LINK_LAYER_SIZE)) {
+  if (!checkFirstBlockCrc(data)) {
     return false;
   }
 
@@ -28,6 +37,10 @@ function checkFrameTypeACrc(data: Buffer) {
 
 function checkFrameTypeBCrc(data: Buffer) {
   const lengthField = data[0];
+
+  if (data.length < MIN_SIZE_WITH_CRC) {
+    return false;
+  }
 
   if (lengthField >= FRAME_B_BLOCK_SIZE) {
     // message has 3 blocks
@@ -79,7 +92,7 @@ function getSizeOfTypeAWithCrc(data: Buffer) {
   return length + (blockCount + 1) * 2;
 }
 
-function stripAndCheckCrcIfExists(data: Buffer) {
+function checkSize(data: Buffer) {
   const size = data[0] + 1;
 
   if (size > data.length) {
@@ -89,69 +102,74 @@ function stripAndCheckCrcIfExists(data: Buffer) {
     );
   }
 
-  if (size == data.length) {
-    // type A without CRC | type B with or w/o CRC
-    if (checkFrameTypeBCrc(data)) {
-      // type with CRC
-      return stripFrameTypeBCrc(data);
-    } else {
-      // assume without CRC - so A or B do not matter
-      return Buffer.from(data);
-    }
-  } else {
-    // type A with CRC (or trailing data...)
-    if (getSizeOfTypeAWithCrc(data) > data.length) {
-      throw new ParserError(
-        "CRC_ERROR",
-        `Telegram data is too short! Expected at least ${getSizeOfTypeAWithCrc(data)} bytes, but got only ${data.length}`
-      );
-    }
+  return size;
+}
 
-    if (checkFrameTypeACrc(data)) {
-      return stripFrameTypeACrc(data);
-    } else {
-      throw new ParserError("CRC_ERROR", "Frame type A CRC check failed!");
-    }
+function stripAndCheckCrcTypeA(data: Buffer) {
+  const expectedSizeTypeA = getSizeOfTypeAWithCrc(data);
+
+  if (expectedSizeTypeA > data.length) {
+    throw new ParserError(
+      "CRC_ERROR",
+      `Telegram data is too short! Expected at least ${expectedSizeTypeA} bytes, but got only ${data.length}`
+    );
+  }
+
+  // ignore trailing data
+  const sizedData =
+    expectedSizeTypeA < data.length
+      ? data.subarray(0, expectedSizeTypeA)
+      : data;
+
+  if (!checkFrameTypeACrc(sizedData)) {
+    throw new ParserError("CRC_ERROR", "Frame type A CRC check failed!");
+  }
+
+  return stripFrameTypeACrc(sizedData);
+}
+
+// Only data which is longer than the length field can be a type A frame with
+// CRC. It is treated as such if it is either long enough to hold all block
+// CRCs or if at least the CRC of the first block matches - otherwise the
+// additional bytes are considered to be trailing data.
+function isFrameTypeAWithCrc(data: Buffer, size: number) {
+  return (
+    size < data.length &&
+    (getSizeOfTypeAWithCrc(data) <= data.length || checkFirstBlockCrc(data))
+  );
+}
+
+function stripAndCheckCrcIfExists(data: Buffer) {
+  const size = checkSize(data);
+
+  if (isFrameTypeAWithCrc(data, size)) {
+    return stripAndCheckCrcTypeA(data);
+  }
+
+  // type B with CRC | type A or B without CRC - both may have trailing data
+  const trimmedData = trimData(data);
+
+  if (checkFrameTypeBCrc(trimmedData)) {
+    return stripFrameTypeBCrc(trimmedData);
+  } else {
+    // assume without CRC - so A or B do not matter
+    return Buffer.from(trimmedData);
   }
 }
 
 function stripAndCheckCrc(data: Buffer) {
-  const size = data[0] + 1;
-
-  if (size > data.length) {
-    throw new ParserError(
-      "CRC_ERROR",
-      `Telegram data is too short! Expected at least ${size} bytes, but got only ${data.length}`
-    );
-  }
+  const size = checkSize(data);
 
   if (size == data.length) {
-    // type B
+    // type B - the CRC is part of the length field
     if (checkFrameTypeBCrc(data)) {
-      // type with CRC
       return stripFrameTypeBCrc(data);
     } else {
-      // assume without CRC - so A or B do not matter
       throw new ParserError("CRC_ERROR", "Frame type B CRC check failed!");
     }
   } else {
     // type A with CRC (or trailing data...)
-    const expectedSizeTypeA = getSizeOfTypeAWithCrc(data);
-    let sizedData = data;
-    if (expectedSizeTypeA > data.length) {
-      throw new ParserError(
-        "CRC_ERROR",
-        `Telegram data is too short! Expected at least ${getSizeOfTypeAWithCrc(data)} bytes, but got only ${data.length}`
-      );
-    } else if (expectedSizeTypeA < data.length) {
-      sizedData = data.subarray(0, expectedSizeTypeA);
-    }
-
-    if (checkFrameTypeACrc(sizedData)) {
-      return stripFrameTypeACrc(sizedData);
-    } else {
-      throw new ParserError("CRC_ERROR", "Frame type A CRC check failed!");
-    }
+    return stripAndCheckCrcTypeA(data);
   }
 }
 
