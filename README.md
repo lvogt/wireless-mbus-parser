@@ -56,6 +56,74 @@ the CRC check fails and `containsCrc` has to be set explicitly.
 
 The legacy result can only be generated from the "verbose" result.
 
+## Error Handling
+
+Everything which prevents a telegram from being parsed is thrown as a
+`ParserError`. Its `name` is one of:
+
+| Name                        | Meaning                                                |
+| --------------------------- | ------------------------------------------------------ |
+| `CRC_ERROR`                 | CRC check failed or the telegram is too short          |
+| `NO_AES_KEY`                | the telegram is encrypted, but no key was provided     |
+| `WRONG_AES_KEY`             | decryption or the MAC check failed                     |
+| `DECRYPTION_ERROR`          | decryption could not be performed                      |
+| `DATA_RECORD_CACHE_MISSING` | compact frame without the matching data record headers |
+| `UNIMPLEMENTED_FEATURE`     | valid, but unsupported telegram content                |
+| `UNEXPECTED_STATE`          | the telegram does not match the expected structure     |
+
+```typescript
+import { ParserError } from "wireless-mbus-parser";
+
+try {
+  await parser.parse(data, { key });
+} catch (error) {
+  if (error instanceof ParserError && error.name === "NO_AES_KEY") {
+    // ...
+  }
+}
+```
+
+Beware: badly malformed data can still surface other errors - most
+notably a `RangeError` while reading beyond the end of the telegram - if
+the CRC did not reject it beforehand.
+
+## Compact Frames
+
+Compact frames (CI 0x79) contain values without the data record headers
+which describe them. The headers have to be taken from a previously
+received full telegram of the same meter, which the parser keeps in a
+cache. Both frames reference the headers by a CRC over them, so the
+parser knows which cache entry belongs to a compact frame.
+
+The cache is only filled for meters which actually send compact frames:
+if a compact frame cannot be decoded, a `ParserError` with the name
+`DATA_RECORD_CACHE_MISSING` is thrown and the next full telegram of that
+meter populates the cache. Therefore at least one compact frame is lost
+whenever a parser is created without a cache.
+
+To keep the cache across restarts, read it from the parser and pass it
+to the constructor later on:
+
+```typescript
+import { WirelessMbusParser } from "wireless-mbus-parser";
+
+const parser = new WirelessMbusParser({
+  cachedDataRecordHeaders: JSON.parse(storedCache),
+});
+
+// ... parse telegrams ...
+
+storedCache = JSON.stringify(parser.cache);
+```
+
+A single entry can also be created from a "verbose" result, e.g. to fill
+the cache without waiting for a compact frame to be lost:
+
+```typescript
+const entry = WirelessMbusParser.getDataRecordHeadersCacheEntry(fullResult);
+const parser = new WirelessMbusParser({ cachedDataRecordHeaders: [entry] });
+```
+
 ## TODO
 
 - manufacturer specific "blob" handler
@@ -81,6 +149,8 @@ The legacy result can only be generated from the "verbose" result.
 - Fix the ELL encryption flag, which was reported as a negative number if
   its most significant bit was set
 - Enable the "strict" tsc option
+- Ship unminified code with source maps
+- Mark the package as side effect free
 
 ### 1.2.0
 
