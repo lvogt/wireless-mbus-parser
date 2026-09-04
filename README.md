@@ -149,8 +149,8 @@ const parser = new WirelessMbusParser({ cachedDataRecordHeaders: [entry] });
 - Fix the ELL encryption flag, which was reported as a negative number if
   its most significant bit was set
 - Enable the "strict" tsc option
-- Update dependencies: eslint 10, vitest 5 and pnpm 11 - vitest 5 requires
-  node 22, so node 20 is no longer part of the CI matrix
+- Update dependencies: eslint 10, vitest 5 and pnpm 11
+- Require node 22 -- node 20 reached its end of life in April 2026
 - Malformed telegrams always throw a `ParserError` - reading beyond the end of
   a telegram surfaced as a `RangeError` before
 - Ship unminified code with source maps
