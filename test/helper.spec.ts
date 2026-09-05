@@ -119,28 +119,60 @@ describe("decodeDateTypeTechem", () => {
   );
 });
 
-describe("decodeDateTypeTechem", () => {
+describe("decodeNoYearDateTypeTechem", () => {
+  // 0x2d90 is the 25th of June - the year is taken from the last period date,
+  // which is the annual due date the current date has to follow
   it.each([
     {
-      data: 0x2d90,
-      expected: `${new Date().getFullYear()}-06-25T00:00:00.000Z`,
+      lastPeriod: "2018-12-31",
+      expected: "2019-06-25T00:00:00.000Z",
     },
-  ])("Date $expected", ({ data, expected }) => {
-    const result = decodeNoYearDateTypeTechem(data);
+    {
+      lastPeriod: "2019-03-31",
+      expected: "2019-06-25T00:00:00.000Z",
+    },
+    {
+      // the due date is after the 25th of June, so the current date is the
+      // one of the following year
+      lastPeriod: "2019-06-30",
+      expected: "2020-06-25T00:00:00.000Z",
+    },
+    {
+      // the current date must be strictly after the due date
+      lastPeriod: "2019-06-25",
+      expected: "2020-06-25T00:00:00.000Z",
+    },
+  ])("Last period $lastPeriod -> $expected", ({ lastPeriod, expected }) => {
+    const result = decodeNoYearDateTypeTechem(0x2d90, new Date(lastPeriod));
     expect(result.toISOString()).toBe(expected);
+  });
+
+  it.each([
+    { lastPeriod: undefined, description: "without a last period date" },
+    { lastPeriod: new Date(1999, 10, 30), description: "with an invalid one" },
+  ])("Falls back to the current year $description", ({ lastPeriod }) => {
+    const result = decodeNoYearDateTypeTechem(0x2d90, lastPeriod);
+    expect(result.toISOString()).toBe(
+      `${new Date().getFullYear()}-06-25T00:00:00.000Z`
+    );
   });
 });
 
-describe("decodeDateType2Techem", () => {
-  it.each([
-    {
-      dataDay: 0x00,
-      dataMonth: 0x60,
-      expected: `${new Date().getFullYear()}-11-30T00:00:00.000Z`,
-    },
-  ])("Date $expected", ({ dataDay, dataMonth, expected }) => {
-    const result = decodeNoYearDateType2Techem(dataDay, dataMonth);
-    expect(result.toISOString()).toBe(expected);
+describe("decodeNoYearDateType2Techem", () => {
+  it("Uses the year after the last period date", () => {
+    const result = decodeNoYearDateType2Techem(
+      0x00,
+      0x60,
+      new Date("2019-12-31")
+    );
+    expect(result.toISOString()).toBe("2020-11-30T00:00:00.000Z");
+  });
+
+  it("Falls back to the current year without a last period date", () => {
+    const result = decodeNoYearDateType2Techem(0x00, 0x60);
+    expect(result.toISOString()).toBe(
+      `${new Date().getFullYear()}-11-30T00:00:00.000Z`
+    );
   });
 });
 

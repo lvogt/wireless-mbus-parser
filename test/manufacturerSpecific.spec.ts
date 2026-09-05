@@ -1,20 +1,7 @@
-import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { WirelessMbusParser } from "@/parser/parser";
 import { EvaluatedDataType } from "@/types";
-
-// Techem and PRIOS telegrams carry dates without a year, which are completed
-// with the current year while parsing - freeze the clock to keep them stable.
-const NOW = new Date("2024-06-15T12:00:00.000Z");
-
-beforeAll(() => {
-  vi.useFakeTimers({ toFake: ["Date"] });
-  vi.setSystemTime(NOW);
-});
-
-afterAll(() => {
-  vi.useRealTimers();
-});
 
 async function decode(data: string) {
   const parser = new WirelessMbusParser();
@@ -75,7 +62,7 @@ describe("Techem", () => {
         info: info("VIF_HCA", { storageNo: 1 }),
       },
       {
-        value: date("2024-06-25T00:00:00.000Z"),
+        value: date("2019-06-25T00:00:00.000Z"),
         unit: "",
         description: "Time point",
         type: EvaluatedDataType.Date,
@@ -112,6 +99,25 @@ describe("Techem", () => {
     ]);
   });
 
+  it("Current date falls back to the current year without a last period date", async () => {
+    // same telegram as above, but with the last period date zeroed out, so
+    // there is nothing to anchor the year of the current date on
+    const result = await decode(
+      "33446850942905119480a20f00007500902d0000018e0a760a000000000000000000000000000000000000000000000000000000"
+    );
+
+    const currentDate = result.data.find(
+      (data) =>
+        data.info.legacyVif === "VIF_TIME_POINT_DATE" &&
+        data.info.storageNo === 0
+    );
+
+    // day and month are taken from the telegram, the year from the wall clock
+    expect(currentDate?.value).toEqual(
+      new Date(new Date().getFullYear(), 5, 25)
+    );
+  });
+
   it("HCA version 0x69", async () => {
     const result = await decode(
       "31446850226677116980A0119F27020480048300C408F709143C003D341A2B0B2A0707000000000000062D114457563D71A1850000"
@@ -141,7 +147,7 @@ describe("Techem", () => {
         info: info("VIF_HCA", { storageNo: 1 }),
       },
       {
-        value: date("2024-02-08T00:00:00.000Z"),
+        value: date("2020-02-08T00:00:00.000Z"),
         unit: "",
         description: "Time point",
         type: EvaluatedDataType.Date,
@@ -187,7 +193,7 @@ describe("Techem", () => {
     expect(result.data.map((data) => data.value)).toEqual([
       date("2019-12-31T00:00:00.000Z"),
       1026,
-      date("2024-02-08T00:00:00.000Z"),
+      date("2020-02-08T00:00:00.000Z"),
       131,
       22.44,
       25.51,
@@ -224,7 +230,7 @@ describe("Techem", () => {
         info: info("VIF_VOLUME", { storageNo: 1 }),
       },
       {
-        value: date("2024-04-27T00:00:00.000Z"),
+        value: date("2019-04-27T00:00:00.000Z"),
         unit: "",
         description: "Time point",
         type: EvaluatedDataType.Date,
@@ -289,7 +295,7 @@ describe("Techem", () => {
         info: info("VIF_VOLUME", { storageNo: 1 }),
       },
       {
-        value: date("2024-06-25T00:00:00.000Z"),
+        value: date("2019-06-25T00:00:00.000Z"),
         unit: "",
         description: "Time point",
         type: EvaluatedDataType.Date,
@@ -341,7 +347,7 @@ describe("Techem", () => {
         info: info("VIF_ENERGY_WATT", { storageNo: 1 }),
       },
       {
-        value: date("2024-11-30T00:00:00.000Z"),
+        value: date("2020-11-30T00:00:00.000Z"),
         unit: "",
         description: "Time point",
         type: EvaluatedDataType.Date,

@@ -76,9 +76,8 @@ function createValidDataRecordsHca(data: Buffer, pos: number, version: number) {
   let i = 0;
 
   //last period date
-  const lastDate = encodeDateTypeG(
-    decodeDateTypeTechem(data.readUInt16LE(pos + 2))
-  );
+  const lastPeriodDate = decodeDateTypeTechem(data.readUInt16LE(pos + 2));
+  const lastDate = encodeDateTypeG(lastPeriodDate);
 
   result[i++] = DIF_DATATYPE_INT16 | 0x40; // storageNo = 1
   result[i++] = 0x6c;
@@ -93,7 +92,7 @@ function createValidDataRecordsHca(data: Buffer, pos: number, version: number) {
 
   //current date
   const currentDate = encodeDateTypeG(
-    decodeNoYearDateTypeTechem(data.readUInt16LE(pos + 6))
+    decodeNoYearDateTypeTechem(data.readUInt16LE(pos + 6), lastPeriodDate)
   );
 
   result[i++] = DIF_DATATYPE_INT16;
@@ -144,9 +143,8 @@ function createValidDataRecordsWater(data: Buffer, pos: number) {
   let i = 0;
 
   //last period date
-  const lastDate = encodeDateTypeG(
-    decodeDateTypeTechem(data.readUInt16LE(pos + 2))
-  );
+  const lastPeriodDate = decodeDateTypeTechem(data.readUInt16LE(pos + 2));
+  const lastDate = encodeDateTypeG(lastPeriodDate);
 
   result[i++] = DIF_DATATYPE_INT16 | 0x40; // storageNo = 1
   result[i++] = 0x6c;
@@ -162,7 +160,7 @@ function createValidDataRecordsWater(data: Buffer, pos: number) {
 
   //current date
   const currentDate = encodeDateTypeG(
-    decodeNoYearDateTypeTechem(data.readUInt16LE(pos + 6))
+    decodeNoYearDateTypeTechem(data.readUInt16LE(pos + 6), lastPeriodDate)
   );
 
   result[i++] = DIF_DATATYPE_INT16;
@@ -192,9 +190,8 @@ function createValidDataRecordsHeat(data: Buffer, pos: number) {
   let i = 0;
 
   //last period date
-  const lastDate = encodeDateTypeG(
-    decodeDateTypeTechem(data.readUInt16LE(pos + 2))
-  );
+  const lastPeriodDate = decodeDateTypeTechem(data.readUInt16LE(pos + 2));
+  const lastDate = encodeDateTypeG(lastPeriodDate);
 
   result[i++] = DIF_DATATYPE_INT16 | 0x40; // storageNo = 1
   result[i++] = 0x6c;
@@ -213,7 +210,8 @@ function createValidDataRecordsHeat(data: Buffer, pos: number) {
   const currentDate = encodeDateTypeG(
     decodeNoYearDateType2Techem(
       data.readUInt8(pos + 11),
-      data.readInt8(pos + 7)
+      data.readInt8(pos + 7),
+      lastPeriodDate
     )
   );
 

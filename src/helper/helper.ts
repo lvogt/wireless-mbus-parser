@@ -183,25 +183,49 @@ export function decodeDateTypeTechem(value: number) {
   return new Date(year + 2000, month - 1, day);
 }
 
-export function decodeNoYearDateTypeTechem(value: number) {
+// Techem telegrams contain the current date without a year, but also the date
+// of the last period, which is the annual due date. The current date is the
+// first occurrence of its day and month after that due date. Without a usable
+// due date the current year remains the best guess.
+function getYearAfterLastPeriod(day: number, month: number, lastPeriod?: Date) {
+  if (lastPeriod === undefined || lastPeriod.getFullYear() < 2000) {
+    return new Date().getFullYear();
+  }
+
+  const lastMonth = lastPeriod.getMonth() + 1;
+  const lastDay = lastPeriod.getDate();
+  const isAfterLastPeriod =
+    month > lastMonth || (month === lastMonth && day > lastDay);
+
+  return lastPeriod.getFullYear() + (isAfterLastPeriod ? 0 : 1);
+}
+
+export function decodeNoYearDateTypeTechem(value: number, lastPeriod?: Date) {
   // value is a 16bit int
   //   rrrM MMMD DDDD rrrr
   // 0b0000 1100 1111 0000 = 15.06.
 
   const day = (value & 0x1f0) >> 4;
   const month = (value & 0x1e00) >> 9;
-  const year = new Date().getFullYear();
-  return new Date(year, month - 1, day);
+  return new Date(
+    getYearAfterLastPeriod(day, month, lastPeriod),
+    month - 1,
+    day
+  );
 }
 
 export function decodeNoYearDateType2Techem(
   valueDay: number,
-  valueMonth: number
+  valueMonth: number,
+  lastPeriod?: Date
 ) {
   const day = (valueDay & 0xf80) >> 7;
   const month = (valueMonth & 0x78) >> 3;
-  const year = new Date().getFullYear();
-  return new Date(year, month - 1, day);
+  return new Date(
+    getYearAfterLastPeriod(day, month, lastPeriod),
+    month - 1,
+    day
+  );
 }
 
 export function encodeDateTypeG(date: Date) {

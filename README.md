@@ -131,6 +131,13 @@ const parser = new WirelessMbusParser({ cachedDataRecordHeaders: [entry] });
 
 ## Changelog
 
+### Unreleased
+
+- Techem: the year of the current date is taken from the last period date of
+  the same telegram instead of the wall clock, so a telegram no longer decodes
+  differently depending on when it is parsed. Only a telegram without a usable
+  last period date still falls back to the current year.
+
 ### 1.3.0
 
 Breaking changes:
