@@ -23,12 +23,17 @@ import {
 import { ParserError } from "@/helper/error";
 import { decodeBCD } from "@/helper/helper";
 import { log } from "@/helper/logger";
+import {
+  getBlobData,
+  isManufacturerSpecific,
+} from "@/parser/manufacturerSpecificData";
 import type {
   CachedDataRecordHeaders,
   DataInformationBlock,
   DataRecord,
   DataRecordHeader,
   DataRecordHeadersCacheEntry,
+  ManufacturerSpecificBlob,
   ParserState,
   PrimaryVif,
   ValueInformationBlock,
@@ -366,19 +371,31 @@ function decodeDataRecord(
 
 function decodeDataRecordsFromCache(
   state: ParserState,
-  cachedHeaders: DataRecordHeader[]
+  cachedHeaders: DataRecordHeader[],
+  collectBlobs: boolean
 ): {
   state: ParserState;
   dataRecords: DataRecord[];
+  blobs: ManufacturerSpecificBlob[];
 } {
   const dataRecords: DataRecord[] = [];
+  const blobs: ManufacturerSpecificBlob[] = [];
 
   let pos = state.pos;
   const data = state.data;
   for (const header of cachedHeaders) {
     const { newPos, value } = decodeDataRecordValue(data, pos, header);
+    const dataRecord = { header, value };
+
+    if (collectBlobs && isManufacturerSpecific(dataRecord)) {
+      blobs.push({
+        dataRecord,
+        data: getBlobData(data, dataRecord, pos, newPos),
+      });
+    }
+
     pos = newPos;
-    dataRecords.push({ header, value });
+    dataRecords.push(dataRecord);
   }
 
   return {
@@ -387,6 +404,7 @@ function decodeDataRecordsFromCache(
       data: data,
     },
     dataRecords: dataRecords,
+    blobs: blobs,
   };
 }
 
@@ -443,19 +461,22 @@ export function handleCachedDataRecordHeaders(
 
 export function decodeDataRecords(
   state: ParserState,
-  cachedHeaders?: DataRecordHeader[]
+  cachedHeaders?: DataRecordHeader[],
+  collectBlobs = false
 ): {
   state: ParserState;
   dataRecords: DataRecord[];
+  blobs: ManufacturerSpecificBlob[];
 } {
   if (cachedHeaders !== undefined) {
-    return decodeDataRecordsFromCache(state, cachedHeaders);
+    return decodeDataRecordsFromCache(state, cachedHeaders, collectBlobs);
   }
 
   const data = state.data;
   let pos = state.pos;
 
   const dataRecords: DataRecord[] = [];
+  const blobs: ManufacturerSpecificBlob[] = [];
 
   outerLoop: while (pos < data.length) {
     while (data[pos] === DIF_FILL_BYTE) {
@@ -469,6 +490,19 @@ export function decodeDataRecords(
     if (dr === null) {
       break outerLoop;
     }
+
+    if (collectBlobs && isManufacturerSpecific(dr)) {
+      blobs.push({
+        dataRecord: dr,
+        data: getBlobData(
+          data,
+          dr,
+          dr.header.offset + dr.header.length,
+          newPos
+        ),
+      });
+    }
+
     pos = newPos;
     dataRecords.push(dr);
   }
@@ -479,6 +513,7 @@ export function decodeDataRecords(
       data: data,
     },
     dataRecords: dataRecords,
+    blobs: blobs,
   };
 }
 

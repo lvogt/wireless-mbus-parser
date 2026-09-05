@@ -124,6 +124,56 @@ const entry = WirelessMbusParser.getDataRecordHeadersCacheEntry(fullResult);
 const parser = new WirelessMbusParser({ cachedDataRecordHeaders: [entry] });
 ```
 
+## Manufacturer Specific Data
+
+Meters put data the standard does not describe into manufacturer specific data
+records, often several values packed into a few bytes. Such a record is always
+kept as it is - and its content is decoded additionally, if a handler for the
+manufacturer exists.
+
+A handler is called with the raw bytes of the record and returns one entry per
+value it extracts. Writing one needs no knowledge about telegram structures:
+
+```typescript
+function decodeAcmeData(data: Buffer): ManufacturerSpecificValue[] {
+  return [
+    { description: "Backflow detected", value: data[0] & 0b1 },
+    { description: "Battery", value: data[1], unit: "%" },
+  ];
+}
+```
+
+Only `description` and `value` are required. `unit`, `legacyName`, `storageNo`
+and `tariff` are optional: storage number and tariff are taken from the record
+the data came from, as is its function field, so a value of a "maximum value"
+record is described as one as well.
+
+Handlers are registered per manufacturer in
+`src/manufacturerSpecificData/handler.ts`:
+
+```typescript
+export const manufacturerSpecificHandlers = {
+  ACM: decodeAcmeData,
+};
+```
+
+There is one handler per manufacturer and not one per device, because
+manufacturers do not agree on how their devices are told apart: the version
+field is the device version for Techem, but part of the identification number
+for Itron. A handler decides for itself which meters it can decode, everything
+it does not recognize yields no values:
+
+```typescript
+function decodeAcmeData(data: Buffer, meterData: MeterData) {
+  return meterData.type === 0x1b ? decodeWaterMeter(data) : [];
+}
+```
+
+The decoded values are appended to the data of the result, after the records of
+the telegram itself, so adding a handler does not move them. The data records
+are not touched at all - they describe the telegram. A handler which throws
+only costs its own values.
+
 ## TODO
 
 - manufacturer specific "blob" handler
