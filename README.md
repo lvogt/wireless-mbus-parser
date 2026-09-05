@@ -133,6 +133,11 @@ const parser = new WirelessMbusParser({ cachedDataRecordHeaders: [entry] });
 
 ### Unreleased
 
+- VIFs which only differ in their power of ten are generated from a range
+  instead of being written out, and all VIF tables are covered by a snapshot
+  listing every entry. The three range entries which scaled by `multiply(x, 1)`
+  now use the identity like the rest, so they no longer throw for values which
+  are not numbers.
 - Techem heat meters: fix the day of the current date, which is a 16 bit field
   and was read as a single byte -- the day could only ever be 0 or 1, and a 0
   silently turned into the last day of the previous month

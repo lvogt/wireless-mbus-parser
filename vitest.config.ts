@@ -1,5 +1,5 @@
 import tsconfigPaths from "vite-tsconfig-paths";
-import { defineConfig } from "vitest/config";
+import { coverageConfigDefaults, defineConfig } from "vitest/config";
 
 export default defineConfig({
   plugins: [tsconfigPaths()],
@@ -9,6 +9,17 @@ export default defineConfig({
     coverage: {
       provider: "istanbul",
       reporter: ["text", "html"],
+      exclude: [
+        ...coverageConfigDefaults.exclude,
+        // The VIF tables are data, not logic: covering them only measures
+        // whether a descriptor was instantiated, not whether it is correct.
+        // They are pinned by a snapshot of every entry instead.
+        "src/vif/defaultVifs.ts",
+        "src/vif/fbVifs.ts",
+        "src/vif/fdVifs.ts",
+        "src/vif/manufacturerSpecificVifs.ts",
+        "src/vif/vifExtension.ts",
+      ],
     },
   },
 });
