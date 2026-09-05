@@ -9,6 +9,9 @@ import {
 import type { VIFDescriptor } from "@/types";
 import { decadeRange } from "@/vif/vifRange";
 
+// Cross checked against libmbus and FHEM on 2026-09-05: the 40 respectively 65
+// comparable entries agreed on unit and scaling exponent. The remaining
+// entries have no counterpart in either implementation.
 export const fdVifs: VIFDescriptor[] = [
   ...decadeRange(0x00, 4, -3, "VIF_CREDIT", "€", "Credit"),
   ...decadeRange(0x04, 4, -3, "VIF_DEBIT", "€", "Debit"),

@@ -2,6 +2,9 @@ import { applyNumberDefault, divide } from "@/helper/vifHelper";
 import type { VIFDescriptor } from "@/types";
 import { decadeRange } from "@/vif/vifRange";
 
+// Cross checked against libmbus on 2026-09-05: all 46 comparable entries
+// agreed on unit and scaling exponent. FHEM only implements a single entry of
+// this table, so it is no reference for it.
 export const fbVifs: VIFDescriptor[] = [
   ...decadeRange(0x00, 2, -1, "VIF_ENERGY_MWH", "MWh", "Energy"),
   ...decadeRange(0x08, 2, -1, "VIF_ENERGY_GJ", "GJ", "Energy"),
