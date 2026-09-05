@@ -159,19 +159,20 @@ describe("decodeNoYearDateTypeTechem", () => {
 });
 
 describe("decodeNoYearDateType2Techem", () => {
+  // 0x0a00 holds the day in bits 7 to 11, 0x60 the month in bits 3 to 6
   it("Uses the year after the last period date", () => {
     const result = decodeNoYearDateType2Techem(
-      0x00,
+      0x0a00,
       0x60,
       new Date("2019-12-31")
     );
-    expect(result.toISOString()).toBe("2020-11-30T00:00:00.000Z");
+    expect(result.toISOString()).toBe("2020-12-20T00:00:00.000Z");
   });
 
   it("Falls back to the current year without a last period date", () => {
-    const result = decodeNoYearDateType2Techem(0x00, 0x60);
+    const result = decodeNoYearDateType2Techem(0x0a00, 0x60);
     expect(result.toISOString()).toBe(
-      `${new Date().getFullYear()}-11-30T00:00:00.000Z`
+      `${new Date().getFullYear()}-12-20T00:00:00.000Z`
     );
   });
 });
