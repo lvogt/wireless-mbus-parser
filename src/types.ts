@@ -342,3 +342,32 @@ export interface LegacyResult {
     functionField: number;
   }[];
 }
+
+// One value extracted from a manufacturer specific blob. Only the description
+// is required - everything else is optional and describes the value further.
+export interface ManufacturerSpecificValue {
+  description: string;
+  value: DataType | Date;
+  unit?: string;
+  legacyName?: string;
+  storageNo?: number;
+  tariff?: number;
+}
+
+// The raw content of a manufacturer specific data record, collected while the
+// records are decoded - that is the only place where the bytes are known for
+// a compact frame as well.
+export interface ManufacturerSpecificBlob {
+  dataRecord: DataRecord;
+  data: Buffer;
+}
+
+// Decodes the content of a manufacturer specific data record. It is called
+// with the raw bytes of the blob, no knowledge about telegram structures is
+// needed to write one. The record itself is passed as well, for the rare case
+// that a manufacturer uses several kinds of blob in one telegram.
+export type ManufacturerSpecificDataRecordHandler = (
+  data: Buffer,
+  meterData: MeterData,
+  dataRecord: DataRecord
+) => ManufacturerSpecificValue[];

@@ -1,6 +1,7 @@
 import { stripAnyCrc } from "@/crc/crcHandler";
 import { ParserError, toParserError } from "@/helper/error";
 import { getMeterData, isCompactFrame } from "@/helper/helper";
+import { getHandler } from "@/manufacturerSpecificData/handler";
 import { decodeApplicationLayer } from "@/parser/applicationLayer";
 import { decodeAuthenticationAndFragmentationLayer } from "@/parser/authenticationFragmentationLayer";
 import {
@@ -14,6 +15,7 @@ import { evaluateDataRecords } from "@/parser/evaluatedData";
 import { decodeExtendedLinkLayer } from "@/parser/extendedLinkLayer";
 import { createLegacyResult } from "@/parser/legacy";
 import { decodeLinkLayer } from "@/parser/linkLayer";
+import { evaluateManufacturerSpecificData } from "@/parser/manufacturerSpecificData";
 import type {
   ApplicationLayer,
   DataRecordHeader,
@@ -132,12 +134,24 @@ export class WirelessMbusParser {
     );
     const meterData = getMeterData(linkLayer, applicationLayer);
 
-    const { dataRecords, headerCrc } = this.handleDataRecordDecoding(
+    // the content of manufacturer specific records is only collected if there
+    // is something which can decode it
+    const handler = getHandler(meterData);
+
+    const { dataRecords, headerCrc, blobs } = this.handleDataRecordDecoding(
       aplState,
-      applicationLayer
+      applicationLayer,
+      handler !== null
     );
 
-    const evaluatedData = evaluateDataRecords(dataRecords, meterData);
+    // the decoded values are appended, so that the records of the telegram
+    // keep their position
+    const evaluatedData = [
+      ...evaluateDataRecords(dataRecords, meterData),
+      ...(handler === null
+        ? []
+        : evaluateManufacturerSpecificData(blobs, handler, meterData)),
+    ];
 
     return {
       data: evaluatedData,
@@ -165,7 +179,8 @@ export class WirelessMbusParser {
 
   private handleDataRecordDecoding(
     state: ParserState,
-    applicationLayer: ApplicationLayer
+    applicationLayer: ApplicationLayer,
+    collectBlobs: boolean
   ) {
     if (isCompactFrame(applicationLayer)) {
       const dataRecordHeaders =
@@ -177,10 +192,18 @@ export class WirelessMbusParser {
           "Compact frame received but data record cache is missing"
         );
       }
-      const { dataRecords } = decodeDataRecords(state, dataRecordHeaders);
-      return { dataRecords, headerCrc: applicationLayer.headerCrc };
+      const { dataRecords, blobs } = decodeDataRecords(
+        state,
+        dataRecordHeaders,
+        collectBlobs
+      );
+      return { dataRecords, headerCrc: applicationLayer.headerCrc, blobs };
     } else {
-      const { dataRecords } = decodeDataRecords(state);
+      const { dataRecords, blobs } = decodeDataRecords(
+        state,
+        undefined,
+        collectBlobs
+      );
 
       const headerCrc = calcHeaderCrc(dataRecords, state.data);
       if (this.dataRecordHeaderCache[headerCrc] === null) {
@@ -188,7 +211,7 @@ export class WirelessMbusParser {
           extractDataRecordHeaders(dataRecords);
       }
 
-      return { dataRecords, headerCrc };
+      return { dataRecords, headerCrc, blobs };
     }
   }
 }

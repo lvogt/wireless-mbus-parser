@@ -48,7 +48,7 @@ function formatDate(date: Date, format: string) {
   );
 }
 
-function dataTypeToLegacyDataType(data: EvaluatedData, dr: DataRecord) {
+function dataTypeToLegacyDataType(data: EvaluatedData, dr?: DataRecord) {
   switch (data.type) {
     case EvaluatedDataType.Null:
       return "null";
@@ -61,7 +61,7 @@ function dataTypeToLegacyDataType(data: EvaluatedData, dr: DataRecord) {
     case EvaluatedDataType.Date:
       return formatDate(data.value as Date, "YYYY-MM-DD");
     case EvaluatedDataType.DateTime:
-      if (dr.header.dib.dataField === DIF_DATATYPE_INT48) {
+      if (dr?.header.dib.dataField === DIF_DATATYPE_INT48) {
         return formatDate(data.value as Date, "YYYY-MM-DD hh:mm:ss");
       } else {
         return formatDate(data.value as Date, "YYYY-MM-DD hh:mm");
@@ -74,12 +74,14 @@ function dataTypeToLegacyDataType(data: EvaluatedData, dr: DataRecord) {
 function createLegacyDataRecord(
   num: number,
   data: EvaluatedData,
-  dr: DataRecord
+  dr?: DataRecord
 ): ArrayElement<LegacyResult["dataRecord"]> {
   const val = dataTypeToLegacyDataType(data, dr);
 
-  const functionFieldTypeKey = dr.header.dib
-    .functionField as keyof typeof functionFieldTypes;
+  // values decoded from a manufacturer specific blob have no data record of
+  // their own, they are instantaneous values
+  const functionField = dr?.header.dib.functionField ?? 0;
+  const functionFieldTypeKey = functionField as keyof typeof functionFieldTypes;
 
   return {
     number: num,
@@ -92,7 +94,7 @@ function createLegacyDataRecord(
     devUnit: data.info.deviceUnit,
     functionFieldText:
       functionFieldTypes[functionFieldTypeKey] ?? "Unknown function field type",
-    functionField: dr.header.dib.functionField,
+    functionField: functionField,
   };
 }
 
