@@ -347,7 +347,7 @@ describe("Techem", () => {
         info: info("VIF_ENERGY_WATT", { storageNo: 1 }),
       },
       {
-        value: date("2020-11-30T00:00:00.000Z"),
+        value: date("2020-12-20T00:00:00.000Z"),
         unit: "",
         description: "Time point",
         type: EvaluatedDataType.Date,

@@ -184,7 +184,7 @@ function createValidDataRecordsWater(data: Buffer, pos: number) {
 }
 
 function createValidDataRecordsHeat(data: Buffer, pos: number) {
-  checkLength(data, pos, 12);
+  checkLength(data, pos, 13);
 
   const result = Buffer.alloc(24);
   let i = 0;
@@ -206,10 +206,11 @@ function createValidDataRecordsHeat(data: Buffer, pos: number) {
   result[i++] = data[pos + 6];
   const lastPeriod = data.readUintLE(pos + 4, 3);
 
-  //current date
+  //current date - the day is a 16 bit field of its own, it does not fit into
+  //a single byte since it occupies the bits 7 to 11
   const currentDate = encodeDateTypeG(
     decodeNoYearDateType2Techem(
-      data.readUInt8(pos + 11),
+      data.readUInt16LE(pos + 11),
       data.readInt8(pos + 7),
       lastPeriodDate
     )
