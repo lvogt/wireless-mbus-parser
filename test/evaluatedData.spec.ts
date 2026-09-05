@@ -792,3 +792,35 @@ describe("64 bit values", () => {
     ]);
   });
 });
+
+describe("VIFE descriptors", () => {
+  // every VIFE of the shipped tables modifies the given object, but the
+  // descriptor may just as well return a new one - the result must be used
+  it("A VIFE returning a new object is applied", () => {
+    manufacturerSpecificsVifes["TST"] = [
+      {
+        vif: 0x01,
+        legacyName: "VIF_TEST",
+        description: "Test",
+        apply: (_descriptor, _dataRecord, evaluatedData) => ({
+          ...evaluatedData,
+          unit: "replaced",
+        }),
+      },
+    ];
+
+    try {
+      // INT8, volume with extension bit, VIFE 0x7f (manufacturer specific
+      // follows) and the manufacturer specific VIFE 0x01
+      const result = decode("0193ff012a", {
+        ...dummyMeter,
+        manufacturer: "TST",
+      });
+
+      expect(result).toHaveLength(1);
+      expect(result[0].unit).toEqual("replaced");
+    } finally {
+      delete manufacturerSpecificsVifes["TST"];
+    }
+  });
+});

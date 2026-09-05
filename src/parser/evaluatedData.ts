@@ -184,7 +184,7 @@ function evaluateDataRecord(
   dataRecord: DataRecord,
   meterType: MeterData
 ): EvaluatedData {
-  const evaluatedData = evaluatePrimaryVif(dataRecord, meterType);
+  let evaluatedData = evaluatePrimaryVif(dataRecord, meterType);
   const manufacturerSpecificPrimaryVif =
     dataRecord.header.vib.primary.table === VifTable.Manufacturer;
 
@@ -198,13 +198,16 @@ function evaluateDataRecord(
     const manufacturerSpecificTable =
       manufacturerSpecificPrimaryVif || lastExtManufacturerSpecific;
 
-    evaluateVifExtension(
-      evaluatedData,
-      dataRecord,
-      meterType,
-      ext,
-      manufacturerSpecificTable
-    );
+    // a descriptor may return a new object instead of modifying the given one,
+    // it only keeps the previous result if applying the VIFE failed
+    evaluatedData =
+      evaluateVifExtension(
+        evaluatedData,
+        dataRecord,
+        meterType,
+        ext,
+        manufacturerSpecificTable
+      ) ?? evaluatedData;
   }
 
   return evaluatedData;
