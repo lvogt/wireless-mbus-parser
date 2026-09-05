@@ -131,20 +131,25 @@ const parser = new WirelessMbusParser({ cachedDataRecordHeaders: [entry] });
 
 ## Changelog
 
-### Unreleased
+### 1.3.1
 
+Both Techem fixes change the dates a telegram decodes to.
+
+- Techem: the year of the current date is taken from the last period date of
+  the same telegram instead of the wall clock, so a telegram no longer decodes
+  differently depending on when it is parsed. Only a telegram without a usable
+  last period date still falls back to the current year.
+- Techem heat meters: fix the day of the current date, which is a 16 bit field
+  and was read as a single byte -- the day could only ever be 0 or 1, and a 0
+  silently turned into the last day of the previous month
+- Use the object returned by applying a VIFE: every descriptor of the shipped
+  tables modifies the evaluated data in place, so one which returns a new
+  object instead was silently doing nothing
 - VIFs which only differ in their power of ten are generated from a range
   instead of being written out, and all VIF tables are covered by a snapshot
   listing every entry. The three range entries which scaled by `multiply(x, 1)`
   now use the identity like the rest, so they no longer throw for values which
   are not numbers.
-- Techem heat meters: fix the day of the current date, which is a 16 bit field
-  and was read as a single byte -- the day could only ever be 0 or 1, and a 0
-  silently turned into the last day of the previous month
-- Techem: the year of the current date is taken from the last period date of
-  the same telegram instead of the wall clock, so a telegram no longer decodes
-  differently depending on when it is parsed. Only a telegram without a usable
-  last period date still falls back to the current year.
 
 ### 1.3.0
 
