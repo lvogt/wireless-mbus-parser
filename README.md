@@ -181,7 +181,7 @@ only costs its own values.
 
 ## Changelog
 
-### Unreleased
+### 1.4.0
 
 - Decode manufacturer specific data records: a handler per manufacturer turns
   the raw bytes of such a record into named values, which are appended to the
