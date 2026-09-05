@@ -1,3 +1,4 @@
+import { decodeItronData } from "@/manufacturerSpecificData/itron";
 import type { ManufacturerSpecificDataRecordHandler, MeterData } from "@/types";
 
 /**
@@ -24,7 +25,9 @@ import type { ManufacturerSpecificDataRecordHandler, MeterData } from "@/types";
 export const manufacturerSpecificHandlers: Record<
   string,
   ManufacturerSpecificDataRecordHandler
-> = {};
+> = {
+  ITW: decodeItronData,
+};
 
 export function getHandler(
   meterData: MeterData

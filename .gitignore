@@ -32,3 +32,6 @@ yarn.lock
 # self
 dist
 coverage
+
+# local files, e.g. specifications
+local
