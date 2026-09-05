@@ -198,3 +198,151 @@ describe("Manufacturer specific data", () => {
     expect(result.data[0].value).toEqual("0102030405060708090a");
   });
 });
+
+describe("Itron", () => {
+  // ITW, device type 0x1a (smoke detector), a volume record and the 64 bit
+  // manufacturer specific record with the configuration and error codes
+  const SMOKE_DETECTOR =
+    "1e44972678563412071a" +
+    "7a2a000000" +
+    "0413e8030000" +
+    "077f" +
+    "80418002783e061f";
+
+  // captured from a device, decrypted and with the encryption flag of the
+  // configuration word cleared, so that no key is needed here. The
+  // identification number is replaced as well.
+  const REAL_SMOKE_DETECTOR =
+    "4e44972678563412001a7a21130000" +
+    "2f2f066d1220ee483200" +
+    "077f80802002533e170c" +
+    "0f0000010100000101000001012927283418311b39000001010000010100000000" +
+    "14310f370d00460100002f";
+
+  async function decodeRealSmokeDetector() {
+    const parser = new WirelessMbusParser();
+    return await parser.parse(Buffer.from(REAL_SMOKE_DETECTOR, "hex"), {
+      verbose: true,
+      containsCrc: false,
+    });
+  }
+
+  async function decodeSmokeDetector() {
+    const parser = new WirelessMbusParser();
+    return await parser.parse(Buffer.from(SMOKE_DETECTOR, "hex"), {
+      verbose: true,
+      containsCrc: false,
+    });
+  }
+
+  function valueOf(
+    data: Awaited<ReturnType<typeof decodeSmokeDetector>>["data"],
+    description: string
+  ) {
+    return data.find((entry) => entry.description === description)?.value;
+  }
+
+  it("Decodes the configuration and error codes", async () => {
+    const result = await decodeSmokeDetector();
+
+    expect(result.meter).toMatchObject({
+      manufacturer: "ITW",
+      type: 0x1a,
+    });
+
+    // the two records of the telegram plus one entry per named bit
+    expect(result.dataRecords).toHaveLength(2);
+    expect(result.data).toHaveLength(28);
+
+    const { data } = result;
+    // config byte 0x80
+    expect(valueOf(data, "Transmitted data encrypted")).toEqual(1);
+    // modem error byte 0x41
+    expect(valueOf(data, "Code corrupt")).toEqual(1);
+    expect(valueOf(data, "Low battery")).toEqual(1);
+    expect(valueOf(data, "Removal")).toEqual(0);
+    // smoke detector error bytes 0x0280
+    expect(valueOf(data, "Warning: smoke alarm")).toEqual(1);
+    expect(
+      valueOf(data, "Warning: no test done during the last period")
+    ).toEqual(1);
+    expect(valueOf(data, "Warning: smoke inlet blocking")).toEqual(0);
+    // status byte 0x06
+    expect(valueOf(data, "Product installed")).toEqual(1);
+    expect(valueOf(data, "Removal occurred")).toEqual(0);
+    expect(valueOf(data, "Network mode")).toEqual("Walk-by");
+    // remaining bytes
+    expect(valueOf(data, "Remaining battery lifetime")).toEqual(120);
+    expect(valueOf(data, "Product code")).toEqual(0x3e);
+    expect(valueOf(data, "Fixed date billing")).toEqual(31);
+  });
+
+  it("Reports the battery lifetime in months", async () => {
+    const result = await decodeSmokeDetector();
+    const battery = result.data.find(
+      (entry) => entry.description === "Remaining battery lifetime"
+    );
+
+    expect(battery?.unit).toEqual("month");
+    expect(battery?.type).toEqual(EvaluatedDataType.Number);
+  });
+
+  it("Reserved bits are not reported", async () => {
+    const result = await decodeSmokeDetector();
+
+    expect(
+      result.data.filter((entry) => entry.description.includes("eserved"))
+    ).toEqual([]);
+  });
+
+  it("Decodes a telegram of a real smoke detector", async () => {
+    const result = await decodeRealSmokeDetector();
+
+    expect(result.meter).toMatchObject({
+      manufacturer: "ITW",
+      id: "12345678",
+      type: 0x1a,
+      deviceType: "Smokedetector",
+      // any error bit sets the alarm state of the link layer as well
+      status: "Alarm (temporary)",
+    });
+
+    const { data } = result;
+    expect(data[0].value).toEqual(new Date("2026-02-08T14:32:18.000Z"));
+
+    // the telegram was encrypted, which the configuration byte states as well
+    expect(valueOf(data, "Transmitted data encrypted")).toEqual(1);
+    // 0x3e is the product code of the smoke detector module
+    expect(valueOf(data, "Product code")).toEqual(0x3e);
+
+    expect(valueOf(data, "Removal")).toEqual(1);
+    expect(valueOf(data, "Removal occurred")).toEqual(1);
+    expect(valueOf(data, "Warning: perimeter intrusion")).toEqual(1);
+    expect(valueOf(data, "Perimeter intrusion occurred")).toEqual(1);
+    expect(
+      valueOf(data, "Warning: no test done during the last period")
+    ).toEqual(1);
+    expect(valueOf(data, "Warning: smoke alarm")).toEqual(0);
+    expect(valueOf(data, "Product installed")).toEqual(1);
+    expect(valueOf(data, "Network mode")).toEqual("Walk-by");
+    expect(valueOf(data, "Remaining battery lifetime")).toEqual(83);
+    expect(valueOf(data, "Fixed date billing")).toEqual(12);
+  });
+
+  it("Legacy result of a real smoke detector", async () => {
+    const result = await decodeRealSmokeDetector();
+
+    expect(WirelessMbusParser.toLegacyResult(result)).toMatchSnapshot();
+  });
+
+  it("Other Itron devices yield no additional values", async () => {
+    // the same telegram, but device type 0x07 (water) instead of 0x1a
+    const parser = new WirelessMbusParser();
+    const result = await parser.parse(
+      Buffer.from(SMOKE_DETECTOR.replace("071a", "0707"), "hex"),
+      { verbose: true, containsCrc: false }
+    );
+
+    expect(result.data).toHaveLength(2);
+  });
+});

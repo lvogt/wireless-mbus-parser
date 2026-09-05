@@ -181,6 +181,14 @@ only costs its own values.
 
 ## Changelog
 
+### Unreleased
+
+- Decode manufacturer specific data records: a handler per manufacturer turns
+  the raw bytes of such a record into named values, which are appended to the
+  data of the result. The data records themselves are not touched, so `data`
+  can contain more entries than `dataRecords` now.
+- Decode the configuration and error codes of the Itron smoke detector
+
 ### 1.3.1
 
 Both Techem fixes change the dates a telegram decodes to.
