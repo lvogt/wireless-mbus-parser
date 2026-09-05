@@ -48,7 +48,7 @@ function checkType(type: number): TCHDeviceType {
     default:
       throw new ParserError(
         "UNIMPLEMENTED_FEATURE",
-        `Unkown Techem device type! 0x${type.toString(16)}`
+        `Unknown Techem device type! 0x${type.toString(16)}`
       );
   }
 }
