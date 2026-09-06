@@ -40,6 +40,8 @@ export type {
   ExtendedLinkLayer8,
   ExtendedLinkLayer16,
   LegacyResult,
+  ManufacturerSpecificDataRecordHandler,
+  ManufacturerSpecificValue,
 } from "@/types";
 
 export { EvaluatedDataType, VifTable } from "@/types";

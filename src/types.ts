@@ -36,6 +36,13 @@ export interface MeterData {
 
 export interface ParserConfiguration {
   cachedDataRecordHeaders?: DataRecordHeadersCacheEntry[];
+  // Handlers for manufacturer specific data records, by manufacturer. They
+  // take precedence over the ones shipped with the parser, so a meter can be
+  // decoded differently without changing the parser itself.
+  manufacturerSpecificHandlers?: Record<
+    string,
+    ManufacturerSpecificDataRecordHandler
+  >;
 }
 
 export interface ParserOptionsCommon {
