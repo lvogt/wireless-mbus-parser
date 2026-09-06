@@ -2,6 +2,8 @@ export { stripAnyCrc } from "@/crc/crcHandler";
 
 export { WirelessMbusParser } from "@/parser/parser";
 
+export { createManufacturerSpecificHandler } from "@/manufacturerSpecificData/fieldSpec";
+
 export type {
   WiredLinkLayer,
   LinkLayer,
@@ -41,7 +43,11 @@ export type {
   ExtendedLinkLayer16,
   LegacyResult,
   ManufacturerSpecificDataRecordHandler,
+  ManufacturerSpecificFieldSpec,
+  ManufacturerSpecificFlagsSpec,
+  ManufacturerSpecificLayout,
   ManufacturerSpecificValue,
+  ManufacturerSpecificValueSpec,
 } from "@/types";
 
 export { EvaluatedDataType, VifTable } from "@/types";

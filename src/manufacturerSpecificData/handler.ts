@@ -21,6 +21,9 @@ import type { ManufacturerSpecificDataRecordHandler, MeterData } from "@/types";
  *   ];
  * }
  * ```
+ *
+ * A blob which is a fixed layout of numbers and flags does not need code at
+ * all - see createManufacturerSpecificHandler().
  */
 export const manufacturerSpecificHandlers: Record<
   string,
