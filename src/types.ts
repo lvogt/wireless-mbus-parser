@@ -378,3 +378,51 @@ export type ManufacturerSpecificDataRecordHandler = (
   meterData: MeterData,
   dataRecord: DataRecord
 ) => ManufacturerSpecificValue[];
+
+// Describes where a value sits inside a manufacturer specific blob, so that a
+// handler can be written as data instead of code - see createManufacturerSpecificHandler().
+interface ManufacturerSpecificFieldBase {
+  // offset of the first byte of the field within the blob
+  byte: number;
+  // width of the field in bytes, little endian, 1 to 6, defaults to 1
+  bytes?: number;
+  unit?: string;
+  legacyName?: string;
+  storageNo?: number;
+  tariff?: number;
+}
+
+// A single value: the whole field, one of its bits or a range of them.
+export interface ManufacturerSpecificValueSpec extends ManufacturerSpecificFieldBase {
+  description: string;
+  // the bit of the field to report, counted from its least significant one
+  bit?: number;
+  // the bits of the field to report, as an inclusive range: [7, 11] are the
+  // five bits starting at bit 7
+  bits?: [number, number];
+  // names for the possible values of the field, indexed by value - a value
+  // without a name is reported as the number it is
+  values?: string[];
+  flags?: never;
+}
+
+// A group of flags: one value per named bit of the field, counted from its
+// least significant one. Reserved bits are named null and are not reported.
+export interface ManufacturerSpecificFlagsSpec extends ManufacturerSpecificFieldBase {
+  flags: (string | null)[];
+  description?: never;
+}
+
+export type ManufacturerSpecificFieldSpec =
+  ManufacturerSpecificValueSpec | ManufacturerSpecificFlagsSpec;
+
+// The fields of one kind of blob, together with the conditions under which
+// they describe it. A layout without conditions applies to every blob.
+export interface ManufacturerSpecificLayout {
+  // the device type(s) this layout describes
+  deviceType?: number | number[];
+  // the primary VIF of the data record this layout describes, for a
+  // manufacturer which uses several kinds of blob in one telegram
+  vif?: number;
+  fields: ManufacturerSpecificFieldSpec[];
+}

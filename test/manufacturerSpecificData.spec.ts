@@ -1,7 +1,13 @@
 import { afterEach, describe, expect, it } from "vitest";
 
+import { createManufacturerSpecificHandler } from "@/manufacturerSpecificData/fieldSpec";
 import { manufacturerSpecificHandlers } from "@/manufacturerSpecificData/handler";
 import { WirelessMbusParser } from "@/parser/parser";
+import type {
+  EvaluatedData,
+  ManufacturerSpecificFieldSpec,
+  ManufacturerSpecificLayout,
+} from "@/types";
 import { EvaluatedDataType } from "@/types";
 
 // TST, one data record with a manufacturer specific VIF (0xff 0x11) holding
@@ -410,5 +416,255 @@ describe("Itron", () => {
     );
 
     expect(result.data).toHaveLength(2);
+  });
+});
+
+describe("Declarative handlers", () => {
+  // the blob of TELEGRAM is 0102030405060708090a
+  async function decodeWith(
+    spec: ManufacturerSpecificFieldSpec[] | ManufacturerSpecificLayout[],
+    telegram = TELEGRAM
+  ) {
+    manufacturerSpecificHandlers["TST"] =
+      createManufacturerSpecificHandler(spec);
+    const { data } = await decode(telegram);
+    return data;
+  }
+
+  function valueOf(data: EvaluatedData[], description: string) {
+    return data.find((entry) => entry.description === description)?.value;
+  }
+
+  it("Reads bytes, bits and ranges of bits", async () => {
+    const data = await decodeWith([
+      { byte: 0, description: "Byte" },
+      { byte: 0, bytes: 2, description: "Word" },
+      { byte: 1, bit: 1, description: "Bit" },
+      { byte: 1, bit: 0, description: "Other bit" },
+      { byte: 2, bits: [0, 3], description: "Nibble" },
+    ]);
+
+    expect(valueOf(data, "Byte")).toEqual(0x01);
+    expect(valueOf(data, "Word")).toEqual(0x0201);
+    expect(valueOf(data, "Bit")).toEqual(1);
+    expect(valueOf(data, "Other bit")).toEqual(0);
+    expect(valueOf(data, "Nibble")).toEqual(0x3);
+  });
+
+  it("A range of bits can span a byte boundary", async () => {
+    const data = await decodeWith([
+      // bits 7 to 9 of 0x0201: the most significant bit of the first byte and
+      // the two least significant ones of the second
+      { byte: 0, bytes: 2, bits: [7, 9], description: "Spanning" },
+    ]);
+
+    expect(valueOf(data, "Spanning")).toEqual(0b100);
+  });
+
+  it("Fields wider than the bitwise operators are read as well", async () => {
+    const data = await decodeWith([
+      { byte: 0, bytes: 6, description: "Wide" },
+      { byte: 0, bytes: 6, bits: [40, 47], description: "Top byte" },
+    ]);
+
+    expect(valueOf(data, "Wide")).toEqual(0x060504030201);
+    expect(valueOf(data, "Top byte")).toEqual(0x06);
+  });
+
+  it("Flags yield one value per named bit", async () => {
+    const data = await decodeWith([
+      { byte: 0, flags: ["Set", null, "Cleared"] },
+      { byte: 4, bytes: 2, flags: [null, null, "High"] },
+    ]);
+
+    // the reserved bits are skipped
+    expect(data.slice(1).map((entry) => entry.description)).toEqual([
+      "Set",
+      "Cleared",
+      "High",
+    ]);
+    expect(valueOf(data, "Set")).toEqual(1);
+    expect(valueOf(data, "Cleared")).toEqual(0);
+    // 0x0605 >> 2
+    expect(valueOf(data, "High")).toEqual(1);
+  });
+
+  it("A value can be named", async () => {
+    const data = await decodeWith([
+      { byte: 0, bits: [0, 1], description: "Mode", values: ["Off", "On"] },
+      {
+        byte: 1,
+        bits: [0, 1],
+        description: "State",
+        values: ["Off", "On", "Standby"],
+      },
+      { byte: 2, description: "Unnamed", values: ["Off", "On"] },
+    ]);
+
+    expect(valueOf(data, "Mode")).toEqual("On");
+    expect(valueOf(data, "State")).toEqual("Standby");
+    // a value without a name stays the number it is
+    expect(valueOf(data, "Unnamed")).toEqual(0x03);
+  });
+
+  it("Unit, storage number and tariff are taken from the field", async () => {
+    const data = await decodeWith([
+      {
+        byte: 4,
+        description: "Battery",
+        unit: "%",
+        legacyName: "VIF_BATTERY",
+        storageNo: 2,
+        tariff: 1,
+      },
+    ]);
+
+    expect(data[1]).toMatchObject({
+      value: 0x05,
+      unit: "%",
+      info: { legacyVif: "VIF_BATTERY", storageNo: 2, tariff: 1 },
+    });
+  });
+
+  it("A layout is chosen by the device type", async () => {
+    // the telegram states device type 0x01
+    const layouts: ManufacturerSpecificLayout[] = [
+      { deviceType: 0x02, fields: [{ byte: 0, description: "Wrong type" }] },
+      {
+        deviceType: [0x00, 0x01],
+        fields: [{ byte: 0, description: "Right type" }],
+      },
+      { fields: [{ byte: 0, description: "Fallback" }] },
+    ];
+
+    const data = await decodeWith(layouts);
+
+    // only the first matching layout is used
+    expect(data.slice(1).map((entry) => entry.description)).toEqual([
+      "Right type",
+    ]);
+  });
+
+  it("A layout is chosen by the VIF of the record", async () => {
+    const data = await decodeWith(
+      [
+        { vif: 0x11, fields: [{ byte: 0, description: "First blob" }] },
+        { vif: 0x12, fields: [{ byte: 0, description: "Second blob" }] },
+      ],
+      MIXED_TELEGRAM
+    );
+
+    expect(data.map((entry) => entry.description)).toEqual([
+      "Volume",
+      "Unknown manufacturer specific VIF 0x11",
+      "Unknown manufacturer specific VIF 0x12",
+      "First blob",
+      "Second blob",
+    ]);
+  });
+
+  it("A blob no layout matches yields no values", async () => {
+    const data = await decodeWith([
+      { deviceType: 0x02, fields: [{ byte: 0, description: "Wrong type" }] },
+    ]);
+
+    expect(data).toHaveLength(1);
+  });
+
+  it("A blob too short for its layout yields no values", async () => {
+    // the first blob of the telegram is 4 bytes, the second one 10
+    const data = await decodeWith(
+      [{ byte: 5, description: "Sixth byte" }],
+      MIXED_TELEGRAM
+    );
+
+    expect(data.slice(3)).toHaveLength(1);
+    expect(valueOf(data, "Sixth byte")).toEqual(0x06);
+  });
+
+  it("It can be passed to the parser as well", async () => {
+    const parser = new WirelessMbusParser({
+      manufacturerSpecificHandlers: {
+        TST: createManufacturerSpecificHandler([
+          { byte: 0, description: "Configured" },
+        ]),
+      },
+    });
+    const result = await parser.parse(Buffer.from(TELEGRAM, "hex"), {
+      containsCrc: false,
+    });
+
+    expect(result.data[1].description).toEqual("Configured");
+  });
+
+  it("An unsound description is rejected", () => {
+    const create = (spec: ManufacturerSpecificFieldSpec[]) => () =>
+      createManufacturerSpecificHandler(spec);
+
+    expect(create([{ byte: -1, description: "Negative" }])).toThrowError(
+      "-1 is not a byte offset"
+    );
+    expect(create([{ byte: 0.5, description: "Fraction" }])).toThrowError(
+      "0.5 is not a byte offset"
+    );
+    expect(create([{ byte: 0, bytes: 7, description: "Wide" }])).toThrowError(
+      "the field at byte 0 is not 1 to 6 bytes wide"
+    );
+    expect(create([{ byte: 0, bytes: 0, description: "Empty" }])).toThrowError(
+      "the field at byte 0 is not 1 to 6 bytes wide"
+    );
+    expect(create([{ byte: 1, bit: 8, description: "Bit" }])).toThrowError(
+      "bit 8 is outside of the field at byte 1 (Bit)"
+    );
+    expect(
+      create([{ byte: 1, bytes: 2, bits: [8, 16], description: "Range" }])
+    ).toThrowError("bit 16 is outside of the field at byte 1 (Range)");
+    expect(
+      create([{ byte: 1, bits: [4, 2], description: "Backwards" }])
+    ).toThrowError("the bit range of byte 1 (Backwards) ends before it starts");
+    expect(
+      create([{ byte: 1, bit: 0, bits: [0, 1], description: "Both" }])
+    ).toThrowError("byte 1 (Both) states both a bit and a bit range");
+    expect(create([{ byte: 0, description: "" }])).toThrowError(
+      "the field at byte 0 has no description"
+    );
+    expect(
+      create([{ byte: 0, bytes: 6, flags: ["a", "b"] }])
+    ).not.toThrowError();
+    expect(
+      create([{ byte: 0, flags: new Array(9).fill("f") } as never])
+    ).toThrowError("there are more flags than bits at byte 0 (flags)");
+    expect(
+      create([{ byte: 0, flags: ["a"], description: "Both" } as never])
+    ).toThrowError("byte 0 (Both) states both flags and a description");
+    expect(
+      create([
+        { byte: 0, description: "Field" },
+        { fields: [{ byte: 0, description: "Layout" }] },
+      ] as never)
+    ).toThrowError("fields and layouts cannot be mixed in one list");
+  });
+
+  // a description can be read from a configuration file, so it is not
+  // necessarily type checked
+  it("A description which is not even a description is rejected", () => {
+    const create = (spec: unknown) => () =>
+      createManufacturerSpecificHandler(spec as never);
+
+    expect(create("nonsense")).toThrowError(
+      "expected a list of fields or layouts"
+    );
+    expect(create([{ byte: 0, bits: [1], description: "Range" }])).toThrowError(
+      "the bit range of byte 0 (Range) is not a pair of bits"
+    );
+    expect(
+      create([{ byte: 0, description: "Names", values: "Off" }])
+    ).toThrowError("the value names of byte 0 (Names) are not strings");
+    expect(create([{ byte: 0, flags: "Leakage" }])).toThrowError(
+      "the flags of byte 0 are not a list"
+    );
+    expect(create([{ byte: 0, flags: [1, 2] }])).toThrowError(
+      "the flags of byte 0 (flags) are not names"
+    );
   });
 });

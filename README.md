@@ -186,6 +186,55 @@ the telegram itself, so adding a handler does not move them. The data records
 are not touched at all - they describe the telegram. A handler which throws
 only costs its own values.
 
+### Describing a blob instead of decoding it
+
+Most blobs are a fixed sequence of numbers and flags, which can be described
+instead of decoded. `createManufacturerSpecificHandler()` turns such a
+description into a handler. The description is plain data, so it can come from
+a configuration file and does not have to be code at all:
+
+```typescript
+import { createManufacturerSpecificHandler } from "wireless-mbus-parser";
+
+const decodeAcmeData = createManufacturerSpecificHandler([
+  { byte: 0, bit: 0, description: "Backflow detected" },
+  { byte: 1, description: "Battery", unit: "%" },
+  { byte: 2, bytes: 3, description: "Volume", unit: "l" },
+  { byte: 5, flags: ["Leakage", "Burst", null, "Removal"] },
+]);
+```
+
+A field starts at `byte` and is `bytes` wide - one byte by default, at most
+six, read little endian. The whole field is reported unless `bit` picks a
+single bit or `bits` an inclusive range of them, which may span the bytes of
+the field: `{ byte: 11, bytes: 2, bits: [7, 11] }` are the five bits starting
+at bit 7. `flags` names one bit each and yields one value per name, the
+reserved ones are named `null` and are not reported. `values` names the
+possible values of a field, indexed by value - a value without a name stays the
+number it is. `unit`, `legacyName`, `storageNo` and `tariff` are the same as
+for a handler written by hand.
+
+Several kinds of blob are described as a list of layouts, each with the device
+types and the VIF it applies to. The first matching layout decodes the blob,
+one without conditions matches everything:
+
+```typescript
+const decodeAcmeData = createManufacturerSpecificHandler([
+  { deviceType: 0x07, fields: [...] },
+  { deviceType: [0x04, 0x0c], vif: 0x11, fields: [...] },
+]);
+```
+
+A blob which is too short for all the fields of its layout yields no values, as
+does one no layout matches. A description which is not sound - a bit outside of
+its field for example - throws where it is created, because that is a mistake
+of its author and not of a telegram.
+
+Everything which is not a fixed layout of numbers and flags still needs code: a
+checksum, a field whose meaning depends on another one or a date. The Itron
+smoke detector shipped with the parser is described declaratively,
+`src/manufacturerSpecificData/itron.ts` is a complete example.
+
 ## TODO
 
 - TCH smoke detector?
@@ -197,6 +246,12 @@ only costs its own values.
 - Manufacturer specific handlers can be passed to the parser, so they no
   longer have to be part of it. `ManufacturerSpecificValue` and
   `ManufacturerSpecificDataRecordHandler` are exported for that.
+- A manufacturer specific handler can be described instead of written:
+  `createManufacturerSpecificHandler()` builds one from a list of fields --
+  bytes, bits, ranges of bits and named flags -- optionally grouped into
+  layouts per device type and VIF. The description is plain data, so it can be
+  read from a configuration file. The Itron smoke detector is described this
+  way now, its output is unchanged.
 
 ### 1.4.0
 
