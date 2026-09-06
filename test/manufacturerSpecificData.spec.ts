@@ -15,6 +15,16 @@ const MIXED_TELEGRAM =
   "0dff11e401020304" +
   "0dff12ea0102030405060708090a";
 
+// an Itron smoke detector, captured from a device, decrypted and with the
+// encryption flag of the configuration word cleared, so that no key is needed
+// here. The identification number is replaced as well.
+const REAL_SMOKE_DETECTOR =
+  "4e44972678563412001a7a21130000" +
+  "2f2f066d1220ee483200" +
+  "077f80802002533e170c" +
+  "0f0000010100000101000001012927283418311b39000001010000010100000000" +
+  "14310f370d00460100002f";
+
 async function decode(telegram = TELEGRAM) {
   const parser = new WirelessMbusParser();
   return await parser.parse(Buffer.from(telegram, "hex"), {
@@ -199,6 +209,72 @@ describe("Manufacturer specific data", () => {
   });
 });
 
+describe("Configured handlers", () => {
+  const handler = (data: Buffer) => [
+    { description: "Configured", value: data[0] },
+  ];
+
+  it("A handler of the configuration is used", async () => {
+    const parser = new WirelessMbusParser({
+      manufacturerSpecificHandlers: { TST: handler },
+    });
+    const result = await parser.parse(Buffer.from(TELEGRAM, "hex"), {
+      verbose: true,
+      containsCrc: false,
+    });
+
+    expect(result.data).toHaveLength(2);
+    expect(result.data[1].description).toEqual("Configured");
+    expect(result.data[1].value).toEqual(0x01);
+  });
+
+  it("It only applies to the parser it was given to", async () => {
+    const configured = new WirelessMbusParser({
+      manufacturerSpecificHandlers: { TST: handler },
+    });
+    await configured.parse(Buffer.from(TELEGRAM, "hex"), {
+      containsCrc: false,
+    });
+
+    const plain = new WirelessMbusParser();
+    const result = await plain.parse(Buffer.from(TELEGRAM, "hex"), {
+      containsCrc: false,
+    });
+
+    expect(result.data).toHaveLength(1);
+  });
+
+  it("It takes precedence over a handler of the parser", async () => {
+    const parser = new WirelessMbusParser({
+      manufacturerSpecificHandlers: {
+        ITW: () => [{ description: "Replaced", value: 1 }],
+      },
+    });
+    const result = await parser.parse(Buffer.from(REAL_SMOKE_DETECTOR, "hex"), {
+      verbose: true,
+      containsCrc: false,
+    });
+
+    expect(result.data.map((entry) => entry.description)).toEqual([
+      "Time point",
+      "Unknown manufacturer specific VIF 0x7f",
+      "Replaced",
+    ]);
+  });
+
+  it("Handlers of the parser are used for other manufacturers", async () => {
+    const parser = new WirelessMbusParser({
+      manufacturerSpecificHandlers: { TST: handler },
+    });
+    const result = await parser.parse(Buffer.from(REAL_SMOKE_DETECTOR, "hex"), {
+      verbose: true,
+      containsCrc: false,
+    });
+
+    expect(result.data).toHaveLength(28);
+  });
+});
+
 describe("Itron", () => {
   // ITW, device type 0x1a (smoke detector), a volume record and the 64 bit
   // manufacturer specific record with the configuration and error codes
@@ -208,16 +284,6 @@ describe("Itron", () => {
     "0413e8030000" +
     "077f" +
     "80418002783e061f";
-
-  // captured from a device, decrypted and with the encryption flag of the
-  // configuration word cleared, so that no key is needed here. The
-  // identification number is replaced as well.
-  const REAL_SMOKE_DETECTOR =
-    "4e44972678563412001a7a21130000" +
-    "2f2f066d1220ee483200" +
-    "077f80802002533e170c" +
-    "0f0000010100000101000001012927283418311b39000001010000010100000000" +
-    "14310f370d00460100002f";
 
   async function decodeRealSmokeDetector() {
     const parser = new WirelessMbusParser();

@@ -148,14 +148,26 @@ and `tariff` are optional: storage number and tariff are taken from the record
 the data came from, as is its function field, so a value of a "maximum value"
 record is described as one as well.
 
-Handlers are registered per manufacturer in
-`src/manufacturerSpecificData/handler.ts`:
+Handlers are registered per manufacturer, either when the parser is created:
+
+```typescript
+const parser = new WirelessMbusParser({
+  manufacturerSpecificHandlers: { ACM: decodeAcmeData },
+});
+```
+
+or in `src/manufacturerSpecificData/handler.ts`, which is the place for
+handlers to be shipped with the parser:
 
 ```typescript
 export const manufacturerSpecificHandlers = {
   ACM: decodeAcmeData,
 };
 ```
+
+A handler of the configuration takes precedence over the one of the parser for
+the same manufacturer, so a meter can be decoded differently without changing
+the parser itself.
 
 There is one handler per manufacturer and not one per device, because
 manufacturers do not agree on how their devices are told apart: the version
@@ -176,10 +188,15 @@ only costs its own values.
 
 ## TODO
 
-- manufacturer specific "blob" handler
 - TCH smoke detector?
 
 ## Changelog
+
+### Unreleased
+
+- Manufacturer specific handlers can be passed to the parser, so they no
+  longer have to be part of it. `ManufacturerSpecificValue` and
+  `ManufacturerSpecificDataRecordHandler` are exported for that.
 
 ### 1.4.0
 

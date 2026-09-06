@@ -32,8 +32,12 @@ import type {
 
 export class WirelessMbusParser {
   private dataRecordHeaderCache: Record<number, DataRecordHeader[] | null> = {};
+  private manufacturerSpecificHandlers: ParserConfiguration["manufacturerSpecificHandlers"];
 
   constructor(configuration?: ParserConfiguration) {
+    this.manufacturerSpecificHandlers =
+      configuration?.manufacturerSpecificHandlers;
+
     for (const entry of configuration?.cachedDataRecordHeaders ?? []) {
       const { crc, dataRecordHeaders } =
         handleDataRecordHeadersCacheEntry(entry);
@@ -136,7 +140,7 @@ export class WirelessMbusParser {
 
     // the content of manufacturer specific records is only collected if there
     // is something which can decode it
-    const handler = getHandler(meterData);
+    const handler = getHandler(meterData, this.manufacturerSpecificHandlers);
 
     const { dataRecords, headerCrc, blobs } = this.handleDataRecordDecoding(
       aplState,

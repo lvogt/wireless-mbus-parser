@@ -30,7 +30,12 @@ export const manufacturerSpecificHandlers: Record<
 };
 
 export function getHandler(
-  meterData: MeterData
+  meterData: MeterData,
+  configuredHandlers?: Record<string, ManufacturerSpecificDataRecordHandler>
 ): ManufacturerSpecificDataRecordHandler | null {
-  return manufacturerSpecificHandlers[meterData.manufacturer] ?? null;
+  return (
+    configuredHandlers?.[meterData.manufacturer] ??
+    manufacturerSpecificHandlers[meterData.manufacturer] ??
+    null
+  );
 }
