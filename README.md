@@ -1,26 +1,46 @@
 # wireless-mbus-parser
 
-This is a pure JS parser for wireless mbus telegrams. It tries to follow
-specifications from EN-13757 and OMS - but both are not fully implemented.
+A parser for wireless M-Bus telegrams: it turns the bytes a receiver hands you
+into the values a meter sent - each with its unit, description, storage number
+and tariff - along with the meter which sent them and, on request, every layer
+the telegram is built from.
 
-The missing parts are mostly either not relevant anymore or were not
-necessary yet - this is especially true for the large amount of VIFs
-introduced by the OMS standard.
+It follows EN 13757 and OMS as far as the meters in the field need it. What is
+missing is either not relevant anymore or has not been necessary yet - most of
+all the large number of VIFs the OMS standard introduced. "Wired" M-Bus
+telegrams are supported to a limited extent, a few proprietary protocols
+partially.
 
-Limited support for parsing "wired" mbus telegrams is implemented.
-A few proprietary protocol are (partially) supported.
-
-A legacy result format to (mostly) match the output from parser included in the
-[iobroker.wireless-mbus](https://www.npmjs.com/package/iobroker.wireless-mbus) package
-is also available.
+A legacy result format which mostly matches the output of the parser that used
+to be part of
+[iobroker.wireless-mbus](https://www.npmjs.com/package/iobroker.wireless-mbus)
+is available as well.
 
 ## Features
 
-- automatic CRC detection / handling
-- ELL encryption and encryption modes 5 and 7
-- compact frame handling
-- Diehl PRIOS telegram are supported
-- Techem heat, water and HCA meters are partially supported
+- every layer of a telegram: link layer, extended link layer, authentication
+  and fragmentation layer and application layer
+- encryption modes 5 and 7, the encryption of the extended link layer and the
+  MAC of the authentication and fragmentation layer
+- automatic CRC detection - receivers differ in whether they strip it
+- compact frames, with a cache of data record headers which can be kept across
+  restarts
+- manufacturer specific data records: a handler per manufacturer turns them
+  into named values, and can be described instead of written
+- proprietary telegrams: Diehl PRIOS, Techem heat, water and HCA meters
+  (partially) and Itron smoke detectors
+- ESM and CommonJS with TypeScript types, one dependency
+
+## Installation
+
+```sh
+npm install wireless-mbus-parser
+# or
+pnpm add wireless-mbus-parser
+```
+
+Node 22 or newer is required. The package ships as ESM and CommonJS with
+TypeScript types.
 
 ## Sample Usage
 
@@ -256,20 +276,16 @@ smoke detector shipped with the parser is described declaratively,
 
 ### Unreleased
 
-- Manufacturer specific handlers can be passed to the parser, so they no
-  longer have to be part of it. `ManufacturerSpecificValue` and
-  `ManufacturerSpecificDataRecordHandler` are exported for that.
+- Manufacturer specific handlers can be passed to the parser as
+  `manufacturerSpecificHandlers` of the configuration, so they no longer have
+  to be part of it
+- Such a handler can be described instead of written:
+  `createManufacturerSpecificHandler()` builds one from a list of bytes, bits
+  and named flags -- plain data, which can come from a configuration file
 - Values of a manufacturer specific handler are named after their description
-  in the legacy result, e.g. `VIF_WARNING_SMOKE_ALARM` instead of
-  `VIF_MANUFACTURER_SPECIFIC` for every single one of them. Consumers which
-  build an identifier from the `type` of a legacy record -- the ioBroker
-  adapter does -- get one per value that way.
-- A manufacturer specific handler can be described instead of written:
-  `createManufacturerSpecificHandler()` builds one from a list of fields --
-  bytes, bits, ranges of bits and named flags -- optionally grouped into
-  layouts per device type and VIF. The description is plain data, so it can be
-  read from a configuration file. The Itron smoke detector is described this
-  way now, its output is unchanged.
+  in the legacy result: `VIF_WARNING_SMOKE_ALARM` instead of
+  `VIF_MANUFACTURER_SPECIFIC` for every one of them. The Itron descriptions are
+  shorter and say which part of the meter reports a flag.
 
 ### 1.4.0
 
