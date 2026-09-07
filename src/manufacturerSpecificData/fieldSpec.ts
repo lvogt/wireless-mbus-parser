@@ -77,8 +77,8 @@ function checkValueSpec(spec: ManufacturerSpecificValueSpec) {
   }
   if (
     spec.values !== undefined &&
-    (!Array.isArray(spec.values) ||
-      spec.values.some((name) => typeof name !== "string"))
+    (typeof spec.values !== "object" ||
+      Object.values(spec.values).some((name) => typeof name !== "string"))
   ) {
     fail(`the value names of ${describe(spec)} are not strings`);
   }
@@ -121,6 +121,35 @@ function checkFieldSpec(spec: ManufacturerSpecificFieldSpec) {
   }
 }
 
+// A layout which states a condition no telegram can meet would silently never
+// decode anything, which is the worst thing a description read from a
+// configuration file can do.
+function checkCondition(value: unknown, what: string) {
+  if (!Number.isInteger(value) || (value as number) < 0) {
+    fail(`the ${what} of a layout is not a number: ${String(value)}`);
+  }
+}
+
+function checkLayout(layout: ManufacturerSpecificLayout) {
+  if (layout.deviceType !== undefined) {
+    const types = Array.isArray(layout.deviceType)
+      ? layout.deviceType
+      : [layout.deviceType];
+    for (const type of types) {
+      checkCondition(type, "device type");
+    }
+  }
+  for (const [what, value] of [
+    ["VIF", layout.vif],
+    ["length", layout.length],
+    ["index", layout.index],
+  ] as const) {
+    if (value !== undefined) {
+      checkCondition(value, what);
+    }
+  }
+}
+
 // Bit fields are cut out by dividing instead of shifting, so that a field
 // beyond the 32 bit of the bitwise operators works as well.
 function extract(value: number, offset: number, bits: number) {
@@ -152,6 +181,8 @@ function decodeValue(
   return {
     ...baseValue(spec),
     description: spec.description,
+    // a list names the values 0, 1, 2 and so on, an object only the ones which
+    // have a name - both are indexed the same way
     value: spec.values?.[value] ?? value,
   };
 }
@@ -179,10 +210,18 @@ function decodeFields(
   });
 }
 
+interface Layout {
+  layout: ManufacturerSpecificLayout;
+  // the length the fields of the layout need, so it is only computed once
+  minLength: number;
+}
+
 function matches(
-  layout: ManufacturerSpecificLayout,
+  { layout, minLength }: Layout,
+  data: Buffer,
   meterData: MeterData,
-  dataRecord: DataRecord
+  dataRecord: DataRecord,
+  index: number
 ) {
   if (layout.deviceType !== undefined) {
     const types = Array.isArray(layout.deviceType)
@@ -193,9 +232,24 @@ function matches(
     }
   }
 
-  return (
-    layout.vif === undefined || layout.vif === dataRecord.header.vib.primary.vif
-  );
+  if (
+    layout.vif !== undefined &&
+    layout.vif !== dataRecord.header.vib.primary.vif
+  ) {
+    return false;
+  }
+
+  if (layout.length !== undefined && layout.length !== data.length) {
+    return false;
+  }
+
+  if (layout.index !== undefined && layout.index !== index) {
+    return false;
+  }
+
+  // a blob which does not hold all the fields is not the one the layout
+  // describes, so the next layout gets its turn
+  return data.length >= minLength;
 }
 
 /**
@@ -247,21 +301,22 @@ export function createManufacturerSpecificHandler(
       : [{ fields: spec as ManufacturerSpecificFieldSpec[] }];
 
   for (const layout of layouts) {
+    checkLayout(layout);
     for (const field of layout.fields) {
       checkFieldSpec(field);
     }
   }
 
-  const minLengths = layouts.map((layout) => requiredLength(layout.fields));
+  const known: Layout[] = layouts.map((layout) => ({
+    layout,
+    minLength: requiredLength(layout.fields),
+  }));
 
-  return (data, meterData, dataRecord) => {
-    const index = layouts.findIndex((layout) =>
-      matches(layout, meterData, dataRecord)
+  return (data, meterData, dataRecord, index) => {
+    const match = known.find((entry) =>
+      matches(entry, data, meterData, dataRecord, index)
     );
-    if (index === -1 || data.length < minLengths[index]) {
-      return [];
-    }
 
-    return decodeFields(data, layouts[index].fields);
+    return match === undefined ? [] : decodeFields(data, match.layout.fields);
   };
 }

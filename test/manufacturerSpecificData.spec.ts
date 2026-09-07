@@ -504,6 +504,22 @@ describe("Declarative handlers", () => {
     expect(valueOf(data, "Unnamed")).toEqual(0x03);
   });
 
+  it("Values which are not counted up are named by an object", async () => {
+    // the medium type of an Itron h_MIU is 0x04, 0x0c or 0x0d - a list would
+    // have to name every value in between
+    const data = await decodeWith([
+      {
+        byte: 2,
+        description: "Medium",
+        values: { 3: "Heat, return", 4: "Heat, supply", 13: "Heat/Cooling" },
+      },
+      { byte: 3, description: "Unnamed", values: { 13: "Heat/Cooling" } },
+    ]);
+
+    expect(valueOf(data, "Medium")).toEqual("Heat, return");
+    expect(valueOf(data, "Unnamed")).toEqual(0x04);
+  });
+
   it("Unit, storage number and tariff are taken from the field", async () => {
     const data = await decodeWith([
       {
@@ -709,5 +725,113 @@ describe("Legacy names", () => {
     expect(await legacyTypes([{ description: "???", value: 1 }])).toEqual([
       "VIF_MANUFACTURER_SPECIFIC",
     ]);
+  });
+});
+
+// Itron meters send more than one manufacturer specific record: a w_MIU a four
+// and a two byte one, a p_MIU two four byte ones - all of them with the plain
+// manufacturer specific VIF 0x7f, so only their size and their order tell them
+// apart. TST, no header, two such records.
+const TWO_BLOBS_OF_DIFFERENT_SIZE =
+  "1444745278563412020178" + "047f01020304" + "027f0506";
+
+const TWO_BLOBS_OF_THE_SAME_SIZE =
+  "1644745278563412020178" + "047f01020304" + "047f05060708";
+
+describe("Several blobs in one telegram", () => {
+  async function decodeWith(
+    spec: ManufacturerSpecificLayout[],
+    telegram: string
+  ) {
+    manufacturerSpecificHandlers["TST"] =
+      createManufacturerSpecificHandler(spec);
+    const { data } = await decode(telegram);
+    // the two records of the telegram come first
+    return data
+      .slice(2)
+      .map((entry) => `${entry.description}=${String(entry.value)}`);
+  }
+
+  it("Blobs of different size are told apart by their length", async () => {
+    expect(
+      await decodeWith(
+        [
+          {
+            length: 4,
+            fields: [
+              { byte: 0, description: "Configuration" },
+              { byte: 3, description: "Billing month" },
+            ],
+          },
+          {
+            length: 2,
+            fields: [
+              { byte: 0, description: "Battery", unit: "month" },
+              { byte: 1, description: "Product code" },
+            ],
+          },
+        ],
+        TWO_BLOBS_OF_DIFFERENT_SIZE
+      )
+    ).toEqual([
+      "Configuration=1",
+      "Billing month=4",
+      "Battery=5",
+      "Product code=6",
+    ]);
+  });
+
+  it("A blob too short for a layout falls through to the next one", async () => {
+    // the same telegram without any condition: the first layout needs four
+    // bytes, which only the first blob has
+    expect(
+      await decodeWith(
+        [
+          { fields: [{ byte: 3, description: "Billing month" }] },
+          { fields: [{ byte: 1, description: "Product code" }] },
+        ],
+        TWO_BLOBS_OF_DIFFERENT_SIZE
+      )
+    ).toEqual(["Billing month=4", "Product code=6"]);
+  });
+
+  it("Blobs of the same size are told apart by their order", async () => {
+    expect(
+      await decodeWith(
+        [
+          { index: 0, fields: [{ byte: 0, description: "Configuration" }] },
+          { index: 1, fields: [{ byte: 0, description: "Status" }] },
+        ],
+        TWO_BLOBS_OF_THE_SAME_SIZE
+      )
+    ).toEqual(["Configuration=1", "Status=5"]);
+  });
+
+  it("A handler is told which blob it decodes", async () => {
+    manufacturerSpecificHandlers["TST"] = (data, _meter, _record, index) => [
+      { description: `blob ${String(index)}`, value: data.readUInt8(0) },
+    ];
+
+    const { data } = await decode(TWO_BLOBS_OF_THE_SAME_SIZE);
+
+    expect(data.slice(2).map((entry) => entry.description)).toEqual([
+      "blob 0",
+      "blob 1",
+    ]);
+  });
+
+  it("A condition which cannot be met is rejected", () => {
+    const create = (spec: unknown) => () =>
+      createManufacturerSpecificHandler(spec as never);
+
+    expect(
+      create([{ length: "4", fields: [{ byte: 0, description: "x" }] }])
+    ).toThrowError("the length of a layout is not a number: 4");
+    expect(
+      create([{ index: -1, fields: [{ byte: 0, description: "x" }] }])
+    ).toThrowError("the index of a layout is not a number: -1");
+    expect(
+      create([{ deviceType: "0x1a", fields: [{ byte: 0, description: "x" }] }])
+    ).toThrowError("the device type of a layout is not a number: 0x1a");
   });
 });

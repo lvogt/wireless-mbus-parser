@@ -100,10 +100,10 @@ export function evaluateManufacturerSpecificData(
 ): EvaluatedData[] {
   const evaluatedData: EvaluatedData[] = [];
 
-  for (const blob of blobs) {
+  for (const [index, blob] of blobs.entries()) {
     let values: ManufacturerSpecificValue[];
     try {
-      values = handler(blob.data, meterData, blob.dataRecord);
+      values = handler(blob.data, meterData, blob.dataRecord, index);
     } catch (error: unknown) {
       // a broken handler must not cost us the rest of the telegram
       log.error(`Decoding manufacturer specific data failed: ${String(error)}`);

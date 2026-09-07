@@ -371,12 +371,14 @@ export interface ManufacturerSpecificBlob {
 
 // Decodes the content of a manufacturer specific data record. It is called
 // with the raw bytes of the blob, no knowledge about telegram structures is
-// needed to write one. The record itself is passed as well, for the rare case
-// that a manufacturer uses several kinds of blob in one telegram.
+// needed to write one. The record itself is passed as well, and the position
+// of the blob among the manufacturer specific records of the telegram - for a
+// manufacturer which uses several kinds of blob in one telegram.
 export type ManufacturerSpecificDataRecordHandler = (
   data: Buffer,
   meterData: MeterData,
-  dataRecord: DataRecord
+  dataRecord: DataRecord,
+  index: number
 ) => ManufacturerSpecificValue[];
 
 // Describes where a value sits inside a manufacturer specific blob, so that a
@@ -400,9 +402,10 @@ export interface ManufacturerSpecificValueSpec extends ManufacturerSpecificField
   // the bits of the field to report, as an inclusive range: [7, 11] are the
   // five bits starting at bit 7
   bits?: [number, number];
-  // names for the possible values of the field, indexed by value - a value
-  // without a name is reported as the number it is
-  values?: string[];
+  // names for the possible values of the field, by value - a value without a
+  // name is reported as the number it is. A list names the values 0, 1, 2 and
+  // so on, an object only the ones which have a name: { 4: "Heat", 13: "Cold" }
+  values?: string[] | Record<number, string>;
   flags?: never;
 }
 
@@ -421,8 +424,13 @@ export type ManufacturerSpecificFieldSpec =
 export interface ManufacturerSpecificLayout {
   // the device type(s) this layout describes
   deviceType?: number | number[];
-  // the primary VIF of the data record this layout describes, for a
-  // manufacturer which uses several kinds of blob in one telegram
+  // the primary VIF of the data record this layout describes
   vif?: number;
+  // the length of the blob in bytes
+  length?: number;
+  // the position of the blob among the manufacturer specific records of the
+  // telegram, counted from 0 - two blobs of the same size and VIF, which
+  // several Itron meters send, only differ in the order they arrive in
+  index?: number;
   fields: ManufacturerSpecificFieldSpec[];
 }

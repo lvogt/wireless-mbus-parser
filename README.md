@@ -241,27 +241,36 @@ single bit or `bits` an inclusive range of them, which may span the bytes of
 the field: `{ byte: 11, bytes: 2, bits: [7, 11] }` are the five bits starting
 at bit 7. `flags` names one bit each and yields one value per name, the
 reserved ones are named `null` and are not reported. `values` names the
-possible values of a field, indexed by value - a value without a name stays the
-number it is. `unit`, `legacyName`, `storageNo` and `tariff` are the same as
+possible values of a field: a list names the values 0, 1, 2 and so on, an
+object only the ones which have a name (`{ 4: "Heat", 13: "Cooling" }`), and a
+value without a name stays the number it is. `unit`, `legacyName`, `storageNo` and `tariff` are the same as
 for a handler written by hand. A flag is named after the name of its bit, so a
 flag whose legacy name should not follow that name is described as a `bit`
 field with a `legacyName` of its own.
 
-Several kinds of blob are described as a list of layouts, each with the device
-types and the VIF it applies to. The first matching layout decodes the blob,
-one without conditions matches everything:
+Several kinds of blob are described as a list of layouts. The first layout
+whose conditions the blob meets decodes it, one without conditions matches
+everything:
 
 ```typescript
 const decodeAcmeData = createManufacturerSpecificHandler([
   { deviceType: 0x07, fields: [...] },
   { deviceType: [0x04, 0x0c], vif: 0x11, fields: [...] },
+  { length: 4, index: 1, fields: [...] },
 ]);
 ```
 
-A blob which is too short for all the fields of its layout yields no values, as
-does one no layout matches. A description which is not sound - a bit outside of
-its field for example - throws where it is created, because that is a mistake
-of its author and not of a telegram.
+A layout applies to the device types of `deviceType`, to records with the
+primary VIF `vif`, to blobs of `length` bytes and to the blob at `index` among
+the manufacturer specific records of the telegram, counted from 0. Meters which
+send several blobs of the same size and VIF - Itron does - can only be told
+apart by that order.
+
+A blob which is too short for all the fields of a layout does not match it and
+falls through to the next one; a blob no layout matches yields no values. A
+description which is not sound - a bit outside of its field, a condition which
+is not a number - throws where it is created, because that is a mistake of its
+author and not of a telegram.
 
 Everything which is not a fixed layout of numbers and flags still needs code: a
 checksum, a field whose meaning depends on another one or a date. The Itron
@@ -281,7 +290,10 @@ smoke detector shipped with the parser is described declaratively,
   to be part of it
 - Such a handler can be described instead of written:
   `createManufacturerSpecificHandler()` builds one from a list of bytes, bits
-  and named flags -- plain data, which can come from a configuration file
+  and named flags -- plain data, which can come from a configuration file. One
+  description can hold several layouts, told apart by device type, VIF, the
+  length of the blob and its position among the manufacturer specific records
+  of the telegram, which is passed to every handler now.
 - Values of a manufacturer specific handler are named after their description
   in the legacy result: `VIF_WARNING_SMOKE_ALARM` instead of
   `VIF_MANUFACTURER_SPECIFIC` for every one of them. The Itron descriptions are
