@@ -148,6 +148,17 @@ and `tariff` are optional: storage number and tariff are taken from the record
 the data came from, as is its function field, so a value of a "maximum value"
 record is described as one as well.
 
+The legacy result carries the `legacyName` of a value as its `type`, which
+consumers use as an identifier - the ioBroker adapter builds the id of its
+objects from it. A value which states none is named after its description:
+"Warning: smoke alarm" becomes `VIF_WARNING_SMOKE_ALARM`, accents are folded
+and everything else that is not a letter or a digit becomes an underscore.
+
+The description of a handler is therefore part of what the legacy result
+promises: rewording it renames the objects of everyone who receives that meter.
+Use `legacyName` for a name which should not follow the wording - or for one
+the description does not make a good identifier of.
+
 Handlers are registered per manufacturer, either when the parser is created:
 
 ```typescript
@@ -212,7 +223,9 @@ at bit 7. `flags` names one bit each and yields one value per name, the
 reserved ones are named `null` and are not reported. `values` names the
 possible values of a field, indexed by value - a value without a name stays the
 number it is. `unit`, `legacyName`, `storageNo` and `tariff` are the same as
-for a handler written by hand.
+for a handler written by hand. A flag is named after the name of its bit, so a
+flag whose legacy name should not follow that name is described as a `bit`
+field with a `legacyName` of its own.
 
 Several kinds of blob are described as a list of layouts, each with the device
 types and the VIF it applies to. The first matching layout decodes the blob,
@@ -246,6 +259,11 @@ smoke detector shipped with the parser is described declaratively,
 - Manufacturer specific handlers can be passed to the parser, so they no
   longer have to be part of it. `ManufacturerSpecificValue` and
   `ManufacturerSpecificDataRecordHandler` are exported for that.
+- Values of a manufacturer specific handler are named after their description
+  in the legacy result, e.g. `VIF_WARNING_SMOKE_ALARM` instead of
+  `VIF_MANUFACTURER_SPECIFIC` for every single one of them. Consumers which
+  build an identifier from the `type` of a legacy record -- the ioBroker
+  adapter does -- get one per value that way.
 - A manufacturer specific handler can be described instead of written:
   `createManufacturerSpecificHandler()` builds one from a list of fields --
   bytes, bits, ranges of bits and named flags -- optionally grouped into

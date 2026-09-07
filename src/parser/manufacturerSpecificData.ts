@@ -54,6 +54,23 @@ function getDataType(value: DataType | Date) {
   }
 }
 
+// The legacy result carries this name as the "type" of a value, where it ends
+// up as part of an object id - the ioBroker adapter builds one from it. So
+// every value needs a name of its own instead of all of them being
+// "manufacturer specific": the description is turned into one, e.g. "Warning:
+// smoke alarm" becomes VIF_WARNING_SMOKE_ALARM. Accents are folded, so that a
+// description in a language which has them stays readable.
+export function toLegacyName(description: string) {
+  const name = description
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+
+  return name === "" ? "VIF_MANUFACTURER_SPECIFIC" : `VIF_${name}`;
+}
+
 function createEvaluatedData(
   source: DataRecord,
   value: ManufacturerSpecificValue
@@ -64,7 +81,7 @@ function createEvaluatedData(
     description: value.description,
     type: getDataType(value.value),
     info: {
-      legacyVif: value.legacyName ?? "VIF_MANUFACTURER_SPECIFIC",
+      legacyVif: value.legacyName ?? toLegacyName(value.description),
       tariff: value.tariff ?? source.header.dib.tariff,
       deviceUnit: source.header.dib.deviceUnit,
       storageNo: value.storageNo ?? source.header.dib.storageNo,
