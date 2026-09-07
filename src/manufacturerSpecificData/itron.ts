@@ -7,18 +7,18 @@ const DEVICE_TYPE_SMOKE_DETECTOR = 0x1a;
 // integer with the manufacturer specific VIF, one byte per group of flags.
 // Reserved bits are named null and are not reported.
 const SMOKE_DETECTOR_STATE: ManufacturerSpecificFieldSpec[] = [
-  { byte: 0, bit: 7, description: "Transmitted data encrypted" },
+  { byte: 0, bit: 7, description: "Data encrypted" },
   {
     byte: 1,
     flags: [
-      "Code corrupt",
-      "Memory corrupt",
-      "Hardware reset",
-      "Watchdog reset",
+      "Modem code corrupt",
+      "Modem memory corrupt",
+      "Modem hardware reset",
+      "Modem watchdog reset",
       null,
       null,
-      "Low battery",
-      "Removal",
+      "Modem low battery",
+      "Modem removal",
     ],
   },
   {
@@ -26,18 +26,25 @@ const SMOKE_DETECTOR_STATE: ManufacturerSpecificFieldSpec[] = [
     bytes: 2,
     flags: [
       "General alarm",
-      "Hardware reset of the smoke detector",
-      "Watchdog reset of the smoke detector",
+      "Detector hardware reset",
+      "Detector watchdog reset",
       "Beeper defect",
       "Warning: out of temperature range",
-      "Warning: perimeter intrusion",
-      "Warning: smoke inlet blocking",
+      "Warning: intrusion",
+      "Warning: inlet blocking",
       "Warning: smoke alarm",
-      "Warning: low battery measurement",
-      "Warning: no test done during the last period",
+      "Warning: low battery",
+      "Warning: no test in last period",
     ],
   },
-  { byte: 4, description: "Remaining battery lifetime", unit: "month" },
+  {
+    byte: 4,
+    description: "Remaining battery lifetime",
+    unit: "month",
+    // the name of the VIF which states the same thing, so a battery reads the
+    // same way whether a meter reports it as a VIF or in a blob
+    legacyName: "VIF_BATTERY_REMAINING",
+  },
   { byte: 5, description: "Product code" },
   {
     byte: 6,
@@ -46,8 +53,8 @@ const SMOKE_DETECTOR_STATE: ManufacturerSpecificFieldSpec[] = [
       "Product installed",
       null, // the network mode, which is the next field
       null,
-      "Perimeter intrusion occurred",
-      "Smoke inlet blocking occurred",
+      "Intrusion occurred",
+      "Inlet blocking occurred",
       "Out of temperature range occurred",
     ],
   },

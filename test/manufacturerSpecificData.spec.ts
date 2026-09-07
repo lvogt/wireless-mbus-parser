@@ -7,6 +7,7 @@ import type {
   EvaluatedData,
   ManufacturerSpecificFieldSpec,
   ManufacturerSpecificLayout,
+  ManufacturerSpecificValue,
 } from "@/types";
 import { EvaluatedDataType } from "@/types";
 
@@ -70,7 +71,7 @@ describe("Manufacturer specific data", () => {
         description: "Tamper",
         type: EvaluatedDataType.String,
         info: {
-          legacyVif: "VIF_MANUFACTURER_SPECIFIC",
+          legacyVif: "VIF_TAMPER",
           tariff: 0,
           deviceUnit: 0,
           storageNo: 0,
@@ -82,7 +83,7 @@ describe("Manufacturer specific data", () => {
         description: "Battery",
         type: EvaluatedDataType.Number,
         info: {
-          legacyVif: "VIF_MANUFACTURER_SPECIFIC",
+          legacyVif: "VIF_BATTERY",
           tariff: 0,
           deviceUnit: 0,
           storageNo: 0,
@@ -94,7 +95,7 @@ describe("Manufacturer specific data", () => {
         description: "Counter",
         type: EvaluatedDataType.Number,
         info: {
-          legacyVif: "VIF_MANUFACTURER_SPECIFIC",
+          legacyVif: "VIF_COUNTER",
           tariff: 0,
           deviceUnit: 0,
           storageNo: 1,
@@ -328,17 +329,15 @@ describe("Itron", () => {
 
     const { data } = result;
     // config byte 0x80
-    expect(valueOf(data, "Transmitted data encrypted")).toEqual(1);
+    expect(valueOf(data, "Data encrypted")).toEqual(1);
     // modem error byte 0x41
-    expect(valueOf(data, "Code corrupt")).toEqual(1);
-    expect(valueOf(data, "Low battery")).toEqual(1);
-    expect(valueOf(data, "Removal")).toEqual(0);
+    expect(valueOf(data, "Modem code corrupt")).toEqual(1);
+    expect(valueOf(data, "Modem low battery")).toEqual(1);
+    expect(valueOf(data, "Modem removal")).toEqual(0);
     // smoke detector error bytes 0x0280
     expect(valueOf(data, "Warning: smoke alarm")).toEqual(1);
-    expect(
-      valueOf(data, "Warning: no test done during the last period")
-    ).toEqual(1);
-    expect(valueOf(data, "Warning: smoke inlet blocking")).toEqual(0);
+    expect(valueOf(data, "Warning: no test in last period")).toEqual(1);
+    expect(valueOf(data, "Warning: inlet blocking")).toEqual(0);
     // status byte 0x06
     expect(valueOf(data, "Product installed")).toEqual(1);
     expect(valueOf(data, "Removal occurred")).toEqual(0);
@@ -383,17 +382,15 @@ describe("Itron", () => {
     expect(data[0].value).toEqual(new Date("2026-02-08T14:32:18.000Z"));
 
     // the telegram was encrypted, which the configuration byte states as well
-    expect(valueOf(data, "Transmitted data encrypted")).toEqual(1);
+    expect(valueOf(data, "Data encrypted")).toEqual(1);
     // 0x3e is the product code of the smoke detector module
     expect(valueOf(data, "Product code")).toEqual(0x3e);
 
-    expect(valueOf(data, "Removal")).toEqual(1);
+    expect(valueOf(data, "Modem removal")).toEqual(1);
     expect(valueOf(data, "Removal occurred")).toEqual(1);
-    expect(valueOf(data, "Warning: perimeter intrusion")).toEqual(1);
-    expect(valueOf(data, "Perimeter intrusion occurred")).toEqual(1);
-    expect(
-      valueOf(data, "Warning: no test done during the last period")
-    ).toEqual(1);
+    expect(valueOf(data, "Warning: intrusion")).toEqual(1);
+    expect(valueOf(data, "Intrusion occurred")).toEqual(1);
+    expect(valueOf(data, "Warning: no test in last period")).toEqual(1);
     expect(valueOf(data, "Warning: smoke alarm")).toEqual(0);
     expect(valueOf(data, "Product installed")).toEqual(1);
     expect(valueOf(data, "Network mode")).toEqual("Walk-by");
@@ -666,5 +663,51 @@ describe("Declarative handlers", () => {
     expect(create([{ byte: 0, flags: [1, 2] }])).toThrowError(
       "the flags of byte 0 (flags) are not names"
     );
+  });
+});
+
+describe("Legacy names", () => {
+  async function legacyTypes(values: ManufacturerSpecificValue[]) {
+    manufacturerSpecificHandlers["TST"] = () => values;
+    const legacy = WirelessMbusParser.toLegacyResult(await decode());
+    return legacy.dataRecord.slice(1).map((record) => record.type);
+  }
+
+  it("A value is named after its description", async () => {
+    // the name ends up in the id of an ioBroker object, so every value needs
+    // one of its own
+    expect(
+      await legacyTypes([
+        { description: "Warning: smoke alarm", value: 1 },
+        { description: "Remaining battery lifetime", value: 83 },
+      ])
+    ).toEqual(["VIF_WARNING_SMOKE_ALARM", "VIF_REMAINING_BATTERY_LIFETIME"]);
+  });
+
+  it("A name of the handler is kept", async () => {
+    expect(
+      await legacyTypes([
+        {
+          description: "Battery",
+          value: 83,
+          legacyName: "VIF_BATTERY_REMAINING",
+        },
+      ])
+    ).toEqual(["VIF_BATTERY_REMAINING"]);
+  });
+
+  it("Accents are folded and separators are collapsed", async () => {
+    expect(
+      await legacyTypes([
+        { description: "Füllstand über Grenze", value: 1 },
+        { description: "  Tariff 2 - 1/2 h  ", value: 1 },
+      ])
+    ).toEqual(["VIF_FULLSTAND_UBER_GRENZE", "VIF_TARIFF_2_1_2_H"]);
+  });
+
+  it("A description without any letters falls back", async () => {
+    expect(await legacyTypes([{ description: "???", value: 1 }])).toEqual([
+      "VIF_MANUFACTURER_SPECIFIC",
+    ]);
   });
 });
