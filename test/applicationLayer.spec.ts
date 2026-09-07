@@ -7,11 +7,12 @@ import { decodeExtendedLinkLayer } from "@/parser/extendedLinkLayer";
 import { decodeLinkLayer } from "@/parser/linkLayer";
 import type { LinkLayer } from "@/types";
 
-async function decodeApl(data: string) {
+async function decodeApl(data: string, key?: string) {
   return await decodeApplicationLayer(
     {
       data: Buffer.from(data, "hex"),
       pos: 0,
+      key: key ? Buffer.from(key, "hex") : undefined,
     },
     {} as unknown as LinkLayer
   );
@@ -248,6 +249,19 @@ describe("Application Layer", () => {
       )
     ).rejects.toThrowErrorMatchingInlineSnapshot(
       "[WRONG_AES_KEY: Received MAC does not match. Wrong key?\nMAC received: 21924d4f3fb66e01]"
+    );
+  });
+
+  it("Encryption Mode 13 is not implemented", async () => {
+    // short header with the configuration word 0x0d10: mode 13, 16 encrypted
+    // bytes, followed by the extended configuration word and the ciphertext
+    await expect(
+      decodeApl(
+        "7A2A00100D070102030405060708090A0B0C0D0E0F10",
+        "000102030405060708090A0B0C0D0E0F"
+      )
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      "[UNIMPLEMENTED_FEATURE: Encryption mode 13 not implemented]"
     );
   });
 

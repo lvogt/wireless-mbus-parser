@@ -390,7 +390,7 @@ export async function decodeApplicationLayer(
     } else {
       throw new ParserError(
         "UNIMPLEMENTED_FEATURE",
-        `Encryption mode ${apl.config.mode.toString(16)} not implemented`
+        `Encryption mode ${apl.config.mode.toString()} not implemented`
       );
     }
 
