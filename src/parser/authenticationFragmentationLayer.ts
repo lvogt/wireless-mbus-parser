@@ -19,10 +19,8 @@ export function decodeAuthenticationAndFragmentationLayer(state: ParserState): {
   const data = state.data;
   let pos = state.pos;
 
-  const ci = data[pos++];
-  if (ci !== CI_AFL) {
-    throw new ParserError("UNEXPECTED_STATE", `Wrong AFL CI: ${ci}`);
-  }
+  const ci = CI_AFL;
+  pos++;
   log.debug("Authentification and Fragmentation Layer");
 
   const afll = data[pos++];
