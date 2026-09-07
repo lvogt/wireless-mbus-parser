@@ -283,7 +283,7 @@ smoke detector shipped with the parser is described declaratively,
 
 ## Changelog
 
-### Unreleased
+### 1.5.0
 
 - Manufacturer specific handlers can be passed to the parser as
   `manufacturerSpecificHandlers` of the configuration, so they no longer have
