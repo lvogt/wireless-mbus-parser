@@ -13,6 +13,7 @@ export const manufacturerSpecificsVifs: Record<string, VIFDescriptor[]> = {
     {
       vif: 0x17,
       legacyName: "VIF_ERROR_FLAGS",
+      name: "error_flags",
       unit: "",
       description: "Alarm flags",
       calc: (val) => val,
@@ -21,6 +22,7 @@ export const manufacturerSpecificsVifs: Record<string, VIFDescriptor[]> = {
     {
       vif: 0x2c,
       legacyName: "VIF_TRANSMIT_PERIOD",
+      name: "transmit_period",
       unit: "s",
       description: "Transmit period",
       calc: (val) => val,
@@ -29,6 +31,7 @@ export const manufacturerSpecificsVifs: Record<string, VIFDescriptor[]> = {
     {
       vif: 0x6e,
       legacyName: "VIF_BATTERY_REMAINING",
+      name: "remaining_battery_life",
       unit: "month",
       description: "Remaining battery life",
       calc: (val) => val,
@@ -39,6 +42,7 @@ export const manufacturerSpecificsVifs: Record<string, VIFDescriptor[]> = {
     {
       vif: 0x00,
       legacyName: "VIF_ELECTRIC_POWER_PHASE",
+      name: "power_phase",
       unit: "W",
       description: "Power",
       calc: (val) => divide(val, 100),
@@ -47,6 +51,7 @@ export const manufacturerSpecificsVifs: Record<string, VIFDescriptor[]> = {
     {
       vif: 0x28,
       legacyName: "VIF_ELECTRIC_POWER_PHASE_NO",
+      name: "phase_angle",
       unit: "s",
       description: "Phase angle",
       calc: (val) => val,
@@ -57,6 +62,7 @@ export const manufacturerSpecificsVifs: Record<string, VIFDescriptor[]> = {
     {
       vif: 0x07,
       legacyName: "VIF_ENERGY_E8",
+      name: "heating_energy_e_8",
       unit: "Wh",
       description: "Heating energy E8",
       calc: (val) => multiply(val, 1000),
@@ -65,6 +71,7 @@ export const manufacturerSpecificsVifs: Record<string, VIFDescriptor[]> = {
     {
       vif: 0x08,
       legacyName: "VIF_ENERGY_E9",
+      name: "heating_energy_e_9",
       unit: "Wh",
       description: "Heating energy E9",
       calc: (val) => multiply(val, 1000),
@@ -73,6 +80,7 @@ export const manufacturerSpecificsVifs: Record<string, VIFDescriptor[]> = {
     {
       vif: 0x11,
       legacyName: "VIF_KAMSTRUP_CONFIG",
+      name: "config_number",
       unit: "",
       description: "Config number (0x11)",
       calc: (val) => val,
@@ -81,6 +89,7 @@ export const manufacturerSpecificsVifs: Record<string, VIFDescriptor[]> = {
     {
       vif: 0x1a,
       legacyName: "VIF_KAMSTRUP_METER_TYPE",
+      name: "meter_type",
       unit: "",
       description: "Meter type",
       calc: (val) => val,
@@ -89,6 +98,7 @@ export const manufacturerSpecificsVifs: Record<string, VIFDescriptor[]> = {
     {
       vif: 0x20,
       legacyName: "VIF_KAMSTRUP_INFO_20",
+      name: "info_register_20",
       unit: "",
       description: "Info register (0x20)",
       calc: (val) => val,
@@ -97,6 +107,7 @@ export const manufacturerSpecificsVifs: Record<string, VIFDescriptor[]> = {
     {
       vif: 0x22,
       legacyName: "VIF_KAMSTRUP_INFO_22",
+      name: "info_register_22",
       unit: "",
       description: "Info register (0x22)",
       calc: (val) => val,
@@ -110,6 +121,7 @@ export const manufacturerSpecificsVifes: Record<string, VIFEDescriptor[]> = {
     {
       vif: 0x3e,
       legacyName: "VIF_PREVIOUS_VALUE",
+      name: "previous_value",
       description: "Previous value",
       apply: extendDescription,
     },
@@ -118,6 +130,7 @@ export const manufacturerSpecificsVifes: Record<string, VIFEDescriptor[]> = {
     {
       vif: 0x0f,
       legacyName: "VIF_TEMPERATURE_AVG",
+      name: "average",
       description: "(average)",
       apply: extendDescription,
     },

@@ -13,13 +13,14 @@ import { decadeRange } from "@/vif/vifRange";
 // which are not a scaled number - dates, time points and special functions -
 // are not covered by that check.
 export const defaultVIFs: VIFDescriptor[] = [
-  ...decadeRange(0x00, 8, -3, "VIF_ENERGY_WATT", "Wh", "Energy"),
-  ...decadeRange(0x08, 8, 0, "VIF_ENERGY_JOULE", "J", "Energy"),
-  ...decadeRange(0x10, 8, -6, "VIF_VOLUME", "m³", "Volume"),
-  ...decadeRange(0x18, 8, -3, "VIF_MASS", "kg", "Mass"),
+  ...decadeRange(0x00, 8, -3, "VIF_ENERGY_WATT", "energy", "Wh", "Energy"),
+  ...decadeRange(0x08, 8, 0, "VIF_ENERGY_JOULE", "energy", "J", "Energy"),
+  ...decadeRange(0x10, 8, -6, "VIF_VOLUME", "volume", "m³", "Volume"),
+  ...decadeRange(0x18, 8, -3, "VIF_MASS", "mass", "kg", "Mass"),
   {
     vif: 0x20,
     legacyName: "VIF_ON_TIME",
+    name: "on_time",
     unit: "s",
     description: "On Time",
     calc: (val) => val,
@@ -28,6 +29,7 @@ export const defaultVIFs: VIFDescriptor[] = [
   {
     vif: 0x21,
     legacyName: "VIF_ON_TIME",
+    name: "on_time",
     unit: "min",
     description: "On Time",
     calc: (val) => val,
@@ -36,6 +38,7 @@ export const defaultVIFs: VIFDescriptor[] = [
   {
     vif: 0x22,
     legacyName: "VIF_ON_TIME",
+    name: "on_time",
     unit: "h",
     description: "On Time",
     calc: (val) => val,
@@ -44,6 +47,7 @@ export const defaultVIFs: VIFDescriptor[] = [
   {
     vif: 0x23,
     legacyName: "VIF_ON_TIME",
+    name: "on_time",
     unit: "d",
     description: "On Time",
     calc: (val) => val,
@@ -52,6 +56,7 @@ export const defaultVIFs: VIFDescriptor[] = [
   {
     vif: 0x24,
     legacyName: "VIF_OP_TIME",
+    name: "operating_time",
     unit: "s",
     description: "Operating Time",
     calc: (val) => val,
@@ -60,6 +65,7 @@ export const defaultVIFs: VIFDescriptor[] = [
   {
     vif: 0x25,
     legacyName: "VIF_OP_TIME",
+    name: "operating_time",
     unit: "min",
     description: "Operating Time",
     calc: (val) => val,
@@ -68,6 +74,7 @@ export const defaultVIFs: VIFDescriptor[] = [
   {
     vif: 0x26,
     legacyName: "VIF_OP_TIME",
+    name: "operating_time",
     unit: "h",
     description: "Operating Time",
     calc: (val) => val,
@@ -76,19 +83,29 @@ export const defaultVIFs: VIFDescriptor[] = [
   {
     vif: 0x27,
     legacyName: "VIF_OP_TIME",
+    name: "operating_time",
     unit: "d",
     description: "Operating Time",
     calc: (val) => val,
     apply: applyNumberDefault,
   },
-  ...decadeRange(0x28, 8, -3, "VIF_ELECTRIC_POWER", "W", "Power"),
-  ...decadeRange(0x30, 8, 0, "VIF_THERMAL_POWER", "J/h", "Power"),
-  ...decadeRange(0x38, 8, -6, "VIF_VOLUME_FLOW", "m³/h", "Volume Flow"),
+  ...decadeRange(0x28, 8, -3, "VIF_ELECTRIC_POWER", "power", "W", "Power"),
+  ...decadeRange(0x30, 8, 0, "VIF_THERMAL_POWER", "power", "J/h", "Power"),
+  ...decadeRange(
+    0x38,
+    8,
+    -6,
+    "VIF_VOLUME_FLOW",
+    "volume_flow",
+    "m³/h",
+    "Volume Flow"
+  ),
   ...decadeRange(
     0x40,
     8,
     -7,
     "VIF_VOLUME_FLOW_EXT1",
+    "volume_flow",
     "m³/min",
     "Volume Flow ext."
   ),
@@ -97,25 +114,60 @@ export const defaultVIFs: VIFDescriptor[] = [
     8,
     -9,
     "VIF_VOLUME_FLOW_EXT2",
+    "volume_flow",
     "m³/s",
     "Volume Flow ext."
   ),
-  ...decadeRange(0x50, 8, -3, "VIF_MASS_FLOW", "kg/h", "Mass Flow"),
-  ...decadeRange(0x58, 4, -3, "VIF_FLOW_TEMP", "°C", "Flow Temperature"),
-  ...decadeRange(0x5c, 4, -3, "VIF_RETURN_TEMP", "°C", "Return Temperature"),
-  ...decadeRange(0x60, 4, -3, "VIF_TEMP_DIFF", "K", "Temperature Difference"),
+  ...decadeRange(
+    0x50,
+    8,
+    -3,
+    "VIF_MASS_FLOW",
+    "mass_flow",
+    "kg/h",
+    "Mass Flow"
+  ),
+  ...decadeRange(
+    0x58,
+    4,
+    -3,
+    "VIF_FLOW_TEMP",
+    "flow_temperature",
+    "°C",
+    "Flow Temperature"
+  ),
+  ...decadeRange(
+    0x5c,
+    4,
+    -3,
+    "VIF_RETURN_TEMP",
+    "return_temperature",
+    "°C",
+    "Return Temperature"
+  ),
+  ...decadeRange(
+    0x60,
+    4,
+    -3,
+    "VIF_TEMP_DIFF",
+    "temperature_difference",
+    "K",
+    "Temperature Difference"
+  ),
   ...decadeRange(
     0x64,
     4,
     -3,
     "VIF_EXTERNAL_TEMP",
+    "external_temperature",
     "°C",
     "External Temperature"
   ),
-  ...decadeRange(0x68, 4, -3, "VIF_PRESSURE", "bar", "Pressure"),
+  ...decadeRange(0x68, 4, -3, "VIF_PRESSURE", "pressure", "bar", "Pressure"),
   {
     vif: 0x6c,
     legacyName: "VIF_TIME_POINT_DATE",
+    name: "time_point",
     unit: "",
     description: "Time point",
     calc: (val) => val,
@@ -124,6 +176,7 @@ export const defaultVIFs: VIFDescriptor[] = [
   {
     vif: 0x6d,
     legacyName: "VIF_TIME_POINT_DATE_TIME",
+    name: "time_point",
     unit: "",
     description: "Time point",
     calc: (val) => val,
@@ -132,6 +185,7 @@ export const defaultVIFs: VIFDescriptor[] = [
   {
     vif: 0x6e,
     legacyName: "VIF_HCA",
+    name: "hca_units",
     unit: "",
     description: "Units for H.C.A.",
     calc: (val) => val,
@@ -140,6 +194,7 @@ export const defaultVIFs: VIFDescriptor[] = [
   {
     vif: 0x70,
     legacyName: "VIF_AVERAGING_DURATION",
+    name: "averaging_duration",
     unit: "s",
     description: "Averaging Duration",
     calc: (val) => val,
@@ -148,6 +203,7 @@ export const defaultVIFs: VIFDescriptor[] = [
   {
     vif: 0x71,
     legacyName: "VIF_AVERAGING_DURATION",
+    name: "averaging_duration",
     unit: "min",
     description: "Averaging Duration",
     calc: (val) => val,
@@ -156,6 +212,7 @@ export const defaultVIFs: VIFDescriptor[] = [
   {
     vif: 0x72,
     legacyName: "VIF_AVERAGING_DURATION",
+    name: "averaging_duration",
     unit: "h",
     description: "Averaging Duration",
     calc: (val) => val,
@@ -164,6 +221,7 @@ export const defaultVIFs: VIFDescriptor[] = [
   {
     vif: 0x73,
     legacyName: "VIF_AVERAGING_DURATION",
+    name: "averaging_duration",
     unit: "d",
     description: "Averaging Duration",
     calc: (val) => val,
@@ -172,6 +230,7 @@ export const defaultVIFs: VIFDescriptor[] = [
   {
     vif: 0x74,
     legacyName: "VIF_ACTUALITY_DURATION",
+    name: "actuality_duration",
     unit: "s",
     description: "Actuality Duration",
     calc: (val) => val,
@@ -180,6 +239,7 @@ export const defaultVIFs: VIFDescriptor[] = [
   {
     vif: 0x75,
     legacyName: "VIF_ACTUALITY_DURATION",
+    name: "actuality_duration",
     unit: "min",
     description: "Actuality Duration",
     calc: (val) => val,
@@ -188,6 +248,7 @@ export const defaultVIFs: VIFDescriptor[] = [
   {
     vif: 0x76,
     legacyName: "VIF_ACTUALITY_DURATION",
+    name: "actuality_duration",
     unit: "h",
     description: "Actuality Duration",
     calc: (val) => val,
@@ -196,6 +257,7 @@ export const defaultVIFs: VIFDescriptor[] = [
   {
     vif: 0x77,
     legacyName: "VIF_ACTUALITY_DURATION",
+    name: "actuality_duration",
     unit: "d",
     description: "Actuality Duration",
     calc: (val) => val,
@@ -204,6 +266,7 @@ export const defaultVIFs: VIFDescriptor[] = [
   {
     vif: 0x78,
     legacyName: "VIF_FABRICATION_NO",
+    name: "fabrication_no",
     unit: "",
     description: "Fabrication No",
     calc: (val) => val,
@@ -212,6 +275,7 @@ export const defaultVIFs: VIFDescriptor[] = [
   {
     vif: 0x79,
     legacyName: "VIF_OWNER_NO",
+    name: "owner_no",
     unit: "",
     description: "Owner No",
     calc: (val) => val,
@@ -220,6 +284,7 @@ export const defaultVIFs: VIFDescriptor[] = [
   {
     vif: 0x7a,
     legacyName: "VIF_BUS_ADDRESS",
+    name: "bus_address",
     unit: "",
     description: "Bus Address",
     calc: (val) => val,

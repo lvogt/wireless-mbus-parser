@@ -107,6 +107,43 @@ Telegram data is arbitrary radio data, so anything unexpected which is
 not caught while parsing is wrapped in a `ParserError` as well - the
 original error is available as its `cause`.
 
+## Names
+
+Every value carries a stable name in `info.name`, which identifies the quantity
+it is regardless of its unit: an energy is `energy` whether the meter reports
+it in Wh or in GJ, a flow temperature is `flow_temperature` in °C and in °F.
+`info.extensionNames` lists the VIF extensions which change what the value
+means, in the order they were sent - e.g. `["negative"]` for an energy which
+only accumulates negative contributions. Extensions which only scale the value
+or report an error have no name.
+
+A meter can mark a value as broken with a record error, e.g. "data error" or
+"no data available". The value then keeps its name - it is still the same
+quantity - and `info.recordError` states the error, e.g. `data_error`; it is
+not set for a sound value. A consumer should not take such a value for a real
+reading: the ioBroker adapter, for example, can skip it or set the quality of
+the state.
+
+```typescript
+const { name, extensionNames, storageNo, tariff, functionField } = value.info;
+const id = [name, ...extensionNames].join("_"); // e.g. "energy_negative"
+```
+
+The names are meant to be used as identifiers, so they are part of the API: a
+name only changes with a new major version. They follow these rules, which a
+test checks for every entry of the VIF tables:
+
+- snake_case of `a-z`, `0-9` and `_`, a digit always follows an underscore
+  (`storage_1`, never `storage1`)
+- no unit
+- no prefix `max_`, `min_` or `error_state_` and no suffix `_u<N>` or `_t<N>` -
+  function field, subunit and tariff are reported separately (`functionField`,
+  `deviceUnit`, `tariff`)
+
+A VIF or extension the parser does not know is named after its code, e.g.
+`unknown_vif_fd_25` or `manufacturer_specific_vife_7`, so that two of them stay
+apart. Such a name changes when the parser learns the code.
+
 ## Compact Frames
 
 Compact frames (CI 0x79) contain values without the data record headers
@@ -179,6 +216,12 @@ promises: rewording it renames the objects of everyone who receives that meter.
 Use `legacyName` for a name which should not follow the wording - or for one
 the description does not make a good identifier of.
 
+The same goes for the [name](#names) of a value: `name` states it, otherwise it
+is derived from the legacy name - `VIF_WARNING_SMOKE_ALARM` becomes
+`warning_smoke_alarm`. A derived name is not checked against the naming rules,
+so a handler whose description starts with "Max", for example, should state
+one.
+
 Handlers are registered per manufacturer, either when the parser is created:
 
 ```typescript
@@ -243,8 +286,9 @@ at bit 7. `flags` names one bit each and yields one value per name, the
 reserved ones are named `null` and are not reported. `values` names the
 possible values of a field: a list names the values 0, 1, 2 and so on, an
 object only the ones which have a name (`{ 4: "Heat", 13: "Cooling" }`), and a
-value without a name stays the number it is. `unit`, `legacyName`, `storageNo` and `tariff` are the same as
-for a handler written by hand. A flag is named after the name of its bit, so a
+value without a name stays the number it is. `unit`, `legacyName`, `name`,
+`storageNo` and `tariff` are the same as for a handler written by hand - `name`
+is checked against the naming rules and cannot be given to a group of `flags`. A flag is named after the name of its bit, so a
 flag whose legacy name should not follow that name is described as a `bit`
 field with a `legacyName` of its own.
 
@@ -282,6 +326,18 @@ smoke detector shipped with the parser is described declaratively,
 - TCH smoke detector?
 
 ## Changelog
+
+### Unreleased
+
+- Every value carries a stable name in `info.name`. The names are meant as
+  identifiers and are part of the API from now on - see [Names](#names).
+- `info.extensionNames` lists the VIF extensions which change what a value
+  means, e.g. `negative`
+- A manufacturer specific value and a field of a declarative handler can state
+  a `name` of their own
+- A value the meter marks as broken states the error in `info.recordError`
+- expose the DIB function field as `info.functionField`
+- The description of the record error "data overflow" was "undefined"
 
 ### 1.5.0
 

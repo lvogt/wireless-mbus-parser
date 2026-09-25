@@ -103,6 +103,7 @@ export type DataType = string | number | bigint | Buffer | null;
 export interface VIFDescriptor {
   vif: number;
   legacyName: string;
+  name: string;
   calc: (value: DataType) => DataType;
   unit: string;
   description: string;
@@ -112,6 +113,8 @@ export interface VIFDescriptor {
 export interface VIFEDescriptor {
   vif: number;
   legacyName: string;
+  name?: string;
+  error?: string;
   calc?: (value: DataType | Date) => DataType | Date;
   unit?: string;
   description?: string;
@@ -142,9 +145,13 @@ export interface EvaluatedData {
   type: EvaluatedDataType;
   info: {
     legacyVif: string;
+    name: string;
+    extensionNames: string[];
+    recordError?: string;
     tariff: number;
     deviceUnit: number;
     storageNo: number;
+    functionField: number;
   };
 }
 
@@ -357,6 +364,7 @@ export interface ManufacturerSpecificValue {
   value: DataType | Date;
   unit?: string;
   legacyName?: string;
+  name?: string;
   storageNo?: number;
   tariff?: number;
 }
@@ -397,6 +405,7 @@ interface ManufacturerSpecificFieldBase {
 // A single value: the whole field, one of its bits or a range of them.
 export interface ManufacturerSpecificValueSpec extends ManufacturerSpecificFieldBase {
   description: string;
+  name?: string;
   // the bit of the field to report, counted from its least significant one
   bit?: number;
   // the bits of the field to report, as an inclusive range: [7, 11] are the
@@ -414,6 +423,7 @@ export interface ManufacturerSpecificValueSpec extends ManufacturerSpecificField
 export interface ManufacturerSpecificFlagsSpec extends ManufacturerSpecificFieldBase {
   flags: (string | null)[];
   description?: never;
+  name?: never;
 }
 
 export type ManufacturerSpecificFieldSpec =

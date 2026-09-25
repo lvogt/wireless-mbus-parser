@@ -100,9 +100,12 @@ function getNumberType(value: DataType | Date) {
 function getInfo(vif: VIFDescriptor, dataRecord: DataRecord) {
   return {
     legacyVif: vif.legacyName,
+    name: vif.name,
+    extensionNames: [],
     tariff: dataRecord.header.dib.tariff,
     deviceUnit: dataRecord.header.dib.deviceUnit,
     storageNo: dataRecord.header.dib.storageNo,
+    functionField: dataRecord.header.dib.functionField,
   };
 }
 

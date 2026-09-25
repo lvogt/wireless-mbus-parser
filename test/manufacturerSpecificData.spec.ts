@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 
+import { isValidName } from "@/helper/name";
 import { createManufacturerSpecificHandler } from "@/manufacturerSpecificData/fieldSpec";
 import { manufacturerSpecificHandlers } from "@/manufacturerSpecificData/handler";
 import { WirelessMbusParser } from "@/parser/parser";
@@ -72,9 +73,12 @@ describe("Manufacturer specific data", () => {
         type: EvaluatedDataType.String,
         info: {
           legacyVif: "VIF_TAMPER",
+          name: "tamper",
+          extensionNames: [],
           tariff: 0,
           deviceUnit: 0,
           storageNo: 0,
+          functionField: 0,
         },
       },
       {
@@ -84,9 +88,12 @@ describe("Manufacturer specific data", () => {
         type: EvaluatedDataType.Number,
         info: {
           legacyVif: "VIF_BATTERY",
+          name: "battery",
+          extensionNames: [],
           tariff: 0,
           deviceUnit: 0,
           storageNo: 0,
+          functionField: 0,
         },
       },
       {
@@ -96,9 +103,12 @@ describe("Manufacturer specific data", () => {
         type: EvaluatedDataType.Number,
         info: {
           legacyVif: "VIF_COUNTER",
+          name: "counter",
+          extensionNames: [],
           tariff: 0,
           deviceUnit: 0,
           storageNo: 1,
+          functionField: 0,
         },
       },
     ]);
@@ -356,6 +366,17 @@ describe("Itron", () => {
 
     expect(battery?.unit).toEqual("month");
     expect(battery?.type).toEqual(EvaluatedDataType.Number);
+    // the same name as the battery VIF of Diehl
+    expect(battery?.info.name).toEqual("remaining_battery_life");
+  });
+
+  // the names of a shipped handler are API just like those of the VIF tables
+  it("Every value follows the naming rules", async () => {
+    const result = await decodeSmokeDetector();
+    const names = result.data.map((entry) => entry.info.name);
+
+    expect(names.filter((name) => !isValidName(name))).toEqual([]);
+    expect(names).toMatchSnapshot();
   });
 
   it("Reserved bits are not reported", async () => {
@@ -656,6 +677,14 @@ describe("Declarative handlers", () => {
         { fields: [{ byte: 0, description: "Layout" }] },
       ] as never)
     ).toThrowError("fields and layouts cannot be mixed in one list");
+    expect(
+      create([{ byte: 0, description: "Flow", name: "max_flow" }])
+    ).toThrowError("byte 0 (Flow) has an invalid name: max_flow");
+    expect(
+      create([{ byte: 0, flags: ["a", "b"], name: "flags" } as never])
+    ).toThrowError(
+      "byte 0 (flags) is a group of flags, which cannot share a name"
+    );
   });
 
   // a description can be read from a configuration file, so it is not
@@ -725,6 +754,47 @@ describe("Legacy names", () => {
     expect(await legacyTypes([{ description: "???", value: 1 }])).toEqual([
       "VIF_MANUFACTURER_SPECIFIC",
     ]);
+  });
+});
+
+describe("Names", () => {
+  async function names(values: ManufacturerSpecificValue[]) {
+    manufacturerSpecificHandlers["TST"] = () => values;
+    const { data } = await decode();
+    return data.slice(1).map((entry) => entry.info.name);
+  }
+
+  it("A value is named after its legacy name", async () => {
+    expect(
+      await names([
+        { description: "Warning: smoke alarm", value: 1 },
+        { description: "Battery", value: 83, legacyName: "VIF_BATTERY_2" },
+        { description: "  Tariff 2 - 1/2 h  ", value: 1 },
+        { description: "Value2", value: 1 },
+        { description: "???", value: 1 },
+      ])
+    ).toEqual([
+      "warning_smoke_alarm",
+      "battery_2",
+      "tariff_2_1_2_h",
+      "value_2",
+      "manufacturer_specific",
+    ]);
+  });
+
+  it("A name of the handler is kept", async () => {
+    expect(
+      await names([{ description: "Battery", value: 83, name: "battery" }])
+    ).toEqual(["battery"]);
+  });
+
+  it("A name of a declarative handler is kept", async () => {
+    manufacturerSpecificHandlers["TST"] = createManufacturerSpecificHandler([
+      { byte: 0, description: "Battery", name: "battery_level" },
+    ]);
+    const { data } = await decode();
+
+    expect(data[1].info.name).toEqual("battery_level");
   });
 });
 

@@ -1,3 +1,4 @@
+import { isValidName } from "@/helper/name";
 import type {
   DataRecord,
   ManufacturerSpecificDataRecordHandler,
@@ -59,6 +60,9 @@ function checkValueSpec(spec: ManufacturerSpecificValueSpec) {
   if (typeof spec.description !== "string" || spec.description === "") {
     fail(`the field at byte ${String(spec.byte)} has no description`);
   }
+  if (spec.name !== undefined && !isValidName(spec.name)) {
+    fail(`${describe(spec)} has an invalid name: ${String(spec.name)}`);
+  }
   if (spec.bit !== undefined && spec.bits !== undefined) {
     fail(`${describe(spec)} states both a bit and a bit range`);
   }
@@ -93,6 +97,9 @@ function checkFlagsSpec(spec: ManufacturerSpecificFlagsSpec) {
   }
   if (spec.flags.some((name) => name !== null && typeof name !== "string")) {
     fail(`the flags of ${describe(spec)} are not names`);
+  }
+  if ("name" in spec) {
+    fail(`${describe(spec)} is a group of flags, which cannot share a name`);
   }
 }
 
@@ -181,6 +188,7 @@ function decodeValue(
   return {
     ...baseValue(spec),
     description: spec.description,
+    name: spec.name,
     // a list names the values 0, 1, 2 and so on, an object only the ones which
     // have a name - both are indexed the same way
     value: spec.values?.[value] ?? value,

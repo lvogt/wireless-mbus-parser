@@ -13,11 +13,12 @@ import { decadeRange } from "@/vif/vifRange";
 // comparable entries agreed on unit and scaling exponent. The remaining
 // entries have no counterpart in either implementation.
 export const fdVifs: VIFDescriptor[] = [
-  ...decadeRange(0x00, 4, -3, "VIF_CREDIT", "€", "Credit"),
-  ...decadeRange(0x04, 4, -3, "VIF_DEBIT", "€", "Debit"),
+  ...decadeRange(0x00, 4, -3, "VIF_CREDIT", "credit", "€", "Credit"),
+  ...decadeRange(0x04, 4, -3, "VIF_DEBIT", "debit", "€", "Debit"),
   {
     vif: 0x08,
     legacyName: "VIF_ACCESS_NO",
+    name: "access_number",
     unit: "",
     description: "Access number (transmission count)",
     calc: (val) => val,
@@ -26,6 +27,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x09,
     legacyName: "VIF_MEDIUM",
+    name: "device_type",
     unit: "",
     description: "Device type",
     calc: (val) => val,
@@ -34,6 +36,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x0a,
     legacyName: "VIF_MANUFACTURER",
+    name: "manufacturer",
     unit: "",
     description: "Manufacturer",
     calc: (val) => val,
@@ -42,6 +45,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x0b,
     legacyName: "VIF_PARAM_SET_IDENTIFICATION",
+    name: "parameter_set_identification",
     unit: "",
     description: "Parameter set identification",
     calc: (val) => val,
@@ -50,6 +54,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x0c,
     legacyName: "VIF_MODEL_VERSION",
+    name: "model_version",
     unit: "",
     description: "Model / Version",
     calc: (val) => val,
@@ -58,6 +63,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x0d,
     legacyName: "VIF_HARDWARE_VERSION",
+    name: "hardware_version",
     unit: "",
     description: "Hardware version #",
     calc: (val) => val,
@@ -66,6 +72,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x0e,
     legacyName: "VIF_FIRMWARE_VERSION",
+    name: "firmware_version",
     unit: "",
     description: "Firmware version #",
     calc: (val) => val,
@@ -74,6 +81,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x0f,
     legacyName: "VIF_SOFTWARE_VERSION",
+    name: "software_version",
     unit: "",
     description: "Software version #",
     calc: (val) => val,
@@ -82,6 +90,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x10,
     legacyName: "VIF_CUSTOMER_LOCATION",
+    name: "customer_location",
     unit: "",
     description: "Customer location",
     calc: (val) => val,
@@ -90,6 +99,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x11,
     legacyName: "VIF_CUSTOMER",
+    name: "customer",
     unit: "",
     description: "Customer",
     calc: (val) => val,
@@ -98,6 +108,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x12,
     legacyName: "VIF_ACCESS_CODE_USER",
+    name: "access_code_user",
     unit: "",
     description: "Access Code User",
     calc: (val) => val,
@@ -106,6 +117,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x13,
     legacyName: "VIF_ACCESS_CODE_OPERATOR",
+    name: "access_code_operator",
     unit: "",
     description: "Access Code Operator",
     calc: (val) => val,
@@ -114,6 +126,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x14,
     legacyName: "VIF_ACCESS_CODE_SYS_OPERATOR",
+    name: "access_code_system_operator",
     unit: "",
     description: "Access Code Sytem Operator",
     calc: (val) => val,
@@ -122,6 +135,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x15,
     legacyName: "VIF_ACCESS_CODE_DEVELOPER",
+    name: "access_code_developer",
     unit: "",
     description: "Access Code Developer",
     calc: (val) => val,
@@ -130,6 +144,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x16,
     legacyName: "VIF_PASSWORD",
+    name: "password",
     unit: "",
     description: "Password",
     calc: (val) => val,
@@ -138,6 +153,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x17,
     legacyName: "VIF_ERROR_FLAGS",
+    name: "error_flags",
     unit: "",
     description: "Error flags (binary)",
     calc: (val) => val,
@@ -146,6 +162,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x18,
     legacyName: "VIF_ERROR_MASK",
+    name: "error_mask",
     unit: "",
     description: "Error mask",
     calc: (val) => val,
@@ -154,6 +171,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x1a,
     legacyName: "VIF_DIGITAL_OUTPUT_BINARY",
+    name: "digital_output",
     unit: "",
     description: "Digital Output (binary)",
     calc: (val) => val,
@@ -162,6 +180,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x1b,
     legacyName: "VIF_DIGITAL_INPUT_BINARY",
+    name: "digital_input",
     unit: "",
     description: "Digital Input (binary) ",
     calc: (val) => val,
@@ -170,6 +189,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x1c,
     legacyName: "VIF_BAUDRATE",
+    name: "baudrate",
     unit: "baud",
     description: "Baudrate",
     calc: (val) => val,
@@ -178,6 +198,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x1d,
     legacyName: "VIF_RESPONSE_DELAY_TIME",
+    name: "response_delay_time",
     unit: "bittimes",
     description: "Response delay time",
     calc: (val) => val,
@@ -186,6 +207,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x1e,
     legacyName: "VIF_RETRY",
+    name: "retry",
     unit: "",
     description: "Retry",
     calc: (val) => val,
@@ -194,6 +216,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x20,
     legacyName: "VIF_FIRST_STORAGE_CYCLIC",
+    name: "first_storage_number_for_cyclic_storage",
     unit: "",
     description: "First storage # for cyclic storage",
     calc: (val) => val,
@@ -202,6 +225,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x21,
     legacyName: "VIF_LAST_STORAGE_CYCLIC",
+    name: "last_storage_number_for_cyclic_storage",
     unit: "",
     description: "Last storage # for cyclic storage",
     calc: (val) => val,
@@ -210,6 +234,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x22,
     legacyName: "VIF_SIZE_STORAGE_BLOCK",
+    name: "size_of_storage_block",
     unit: "",
     description: "Size of storage block",
     calc: (val) => val,
@@ -218,6 +243,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x24,
     legacyName: "VIF_SIZE_STORAGE_INTERVAL",
+    name: "storage_interval",
     unit: "s",
     description: "Storage interval ",
     calc: (val) => val,
@@ -226,6 +252,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x25,
     legacyName: "VIF_SIZE_STORAGE_INTERVAL",
+    name: "storage_interval",
     unit: "min",
     description: "Storage interval ",
     calc: (val) => val,
@@ -234,6 +261,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x26,
     legacyName: "VIF_SIZE_STORAGE_INTERVAL",
+    name: "storage_interval",
     unit: "h",
     description: "Storage interval ",
     calc: (val) => val,
@@ -242,6 +270,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x27,
     legacyName: "VIF_SIZE_STORAGE_INTERVAL",
+    name: "storage_interval",
     unit: "d",
     description: "Storage interval ",
     calc: (val) => val,
@@ -250,6 +279,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x28,
     legacyName: "VIF_SIZE_STORAGE_INTERVAL",
+    name: "storage_interval",
     unit: "month",
     description: "Storage interval",
     calc: (val) => val,
@@ -258,6 +288,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x29,
     legacyName: "VIF_SIZE_STORAGE_INTERVAL",
+    name: "storage_interval",
     unit: "year",
     description: "Storage interval",
     calc: (val) => val,
@@ -266,6 +297,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x2c,
     legacyName: "VIF_DURATION_SINCE_LAST_READ",
+    name: "duration_since_last_readout",
     unit: "s",
     description: "Duration since last readout",
     calc: (val) => val,
@@ -274,6 +306,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x2d,
     legacyName: "VIF_DURATION_SINCE_LAST_READ",
+    name: "duration_since_last_readout",
     unit: "min",
     description: "Duration since last readout",
     calc: (val) => val,
@@ -282,6 +315,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x2e,
     legacyName: "VIF_DURATION_SINCE_LAST_READ",
+    name: "duration_since_last_readout",
     unit: "h",
     description: "Duration since last readout",
     calc: (val) => val,
@@ -290,6 +324,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x2f,
     legacyName: "VIF_DURATION_SINCE_LAST_READ",
+    name: "duration_since_last_readout",
     unit: "d",
     description: "Duration since last readout",
     calc: (val) => val,
@@ -298,6 +333,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x30,
     legacyName: "VIF_TARIFF_START",
+    name: "start_of_tariff",
     unit: "",
     description: "Start of tariff",
     calc: (val) => val,
@@ -306,6 +342,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x31,
     legacyName: "VIF_TARIFF_DURATION",
+    name: "duration_of_tariff",
     unit: "min",
     description: "Duration of tariff",
     calc: (val) => val,
@@ -314,6 +351,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x32,
     legacyName: "VIF_TARIFF_DURATION",
+    name: "duration_of_tariff",
     unit: "h",
     description: "Duration of tariff",
     calc: (val) => val,
@@ -322,6 +360,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x33,
     legacyName: "VIF_TARIFF_DURATION",
+    name: "duration_of_tariff",
     unit: "d",
     description: "Duration of tariff",
     calc: (val) => val,
@@ -330,6 +369,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x34,
     legacyName: "VIF_TARIFF_PERIOD",
+    name: "period_of_tariff",
     unit: "s",
     description: "Period of tariff",
     calc: (val) => val,
@@ -338,6 +378,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x35,
     legacyName: "VIF_TARIFF_PERIOD",
+    name: "period_of_tariff",
     unit: "min",
     description: "Period of tariff",
     calc: (val) => val,
@@ -346,6 +387,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x36,
     legacyName: "VIF_TARIFF_PERIOD",
+    name: "period_of_tariff",
     unit: "h",
     description: "Period of tariff",
     calc: (val) => val,
@@ -354,6 +396,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x37,
     legacyName: "VIF_TARIFF_PERIOD",
+    name: "period_of_tariff",
     unit: "d",
     description: "Period of tariff",
     calc: (val) => val,
@@ -362,6 +405,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x38,
     legacyName: "VIF_TARIFF_PERIOD",
+    name: "period_of_tariff",
     unit: "months",
     description: "Period of tariff",
     calc: (val) => val,
@@ -370,6 +414,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x39,
     legacyName: "VIF_TARIFF_PERIOD",
+    name: "period_of_tariff",
     unit: "years",
     description: "Period of tariff",
     calc: (val) => val,
@@ -378,16 +423,34 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x3a,
     legacyName: "VIF_DIMENSIONLESS",
+    name: "dimensionless",
     unit: "",
     description: "Dimensionless",
     calc: (val) => val,
     apply: applyNumberDefault,
   },
-  ...decadeRange(0x40, 16, -9, "VIF_ELECTRICAL_VOLTAGE", "V", "Voltage"),
-  ...decadeRange(0x50, 16, -12, "VIF_ELECTRICAL_CURRENT", "A", "Current"),
+  ...decadeRange(
+    0x40,
+    16,
+    -9,
+    "VIF_ELECTRICAL_VOLTAGE",
+    "voltage",
+    "V",
+    "Voltage"
+  ),
+  ...decadeRange(
+    0x50,
+    16,
+    -12,
+    "VIF_ELECTRICAL_CURRENT",
+    "current",
+    "A",
+    "Current"
+  ),
   {
     vif: 0x60,
     legacyName: "VIF_RESET_COUNTER",
+    name: "reset_counter",
     unit: "",
     description: "Reset counter",
     calc: (val) => val,
@@ -396,6 +459,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x61,
     legacyName: "VIF_CUMULATION_COUNTER",
+    name: "cumulation_counter",
     unit: "",
     description: "Cumulation counter",
     calc: (val) => val,
@@ -404,6 +468,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x62,
     legacyName: "VIF_CONTROL_SIGNAL",
+    name: "control_signal",
     unit: "",
     description: "Control signal",
     calc: (val) => val,
@@ -412,6 +477,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x63,
     legacyName: "VIF_DAY_OF_WEEK",
+    name: "day_of_week",
     unit: "",
     description: "Day of week",
     calc: (val) => val,
@@ -420,6 +486,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x64,
     legacyName: "VIF_WEEK_NUMBER",
+    name: "week_number",
     unit: "",
     description: "Week number",
     calc: (val) => val,
@@ -428,6 +495,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x65,
     legacyName: "VIF_TIME_POINT_DAY_CHANGE",
+    name: "time_point_of_day_change",
     unit: "",
     description: "Time point of day change",
     calc: (val) => val,
@@ -436,6 +504,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x66,
     legacyName: "VIF_STATE_OF_PARAM_ACTIVATION",
+    name: "state_of_parameter_activation",
     unit: "",
     description: "State of parameter activation",
     calc: (val) => val,
@@ -444,6 +513,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x67,
     legacyName: "VIF_SPECIAL_SUPPLIER_INFO",
+    name: "special_supplier_information",
     unit: "",
     description: "Special supplier information",
     calc: (val) => val,
@@ -452,6 +522,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x68,
     legacyName: "VIF_DURATION_SINCE_CUMULATION",
+    name: "duration_since_last_cumulation",
     unit: "s",
     description: "Duration since last cumulation",
     calc: (val) => val,
@@ -460,6 +531,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x69,
     legacyName: "VIF_DURATION_SINCE_CUMULATION",
+    name: "duration_since_last_cumulation",
     unit: "min",
     description: "Duration since last cumulation",
     calc: (val) => val,
@@ -468,6 +540,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x6a,
     legacyName: "VIF_DURATION_SINCE_CUMULATION",
+    name: "duration_since_last_cumulation",
     unit: "h",
     description: "Duration since last cumulation",
     calc: (val) => val,
@@ -476,6 +549,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x6b,
     legacyName: "VIF_DURATION_SINCE_CUMULATION",
+    name: "duration_since_last_cumulation",
     unit: "d",
     description: "Duration since last cumulation",
     calc: (val) => val,
@@ -484,6 +558,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x6c,
     legacyName: "VIF_OPERATING_TIME_BATTERY",
+    name: "operating_time_battery",
     unit: "s",
     description: "Operating time battery",
     calc: (val) => val,
@@ -492,6 +567,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x6d,
     legacyName: "VIF_OPERATING_TIME_BATTERY",
+    name: "operating_time_battery",
     unit: "min",
     description: "Operating time battery",
     calc: (val) => val,
@@ -500,6 +576,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x6e,
     legacyName: "VIF_OPERATING_TIME_BATTERY",
+    name: "operating_time_battery",
     unit: "h",
     description: "Operating time battery",
     calc: (val) => val,
@@ -508,6 +585,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x6f,
     legacyName: "VIF_OPERATING_TIME_BATTERY",
+    name: "operating_time_battery",
     unit: "d",
     description: "Operating time battery",
     calc: (val) => val,
@@ -516,6 +594,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x70,
     legacyName: "VIF_DATETIME_BATTERY_CHANGE",
+    name: "date_and_time_of_battery_change",
     unit: "",
     description: "Date and time of battery change",
     calc: (val) => val,
@@ -524,6 +603,7 @@ export const fdVifs: VIFDescriptor[] = [
   {
     vif: 0x71,
     legacyName: "VIF_RECEPTION_LEVEL",
+    name: "reception_level",
     unit: "dBm",
     description: "Reception level",
     calc: (val) => val,
