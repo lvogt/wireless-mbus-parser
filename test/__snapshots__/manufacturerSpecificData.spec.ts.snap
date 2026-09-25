@@ -1,5 +1,38 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Itron > Every value follows the naming rules 1`] = `
+[
+  "volume",
+  "manufacturer_specific_vif_127",
+  "data_encrypted",
+  "modem_code_corrupt",
+  "modem_memory_corrupt",
+  "modem_hardware_reset",
+  "modem_watchdog_reset",
+  "modem_low_battery",
+  "modem_removal",
+  "general_alarm",
+  "detector_hardware_reset",
+  "detector_watchdog_reset",
+  "beeper_defect",
+  "warning_out_of_temperature_range",
+  "warning_intrusion",
+  "warning_inlet_blocking",
+  "warning_smoke_alarm",
+  "warning_low_battery",
+  "warning_no_test_in_last_period",
+  "remaining_battery_life",
+  "product_code",
+  "removal_occurred",
+  "product_installed",
+  "intrusion_occurred",
+  "inlet_blocking_occurred",
+  "out_of_temperature_range_occurred",
+  "network_mode",
+  "fixed_date_billing",
+]
+`;
+
 exports[`Itron > Legacy result of a real smoke detector 1`] = `
 {
   "dataRecord": [

@@ -44,6 +44,7 @@ const SMOKE_DETECTOR_STATE: ManufacturerSpecificFieldSpec[] = [
     // the name of the VIF which states the same thing, so a battery reads the
     // same way whether a meter reports it as a VIF or in a blob
     legacyName: "VIF_BATTERY_REMAINING",
+    name: "remaining_battery_life",
   },
   { byte: 5, description: "Product code" },
   {

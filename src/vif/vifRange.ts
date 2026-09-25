@@ -21,12 +21,14 @@ export function decadeRange(
   count: number,
   exponent: number,
   legacyName: string,
+  name: string,
   unit: string,
   description: string
 ): VIFDescriptor[] {
   return Array.from({ length: count }, (_, index) => ({
     vif: vif + index,
     legacyName,
+    name,
     unit,
     description,
     calc: scaleBy(exponent + index),

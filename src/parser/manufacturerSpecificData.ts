@@ -1,5 +1,6 @@
 import { DIF_DATATYPE_VARLEN } from "@/helper/constants";
 import { log } from "@/helper/logger";
+import { toName } from "@/helper/name";
 import { applyFunctionFieldType } from "@/helper/vifHelper";
 import type {
   DataRecord,
@@ -75,16 +76,20 @@ function createEvaluatedData(
   source: DataRecord,
   value: ManufacturerSpecificValue
 ): EvaluatedData {
+  const legacyName = value.legacyName ?? toLegacyName(value.description);
   const evaluatedData: EvaluatedData = {
     value: value.value,
     unit: value.unit ?? "",
     description: value.description,
     type: getDataType(value.value),
     info: {
-      legacyVif: value.legacyName ?? toLegacyName(value.description),
+      legacyVif: legacyName,
+      name: value.name ?? toName(legacyName),
+      extensionNames: [],
       tariff: value.tariff ?? source.header.dib.tariff,
       deviceUnit: source.header.dib.deviceUnit,
       storageNo: value.storageNo ?? source.header.dib.storageNo,
+      functionField: source.header.dib.functionField,
     },
   };
 

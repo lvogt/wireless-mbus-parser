@@ -106,11 +106,29 @@ function getPlainTextDescriptor(primaryVif: PrimaryVif): VIFDescriptor {
   return {
     vif: primaryVif.vif,
     legacyName: "VIF_PLAIN_TEXT",
+    name: "plain_text",
     unit: primaryVif.plainText,
     description: "",
     calc: (val) => val,
     apply: applyNumberOrStringifyDefault,
   };
+}
+
+// The code is part of the name, so that two unknown VIFs of one telegram stay
+// apart. It is decimal, as a hex digit may follow a letter ("fd_a1"), which a
+// name does not allow.
+function fallbackName(primaryVif: PrimaryVif, manufacturerSpecific: boolean) {
+  if (manufacturerSpecific) {
+    return `manufacturer_specific_vif_${primaryVif.vif}`;
+  }
+  switch (primaryVif.table) {
+    case VifTable.FD:
+      return `unknown_vif_fd_${primaryVif.vif}`;
+    case VifTable.FB:
+      return `unknown_vif_fb_${primaryVif.vif}`;
+    default:
+      return `unknown_vif_${primaryVif.vif}`;
+  }
 }
 
 function getFallbackDescriptor(
@@ -125,6 +143,7 @@ function getFallbackDescriptor(
     legacyName: manufacturerSpecific
       ? "VIF_TYPE_MANUFACTURER_UNKOWN"
       : "VIF_UNKNOWN",
+    name: fallbackName(dataRecord.header.vib.primary, manufacturerSpecific),
     unit: "",
     description: `Unknown ${manufacturerSpecific ? "manufacturer specific " : ""}VIF 0x${dataRecord.header.vib.primary.vif.toString(16).padStart(2, "0")}`,
     calc: (val) => val,
@@ -136,11 +155,25 @@ function getFallbackExtensionDescriptor(
   extension: number,
   manufacturerSpecific = false
 ): VIFEDescriptor {
+  // the standard reserves the whole range for record errors
+  if (!manufacturerSpecific && extension <= 0x1f) {
+    return {
+      vif: extension,
+      legacyName: "VIFE_UNKNOWN",
+      error: `unknown_error_${extension}`,
+      description: `Unknown record error 0x${extension.toString(16).padStart(2, "0")}`,
+      apply: extendDescription,
+    };
+  }
+
   return {
     vif: extension,
     legacyName: manufacturerSpecific
       ? "VIFE_MANUFACTURER_UNKNOWN"
       : "VIFE_UNKNOWN",
+    // an unknown extension may change what the value means, so it keeps the
+    // record apart from one without it
+    name: `${manufacturerSpecific ? "manufacturer_specific" : "unknown"}_vife_${extension}`,
     description: `Unknown VIFE 0x${extension.toString(16).padStart(2, "0")}`,
     apply: extendDescription,
   };
@@ -173,11 +206,25 @@ function evaluateVifExtension(
     manufacturerSpecific
   );
 
+  let result: EvaluatedData | undefined;
   try {
-    return descriptor.apply(descriptor, dataRecord, data);
+    result = descriptor.apply(descriptor, dataRecord, data);
   } catch (e: unknown) {
     log.error(`Applying VIFE failed: ${JSON.stringify(e)}`);
   }
+
+  // a descriptor may return a new object instead of modifying the given one,
+  // the previous result is kept if applying the VIFE failed - the name belongs
+  // to the record either way
+  result ??= data;
+  if (descriptor.name !== undefined) {
+    result.info.extensionNames.push(descriptor.name);
+  }
+  // the first error is the one to report, a meter hardly states two
+  if (descriptor.error !== undefined) {
+    result.info.recordError ??= descriptor.error;
+  }
+  return result;
 }
 
 function evaluateDataRecord(
@@ -198,16 +245,13 @@ function evaluateDataRecord(
     const manufacturerSpecificTable =
       manufacturerSpecificPrimaryVif || lastExtManufacturerSpecific;
 
-    // a descriptor may return a new object instead of modifying the given one,
-    // it only keeps the previous result if applying the VIFE failed
-    evaluatedData =
-      evaluateVifExtension(
-        evaluatedData,
-        dataRecord,
-        meterType,
-        ext,
-        manufacturerSpecificTable
-      ) ?? evaluatedData;
+    evaluatedData = evaluateVifExtension(
+      evaluatedData,
+      dataRecord,
+      meterType,
+      ext,
+      manufacturerSpecificTable
+    );
   }
 
   return evaluatedData;

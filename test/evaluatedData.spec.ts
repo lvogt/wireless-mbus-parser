@@ -27,13 +27,23 @@ function decode(data: string, meterType?: MeterData) {
 
 function info(
   legacyVif: string,
-  dib?: { storageNo?: number; deviceUnit?: number; tariff?: number }
+  name: string,
+  extra?: {
+    storageNo?: number;
+    deviceUnit?: number;
+    tariff?: number;
+    functionField?: number;
+    extensionNames?: string[];
+  }
 ) {
   return {
     legacyVif,
-    storageNo: dib?.storageNo ?? 0,
-    deviceUnit: dib?.deviceUnit ?? 0,
-    tariff: dib?.tariff ?? 0,
+    name,
+    extensionNames: extra?.extensionNames ?? [],
+    storageNo: extra?.storageNo ?? 0,
+    deviceUnit: extra?.deviceUnit ?? 0,
+    tariff: extra?.tariff ?? 0,
+    functionField: extra?.functionField ?? 0,
   };
 }
 
@@ -77,42 +87,42 @@ describe("Evaluate data records", () => {
         type: EvaluatedDataType.String,
         unit: "",
         value: "54",
-        info: info("VIF_UNKNOWN"),
+        info: info("VIF_UNKNOWN", "unknown_vif_fb_27"),
       },
       {
         description: "External Temperature",
         type: EvaluatedDataType.Number,
         unit: "°C",
         value: 21.7,
-        info: info("VIF_EXTERNAL_TEMP"),
+        info: info("VIF_EXTERNAL_TEMP", "external_temperature"),
       },
       {
         description: "Volume",
         type: EvaluatedDataType.Number,
         unit: "m³",
         value: 12.565,
-        info: info("VIF_VOLUME"),
+        info: info("VIF_VOLUME", "volume"),
       },
       {
         description: "Time point",
         type: EvaluatedDataType.DateTime,
         unit: "",
         value: new Date("2008-05-31T23:50:00.000Z"),
-        info: info("VIF_TIME_POINT_DATE_TIME"),
+        info: info("VIF_TIME_POINT_DATE_TIME", "time_point"),
       },
       {
         description: "Volume",
         type: EvaluatedDataType.Number,
         unit: "m³",
         value: 370240794.901,
-        info: info("VIF_VOLUME"),
+        info: info("VIF_VOLUME", "volume"),
       },
       {
         description: "Energy",
         type: EvaluatedDataType.BigInt,
         unit: "Wh",
         value: 30980n,
-        info: info("VIF_ENERGY_WATT", { deviceUnit: 6 }),
+        info: info("VIF_ENERGY_WATT", "energy", { deviceUnit: 6 }),
       },
     ]);
   });
@@ -129,28 +139,31 @@ describe("Evaluate data records", () => {
         type: EvaluatedDataType.Number,
         unit: "m³",
         value: 0.045,
-        info: info("VIF_VOLUME"),
+        info: info("VIF_VOLUME", "volume"),
       },
       {
         description: "Volume Flow (maximum value)",
         type: EvaluatedDataType.Number,
         unit: "m³/h",
         value: 0.113,
-        info: info("VIF_VOLUME_FLOW", { storageNo: 5 }),
+        info: info("VIF_VOLUME_FLOW", "volume_flow", {
+          storageNo: 5,
+          functionField: 1,
+        }),
       },
       {
         description: "Energy",
         type: EvaluatedDataType.Number,
         unit: "Wh",
         value: 218370,
-        info: info("VIF_ENERGY_WATT", { deviceUnit: 1, tariff: 2 }),
+        info: info("VIF_ENERGY_WATT", "energy", { deviceUnit: 1, tariff: 2 }),
       },
       {
         description: "Volume",
         type: EvaluatedDataType.Number,
         unit: "m³",
         value: 28504.27,
-        info: info("VIF_VOLUME"),
+        info: info("VIF_VOLUME", "volume"),
       },
       {
         description:
@@ -158,7 +171,9 @@ describe("Evaluate data records", () => {
         type: EvaluatedDataType.Number,
         unit: "Wh",
         value: 305.1,
-        info: info("VIF_ENERGY_WATT"),
+        info: info("VIF_ENERGY_WATT", "energy", {
+          extensionNames: ["negative"],
+        }),
       },
     ]);
   });
@@ -173,8 +188,54 @@ describe("Evaluate data records", () => {
         type: EvaluatedDataType.String,
         unit: "",
         value: "256",
-        info: info("VIF_TYPE_MANUFACTURER_UNKOWN"),
+        info: info(
+          "VIF_TYPE_MANUFACTURER_UNKOWN",
+          "manufacturer_specific_vif_32"
+        ),
       },
+    ]);
+  });
+
+  it("A record error keeps the name and is reported as such", () => {
+    const result = decode("0c931800000000" + "0c930800000000" + "0c1312000000");
+
+    expect(result).toEqual([
+      {
+        description: "Volume; Data error",
+        type: EvaluatedDataType.Number,
+        unit: "m³",
+        value: 0,
+        info: { ...info("VIF_VOLUME", "volume"), recordError: "data_error" },
+      },
+      {
+        description: "Volume; Unknown record error 0x08",
+        type: EvaluatedDataType.Number,
+        unit: "m³",
+        value: 0,
+        info: {
+          ...info("VIF_VOLUME", "volume"),
+          recordError: "unknown_error_8",
+        },
+      },
+      {
+        description: "Volume",
+        type: EvaluatedDataType.Number,
+        unit: "m³",
+        value: 0.012,
+        info: info("VIF_VOLUME", "volume"),
+      },
+    ]);
+    expect(result[2].info).not.toHaveProperty("recordError");
+  });
+
+  it("Unknown VIFs are named after their code and table", () => {
+    const result = decode("016f01" + "01fd1901" + "01fb1b01" + "017f01");
+
+    expect(result.map((entry) => entry.info.name)).toEqual([
+      "unknown_vif_111",
+      "unknown_vif_fd_25",
+      "unknown_vif_fb_27",
+      "manufacturer_specific_vif_127",
     ]);
   });
 
@@ -188,7 +249,7 @@ describe("Evaluate data records", () => {
         type: EvaluatedDataType.Number,
         unit: "",
         value: 0,
-        info: info("VIF_ERROR_FLAGS"),
+        info: info("VIF_ERROR_FLAGS", "error_flags"),
       },
     ]);
   });
@@ -203,7 +264,7 @@ describe("Evaluate data records", () => {
         type: EvaluatedDataType.Date,
         unit: "",
         value: new Date("2007-04-30T00:00:00.000Z"),
-        info: info("VIF_TIME_POINT_DATE", { storageNo: 1 }),
+        info: info("VIF_TIME_POINT_DATE", "time_point", { storageNo: 1 }),
       },
     ]);
   });
@@ -222,7 +283,7 @@ describe("Evaluate data records", () => {
         type: EvaluatedDataType.Number,
         unit: "Synthetic",
         value: null,
-        info: info("VIF_PLAIN_TEXT"),
+        info: info("VIF_PLAIN_TEXT", "plain_text"),
       },
     ]);
   });
@@ -239,7 +300,7 @@ describe("Raw Data Records - LVAR", () => {
         type: EvaluatedDataType.String,
         unit: "",
         value: "BKG4",
-        info: info("VIF_MODEL_VERSION"),
+        info: info("VIF_MODEL_VERSION", "model_version"),
       },
     ]);
   });
@@ -254,7 +315,7 @@ describe("Raw Data Records - LVAR", () => {
         type: EvaluatedDataType.Number,
         unit: "m³",
         value: 9078563.412,
-        info: info("VIF_VOLUME"),
+        info: info("VIF_VOLUME", "volume", { functionField: 3 }),
       },
     ]);
   });
@@ -269,7 +330,7 @@ describe("Raw Data Records - LVAR", () => {
         type: EvaluatedDataType.Number,
         unit: "m³",
         value: -9078563.412,
-        info: info("VIF_VOLUME"),
+        info: info("VIF_VOLUME", "volume", { functionField: 2 }),
       },
     ]);
   });
@@ -284,7 +345,7 @@ describe("Raw Data Records - LVAR", () => {
         type: EvaluatedDataType.DateTime,
         unit: "",
         value: new Date("1999-11-30T16:03:00.000Z"),
-        info: info("VIF_TIME_POINT_DATE_TIME", { storageNo: 3 }),
+        info: info("VIF_TIME_POINT_DATE_TIME", "time_point", { storageNo: 3 }),
       },
     ]);
   });
@@ -299,7 +360,7 @@ describe("Raw Data Records - LVAR", () => {
         type: EvaluatedDataType.String,
         unit: "",
         value: "03301234567890",
-        info: info("VIF_TIME_POINT_DATE_TIME", { storageNo: 3 }),
+        info: info("VIF_TIME_POINT_DATE_TIME", "time_point", { storageNo: 3 }),
       },
     ]);
   });
@@ -318,7 +379,7 @@ describe("Raw Data Records - LVAR", () => {
         type: EvaluatedDataType.Number,
         unit: "m³",
         value: null,
-        info: info("VIF_VOLUME"),
+        info: info("VIF_VOLUME", "volume"),
       },
     ]);
   });
@@ -333,7 +394,9 @@ describe("Raw Data Records - LVAR", () => {
         type: EvaluatedDataType.Number,
         unit: "Wh / kg",
         value: 1333001,
-        info: info("VIF_ENERGY_WATT"),
+        info: info("VIF_ENERGY_WATT", "energy", {
+          extensionNames: ["start", "per_kilogram"],
+        }),
       },
     ]);
   });
@@ -351,7 +414,9 @@ describe("Raw Data Records - LVAR", () => {
         type: EvaluatedDataType.Number,
         unit: "°C",
         value: 3,
-        info: info("VIF_EXTERNAL_TEMP"),
+        info: info("VIF_EXTERNAL_TEMP", "external_temperature", {
+          extensionNames: ["average", "manufacturer_specific_vife_32"],
+        }),
       },
     ]);
   });
@@ -366,21 +431,21 @@ describe("Raw Data Records - LVAR", () => {
         type: EvaluatedDataType.Date,
         unit: "",
         value: new Date("2012-01-01T00:00:00.000Z"),
-        info: info("VIF_TARIFF_START"),
+        info: info("VIF_TARIFF_START", "start_of_tariff"),
       },
       {
         description: "Start of tariff",
         type: EvaluatedDataType.DateTime,
         unit: "",
         value: new Date("2008-05-31T23:50:00.000Z"),
-        info: info("VIF_TARIFF_START"),
+        info: info("VIF_TARIFF_START", "start_of_tariff"),
       },
       {
         description: "Start of tariff",
         type: EvaluatedDataType.DateTime,
         unit: "",
         value: new Date("2026-04-22T18:52:22.000Z"),
-        info: info("VIF_TARIFF_START"),
+        info: info("VIF_TARIFF_START", "start_of_tariff"),
       },
     ]);
   });
@@ -399,49 +464,51 @@ describe("PRIOS", () => {
         type: EvaluatedDataType.Number,
         unit: "m³",
         value: 175.854,
-        info: info("VIF_VOLUME"),
+        info: info("VIF_VOLUME", "volume"),
       },
       {
         description: "Volume",
         type: EvaluatedDataType.Number,
         unit: "m³",
         value: 172.125,
-        info: info("VIF_VOLUME", { storageNo: 1 }),
+        info: info("VIF_VOLUME", "volume", { storageNo: 1 }),
       },
       {
         description: "Time point",
         type: EvaluatedDataType.Date,
         unit: "",
         value: new Date("2022-04-01T00:00:00.000Z"),
-        info: info("VIF_TIME_POINT_DATE", { storageNo: 1 }),
+        info: info("VIF_TIME_POINT_DATE", "time_point", { storageNo: 1 }),
       },
       {
         description: "Remaining battery life",
         type: EvaluatedDataType.Number,
         unit: "month",
         value: 156,
-        info: info("VIF_BATTERY_REMAINING"),
+        info: info("VIF_BATTERY_REMAINING", "remaining_battery_life"),
       },
       {
         description: "Transmit period",
         type: EvaluatedDataType.Number,
         unit: "s",
         value: 8,
-        info: info("VIF_TRANSMIT_PERIOD"),
+        info: info("VIF_TRANSMIT_PERIOD", "transmit_period"),
       },
       {
         description: "Alarm flags",
         type: EvaluatedDataType.String,
         unit: "",
         value: "no alarms",
-        info: info("VIF_ERROR_FLAGS"),
+        info: info("VIF_ERROR_FLAGS", "error_flags"),
       },
       {
         description: "Alarm flags; Previous value",
         type: EvaluatedDataType.String,
         unit: "",
         value: "no alarms",
-        info: info("VIF_ERROR_FLAGS"),
+        info: info("VIF_ERROR_FLAGS", "error_flags", {
+          extensionNames: ["previous_value"],
+        }),
       },
     ]);
   });
@@ -461,49 +528,49 @@ describe("Techem", () => {
         type: EvaluatedDataType.Date,
         unit: "",
         value: new Date("2018-12-31T00:00:00.000Z"),
-        info: info("VIF_TIME_POINT_DATE", { storageNo: 1 }),
+        info: info("VIF_TIME_POINT_DATE", "time_point", { storageNo: 1 }),
       },
       {
         description: "Units for H.C.A.",
         type: EvaluatedDataType.Number,
         unit: "",
         value: 117,
-        info: info("VIF_HCA", { storageNo: 1 }),
+        info: info("VIF_HCA", "hca_units", { storageNo: 1 }),
       },
       {
         description: "Time point",
         type: EvaluatedDataType.Date,
         unit: "",
         value: new Date("2024-06-25T00:00:00.000Z"),
-        info: info("VIF_TIME_POINT_DATE"),
+        info: info("VIF_TIME_POINT_DATE", "time_point"),
       },
       {
         description: "Units for H.C.A.",
         type: EvaluatedDataType.Number,
         unit: "",
         value: 0,
-        info: info("VIF_HCA"),
+        info: info("VIF_HCA", "hca_units"),
       },
       {
         description: "External Temperature",
         type: EvaluatedDataType.Number,
         unit: "°C",
         value: 27.02,
-        info: info("VIF_EXTERNAL_TEMP"),
+        info: info("VIF_EXTERNAL_TEMP", "external_temperature"),
       },
       {
         description: "External Temperature",
         type: EvaluatedDataType.Number,
         unit: "°C",
         value: 26.78,
-        info: info("VIF_EXTERNAL_TEMP"),
+        info: info("VIF_EXTERNAL_TEMP", "external_temperature"),
       },
       {
         description: "Temperature Difference",
         type: EvaluatedDataType.Number,
         unit: "K",
         value: 0.24,
-        info: info("VIF_TEMP_DIFF"),
+        info: info("VIF_TEMP_DIFF", "temperature_difference"),
       },
     ]);
   });
@@ -521,49 +588,49 @@ describe("Techem", () => {
         type: EvaluatedDataType.Date,
         unit: "",
         value: new Date("2019-12-31T00:00:00.000Z"),
-        info: info("VIF_TIME_POINT_DATE", { storageNo: 1 }),
+        info: info("VIF_TIME_POINT_DATE", "time_point", { storageNo: 1 }),
       },
       {
         description: "Units for H.C.A.",
         type: EvaluatedDataType.Number,
         unit: "",
         value: 1026,
-        info: info("VIF_HCA", { storageNo: 1 }),
+        info: info("VIF_HCA", "hca_units", { storageNo: 1 }),
       },
       {
         description: "Time point",
         type: EvaluatedDataType.Date,
         unit: "",
         value: new Date("2024-02-08T00:00:00.000Z"),
-        info: info("VIF_TIME_POINT_DATE"),
+        info: info("VIF_TIME_POINT_DATE", "time_point"),
       },
       {
         description: "Units for H.C.A.",
         type: EvaluatedDataType.Number,
         unit: "",
         value: 131,
-        info: info("VIF_HCA"),
+        info: info("VIF_HCA", "hca_units"),
       },
       {
         description: "External Temperature",
         type: EvaluatedDataType.Number,
         unit: "°C",
         value: 22.44,
-        info: info("VIF_EXTERNAL_TEMP"),
+        info: info("VIF_EXTERNAL_TEMP", "external_temperature"),
       },
       {
         description: "External Temperature",
         type: EvaluatedDataType.Number,
         unit: "°C",
         value: 25.51,
-        info: info("VIF_EXTERNAL_TEMP"),
+        info: info("VIF_EXTERNAL_TEMP", "external_temperature"),
       },
       {
         description: "Temperature Difference",
         type: EvaluatedDataType.Number,
         unit: "K",
         value: -3.07,
-        info: info("VIF_TEMP_DIFF"),
+        info: info("VIF_TEMP_DIFF", "temperature_difference"),
       },
     ]);
   });
@@ -583,35 +650,35 @@ describe("Techem", () => {
         type: EvaluatedDataType.Date,
         unit: "",
         value: new Date("2018-12-31T00:00:00.000Z"),
-        info: info("VIF_TIME_POINT_DATE", { storageNo: 1 }),
+        info: info("VIF_TIME_POINT_DATE", "time_point", { storageNo: 1 }),
       },
       {
         description: "Volume",
         type: EvaluatedDataType.Number,
         unit: "m³",
         value: 8.9,
-        info: info("VIF_VOLUME", { storageNo: 1 }),
+        info: info("VIF_VOLUME", "volume", { storageNo: 1 }),
       },
       {
         description: "Time point",
         type: EvaluatedDataType.Date,
         unit: "",
         value: new Date("2024-04-27T00:00:00.000Z"),
-        info: info("VIF_TIME_POINT_DATE"),
+        info: info("VIF_TIME_POINT_DATE", "time_point"),
       },
       {
         description: "Volume",
         type: EvaluatedDataType.Number,
         unit: "m³",
         value: 4.9,
-        info: info("VIF_VOLUME"),
+        info: info("VIF_VOLUME", "volume"),
       },
       {
         description: "Volume",
         type: EvaluatedDataType.Number,
         unit: "m³",
         value: 13.8,
-        info: info("VIF_VOLUME"),
+        info: info("VIF_VOLUME", "volume"),
       },
     ]);
   });
@@ -631,35 +698,35 @@ describe("Techem", () => {
         type: EvaluatedDataType.Date,
         unit: "",
         value: new Date("2018-12-31T00:00:00.000Z"),
-        info: info("VIF_TIME_POINT_DATE", { storageNo: 1 }),
+        info: info("VIF_TIME_POINT_DATE", "time_point", { storageNo: 1 }),
       },
       {
         description: "Volume",
         type: EvaluatedDataType.Number,
         unit: "m³",
         value: 126.7,
-        info: info("VIF_VOLUME", { storageNo: 1 }),
+        info: info("VIF_VOLUME", "volume", { storageNo: 1 }),
       },
       {
         description: "Time point",
         type: EvaluatedDataType.Date,
         unit: "",
         value: new Date("2024-06-25T00:00:00.000Z"),
-        info: info("VIF_TIME_POINT_DATE"),
+        info: info("VIF_TIME_POINT_DATE", "time_point"),
       },
       {
         description: "Volume",
         type: EvaluatedDataType.Number,
         unit: "m³",
         value: 11.7,
-        info: info("VIF_VOLUME"),
+        info: info("VIF_VOLUME", "volume"),
       },
       {
         description: "Volume",
         type: EvaluatedDataType.Number,
         unit: "m³",
         value: 138.4,
-        info: info("VIF_VOLUME"),
+        info: info("VIF_VOLUME", "volume"),
       },
     ]);
   });
@@ -679,35 +746,35 @@ describe("Techem", () => {
         type: EvaluatedDataType.Date,
         unit: "",
         value: new Date("2019-12-31T00:00:00.000Z"),
-        info: info("VIF_TIME_POINT_DATE", { storageNo: 1 }),
+        info: info("VIF_TIME_POINT_DATE", "time_point", { storageNo: 1 }),
       },
       {
         description: "Energy",
         type: EvaluatedDataType.Number,
         unit: "Wh",
         value: 375000,
-        info: info("VIF_ENERGY_WATT", { storageNo: 1 }),
+        info: info("VIF_ENERGY_WATT", "energy", { storageNo: 1 }),
       },
       {
         description: "Time point",
         type: EvaluatedDataType.Date,
         unit: "",
         value: new Date("2024-11-30T00:00:00.000Z"),
-        info: info("VIF_TIME_POINT_DATE"),
+        info: info("VIF_TIME_POINT_DATE", "time_point"),
       },
       {
         description: "Energy",
         type: EvaluatedDataType.Number,
         unit: "Wh",
         value: 120000,
-        info: info("VIF_ENERGY_WATT"),
+        info: info("VIF_ENERGY_WATT", "energy"),
       },
       {
         description: "Energy",
         type: EvaluatedDataType.Number,
         unit: "Wh",
         value: 495000,
-        info: info("VIF_ENERGY_WATT"),
+        info: info("VIF_ENERGY_WATT", "energy"),
       },
     ]);
   });
@@ -724,7 +791,7 @@ describe("Special DIF values", () => {
         type: EvaluatedDataType.String,
         unit: "m³",
         value: "<null>",
-        info: info("VIF_VOLUME"),
+        info: info("VIF_VOLUME", "volume"),
       },
     ]);
   });
@@ -739,7 +806,7 @@ describe("Special DIF values", () => {
         type: EvaluatedDataType.String,
         unit: "m³",
         value: "<null>",
-        info: info("VIF_VOLUME"),
+        info: info("VIF_VOLUME", "volume"),
       },
     ]);
   });
@@ -756,7 +823,7 @@ describe("64 bit values", () => {
         type: EvaluatedDataType.BigInt,
         unit: "Wh",
         value: 1234605616436508552n,
-        info: info("VIF_ENERGY_WATT"),
+        info: info("VIF_ENERGY_WATT", "energy"),
       },
     ]);
   });
@@ -771,7 +838,7 @@ describe("64 bit values", () => {
         type: EvaluatedDataType.Number,
         unit: "m³",
         value: 1234605616436508.8,
-        info: info("VIF_VOLUME"),
+        info: info("VIF_VOLUME", "volume"),
       },
     ]);
   });
@@ -787,7 +854,7 @@ describe("64 bit values", () => {
         type: EvaluatedDataType.Number,
         unit: "Wh",
         value: 1234605616436.5088,
-        info: info("VIF_ENERGY_WATT"),
+        info: info("VIF_ENERGY_WATT", "energy"),
       },
     ]);
   });
