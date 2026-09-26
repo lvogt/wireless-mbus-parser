@@ -351,7 +351,7 @@ configuration file as it is.
 
 ## Changelog
 
-### Unreleased
+### 1.6.0
 
 - Every value carries a stable name in `info.name`. The names are meant as
   identifiers and are part of the API from now on - see [Names](#names).
