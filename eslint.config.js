@@ -6,7 +6,7 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default [
-  { files: ["**/*.{js,mjs,cjs,ts}", "tsup.config.ts", "vitest.config.ts"] },
+  { files: ["**/*.{js,mjs,cjs,ts}", "tsdown.config.ts", "vitest.config.ts"] },
   { ignores: ["node_modules", "dist/**", "coverage/**"] },
   { languageOptions: { globals: globals.node } },
   {

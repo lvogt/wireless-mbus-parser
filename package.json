@@ -40,7 +40,7 @@
   ],
   "scripts": {
     "build": "$npm_execpath run compile && $npm_execpath run test && $npm_execpath format && $npm_execpath run lint && $npm_execpath run build:code",
-    "build:code": "tsup-node",
+    "build:code": "tsdown",
     "compile": "tsc",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -65,7 +65,7 @@
     "globals": "17.12.0",
     "prettier": "3.9.9",
     "rimraf": "6.1.3",
-    "tsup": "8.5.1",
+    "tsdown": "0.23.0",
     "typescript": "6.0.3",
     "typescript-eslint": "8.70.1",
     "vite-tsconfig-paths": "6.1.1",
