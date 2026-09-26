@@ -321,6 +321,30 @@ checksum, a field whose meaning depends on another one or a date. The Itron
 smoke detector shipped with the parser is described declaratively,
 `src/manufacturerSpecificData/itron.ts` is a complete example.
 
+The descriptions shipped with the parser are available as data as well. A
+configured handler replaces the internal one scoped by manufacturer. The
+built-in description can be used as a starting point or extended if something
+is missing:
+
+```typescript
+import {
+  WirelessMbusParser,
+  createManufacturerSpecificHandler,
+  getManufacturerSpecificDescriptions,
+} from "wireless-mbus-parser";
+
+const { ITW } = getManufacturerSpecificDescriptions();
+// e.g. decode a further device type with the same layout
+ITW[0].deviceType = [0x1a, 0x1b];
+
+const parser = new WirelessMbusParser({
+  manufacturerSpecificHandlers: { ITW: createManufacturerSpecificHandler(ITW) },
+});
+```
+
+The result is a copy, which survives JSON - it can be written to a
+configuration file as it is.
+
 ## TODO
 
 - TCH smoke detector?
@@ -338,6 +362,8 @@ smoke detector shipped with the parser is described declaratively,
 - A value the meter marks as broken states the error in `info.recordError`
 - expose the DIB function field as `info.functionField`
 - The description of the record error "data overflow" was "undefined"
+- `getManufacturerSpecificDescriptions()` returns the descriptions of the
+  built-in manufacturer specific handlers
 
 ### 1.5.0
 
