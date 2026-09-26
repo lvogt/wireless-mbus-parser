@@ -1,13 +1,31 @@
 version: 2
 updates:
-  - package-ecosystem: "npm" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: "npm"
+    directory: "/"
     schedule:
       interval: "weekly"
     assignees:
       - lvogt
+    ignore:
+      # the types follow the oldest supported Node version (engines: >=22)
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+      # typescript-eslint does not support TypeScript 7 yet
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
     groups:
       production-dependencies:
         dependency-type: "production"
       development-dependencies:
         dependency-type: "development"
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - lvogt
+    groups:
+      github-actions:
+        patterns: ["*"]
