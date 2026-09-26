@@ -1,8 +1,11 @@
-import tsconfigPaths from "vite-tsconfig-paths";
+import { fileURLToPath } from "node:url";
 import { coverageConfigDefaults, defineConfig } from "vitest/config";
 
 export default defineConfig({
-  plugins: [tsconfigPaths()],
+  // the path mapping of tsconfig.json, which Vite does not read by itself
+  resolve: {
+    alias: { "@": fileURLToPath(new URL("src", import.meta.url)) },
+  },
   test: {
     globalSetup: "test/vitest.setup.ts",
     include: ["test/**/*.spec.ts"],
