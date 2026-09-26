@@ -1,5 +1,12 @@
-import { decodeItronData } from "@/manufacturerSpecificData/itron";
-import type { ManufacturerSpecificDataRecordHandler, MeterData } from "@/types";
+import {
+  decodeItronData,
+  itronDescription,
+} from "@/manufacturerSpecificData/itron";
+import type {
+  ManufacturerSpecificDataRecordHandler,
+  ManufacturerSpecificLayout,
+  MeterData,
+} from "@/types";
 
 /**
  * Handlers for manufacturer specific data records, by manufacturer.
@@ -31,6 +38,24 @@ export const manufacturerSpecificHandlers: Record<
 > = {
   ITW: decodeItronData,
 };
+
+const manufacturerSpecificDescriptions: Record<
+  string,
+  ManufacturerSpecificLayout[]
+> = {
+  ITW: itronDescription,
+};
+
+/**
+ * Returns the descriptions of the manufacturer specific handlers shipped with
+ * the parser.
+ */
+export function getManufacturerSpecificDescriptions(): Record<
+  string,
+  ManufacturerSpecificLayout[]
+> {
+  return structuredClone(manufacturerSpecificDescriptions);
+}
 
 export function getHandler(
   meterData: MeterData,

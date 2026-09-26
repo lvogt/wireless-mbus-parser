@@ -4,6 +4,8 @@ export { WirelessMbusParser } from "@/parser/parser";
 
 export { createManufacturerSpecificHandler } from "@/manufacturerSpecificData/fieldSpec";
 
+export { getManufacturerSpecificDescriptions } from "@/manufacturerSpecificData/handler";
+
 export type {
   WiredLinkLayer,
   LinkLayer,

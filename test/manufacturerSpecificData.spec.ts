@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 
 import { isValidName } from "@/helper/name";
+import { getManufacturerSpecificDescriptions } from "@/index";
 import { createManufacturerSpecificHandler } from "@/manufacturerSpecificData/fieldSpec";
 import { manufacturerSpecificHandlers } from "@/manufacturerSpecificData/handler";
 import { WirelessMbusParser } from "@/parser/parser";
@@ -377,6 +378,58 @@ describe("Itron", () => {
 
     expect(names.filter((name) => !isValidName(name))).toEqual([]);
     expect(names).toMatchSnapshot();
+  });
+
+  describe("Built-in description", () => {
+    it("Is handed out by manufacturer", () => {
+      const descriptions = getManufacturerSpecificDescriptions();
+
+      expect(Object.keys(descriptions)).toEqual(["ITW"]);
+      expect(descriptions.ITW[0]).toMatchObject({ deviceType: 0x1a });
+    });
+
+    // it ends up in a configuration file
+    it("Survives JSON unchanged", () => {
+      const descriptions = getManufacturerSpecificDescriptions();
+
+      expect(JSON.parse(JSON.stringify(descriptions))).toEqual(descriptions);
+    });
+
+    it.each([
+      ["a synthetic", () => SMOKE_DETECTOR],
+      ["a real", () => REAL_SMOKE_DETECTOR],
+    ])(
+      "A handler built from it decodes %s smoke detector like the parser",
+      async (_what, telegram) => {
+        const data = Buffer.from(telegram(), "hex");
+        const options = { containsCrc: false };
+        const description = JSON.parse(
+          JSON.stringify(getManufacturerSpecificDescriptions().ITW)
+        ) as ManufacturerSpecificLayout[];
+        const configured = new WirelessMbusParser({
+          manufacturerSpecificHandlers: {
+            ITW: createManufacturerSpecificHandler(description),
+          },
+        });
+
+        const expected = await new WirelessMbusParser().parse(data, options);
+        expect(await configured.parse(data, options)).toEqual(expected);
+      }
+    );
+
+    it("Changing it does not change the parser", async () => {
+      const descriptions = getManufacturerSpecificDescriptions();
+      descriptions.ITW[0].fields.length = 0;
+      descriptions.ITW.push({ fields: [] });
+      delete descriptions.ITW;
+
+      expect(getManufacturerSpecificDescriptions().ITW).toHaveLength(1);
+      expect(getManufacturerSpecificDescriptions().ITW[0].fields).not.toEqual(
+        []
+      );
+      const result = await decodeSmokeDetector();
+      expect(valueOf(result.data, "Warning: smoke alarm")).toBeDefined();
+    });
   });
 
   it("Reserved bits are not reported", async () => {

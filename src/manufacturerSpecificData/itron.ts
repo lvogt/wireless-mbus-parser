@@ -1,5 +1,8 @@
 import { createManufacturerSpecificHandler } from "@/manufacturerSpecificData/fieldSpec";
-import type { ManufacturerSpecificFieldSpec } from "@/types";
+import type {
+  ManufacturerSpecificFieldSpec,
+  ManufacturerSpecificLayout,
+} from "@/types";
 
 const DEVICE_TYPE_SMOKE_DETECTOR = 0x1a;
 
@@ -68,6 +71,11 @@ const SMOKE_DETECTOR_STATE: ManufacturerSpecificFieldSpec[] = [
   { byte: 7, description: "Fixed date billing" },
 ];
 
-export const decodeItronData = createManufacturerSpecificHandler([
+// Plain data, so it can be handed out as the starting point of a description
+// of one's own - see getManufacturerSpecificDescriptions().
+export const itronDescription: ManufacturerSpecificLayout[] = [
   { deviceType: DEVICE_TYPE_SMOKE_DETECTOR, fields: SMOKE_DETECTOR_STATE },
-]);
+];
+
+export const decodeItronData =
+  createManufacturerSpecificHandler(itronDescription);
