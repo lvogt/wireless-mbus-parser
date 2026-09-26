@@ -1,5 +1,6 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { log } from "@/helper/logger";
 import { isValidName } from "@/helper/name";
 import { getManufacturerSpecificDescriptions } from "@/index";
 import { createManufacturerSpecificHandler } from "@/manufacturerSpecificData/fieldSpec";
@@ -219,11 +220,17 @@ describe("Manufacturer specific data", () => {
     manufacturerSpecificHandlers["TST"] = () => {
       throw new Error("broken handler");
     };
+    // the error is logged, not thrown - and kept out of the test output
+    const logError = vi.spyOn(log, "error").mockReturnValue(undefined);
 
     const result = await decode();
 
     expect(result.data).toHaveLength(1);
     expect(result.data[0].value).toEqual("0102030405060708090a");
+    expect(logError).toHaveBeenCalledWith(
+      "Decoding manufacturer specific data failed: Error: broken handler"
+    );
+    logError.mockRestore();
   });
 });
 
